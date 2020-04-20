@@ -1,0 +1,3 @@
+accessing
+numberOfChannels
+	^ numberOfChannels

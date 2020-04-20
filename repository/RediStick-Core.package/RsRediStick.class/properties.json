@@ -1,0 +1,11 @@
+{
+	"commentStamp" : "",
+	"super" : "SkStick",
+	"category" : "RediStick-Core",
+	"classinstvars" : [ ],
+	"pools" : [ ],
+	"classvars" : [ ],
+	"instvars" : [ ],
+	"name" : "RsRediStick",
+	"type" : "normal"
+}

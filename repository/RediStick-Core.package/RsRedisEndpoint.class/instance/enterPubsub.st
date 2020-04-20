@@ -1,0 +1,3 @@
+private
+enterPubsub
+	pubsub := true.

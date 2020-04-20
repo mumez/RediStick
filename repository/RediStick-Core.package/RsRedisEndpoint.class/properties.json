@@ -1,0 +1,18 @@
+{
+	"commentStamp" : "",
+	"super" : "SkSyncStickEndpoint",
+	"category" : "RediStick-Core",
+	"classinstvars" : [ ],
+	"pools" : [ ],
+	"classvars" : [ ],
+	"instvars" : [
+		"pubsub",
+		"channels",
+		"subscriptionMode",
+		"timeout",
+		"listener",
+		"sendMutex"
+	],
+	"name" : "RsRedisEndpoint",
+	"type" : "normal"
+}
