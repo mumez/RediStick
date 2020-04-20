@@ -16,3 +16,13 @@ stick endpoint get: 'a'.
 stick endpoint set: 'a' value: 999.
 
 ```
+
+## Installation
+
+```smalltalk
+
+Metacello new
+  baseline: 'RediStick';
+  repository: 'github://mumez/RediStick/repository';
+  load.
+```
