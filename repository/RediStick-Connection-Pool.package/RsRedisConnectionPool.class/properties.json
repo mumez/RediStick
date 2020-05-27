@@ -1,0 +1,20 @@
+{
+	"commentStamp" : "",
+	"super" : "Object",
+	"category" : "RediStick-Connection-Pool",
+	"classinstvars" : [
+		"default",
+		"maxRedisConnectionsPerKey",
+		"logger",
+		"primaryUrl",
+		"secondaryUrl"
+	],
+	"pools" : [ ],
+	"classvars" : [ ],
+	"instvars" : [
+		"lock",
+		"connections"
+	],
+	"name" : "RsRedisConnectionPool",
+	"type" : "normal"
+}

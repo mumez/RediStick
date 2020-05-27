@@ -1,0 +1,13 @@
+{
+	"commentStamp" : "",
+	"super" : "ProtoObject",
+	"category" : "RediStick-Connection-Pool",
+	"classinstvars" : [ ],
+	"pools" : [ ],
+	"classvars" : [ ],
+	"instvars" : [
+		"connectionKey"
+	],
+	"name" : "RsRedisProxy",
+	"type" : "normal"
+}
