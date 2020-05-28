@@ -1,0 +1,13 @@
+{
+	"commentStamp" : "CafeKrem 5/28/2020 09:23",
+	"super" : "TestCase",
+	"category" : "RediStick-Connection-Pool-tests",
+	"classinstvars" : [ ],
+	"pools" : [ ],
+	"classvars" : [ ],
+	"instvars" : [
+		"connectionPool"
+	],
+	"name" : "RsRedisConnectionPoolTest",
+	"type" : "normal"
+}
