@@ -1,3 +1,3 @@
 factory
 redisWrapperClass
-	^ RsRedis
+	^ RsRedisWrapper

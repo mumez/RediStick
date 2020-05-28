@@ -1,0 +1,11 @@
+{
+	"commentStamp" : "CafeKrem 5/28/2020 10:04",
+	"super" : "Exception",
+	"category" : "RediStick-Connection-Pool-errors",
+	"classinstvars" : [ ],
+	"pools" : [ ],
+	"classvars" : [ ],
+	"instvars" : [ ],
+	"name" : "RSStickWithSameNameAlreadyExistsException",
+	"type" : "normal"
+}

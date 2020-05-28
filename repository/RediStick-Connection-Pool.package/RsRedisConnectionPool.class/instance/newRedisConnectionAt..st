@@ -1,3 +1,9 @@
 factory
-newRedisConnectionAt: key
-	^self redisWrapperClass on: (self createStickAt: key)
+newRedisConnectionAt: aKey
+	| redisWrapper |
+	redisWrapper := self redisWrapperClass on: (self createStickAt: aKey).
+	connections
+		at: aKey
+		ifPresent: [ RSStickWithSameNameAlreadyExistsException signal ]
+		ifAbsentPut: redisWrapper.
+	^ redisWrapper
