@@ -1,7 +1,7 @@
 {
 	"commentStamp" : "",
 	"super" : "Object",
-	"category" : "RediStick-Connection-Pool",
+	"category" : "RediStick-Connection-Pool-base",
 	"classinstvars" : [ ],
 	"pools" : [ ],
 	"classvars" : [ ],
