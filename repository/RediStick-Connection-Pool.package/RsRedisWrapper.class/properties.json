@@ -1,5 +1,5 @@
 {
-	"commentStamp" : "",
+	"commentStamp" : "CafeKrem 5/28/2020 09:53",
 	"super" : "Object",
 	"category" : "RediStick-Connection-Pool-base",
 	"classinstvars" : [ ],
@@ -8,6 +8,6 @@
 	"instvars" : [
 		"stick"
 	],
-	"name" : "RsRedis",
+	"name" : "RsRedisWrapper",
 	"type" : "normal"
 }
