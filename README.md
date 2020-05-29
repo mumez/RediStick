@@ -19,10 +19,22 @@ stick endpoint set: 'a' value: 999.
 
 ## Installation
 
+Default (Core only):
+
 ```smalltalk
 
 Metacello new
   baseline: 'RediStick';
   repository: 'github://mumez/RediStick/repository';
   load.
+```
+
+With Connection-Pool package:
+
+```smalltalk
+
+Metacello new
+  baseline: 'RediStick';
+  repository: 'github://mumez/RediStick/repository';
+  load: #('Core' 'ConnectionPool').
 ```
