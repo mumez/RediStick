@@ -1,3 +1,3 @@
 commands-strings
 mSet: aDictionary
-	^ self unifiedCommand: {'MSET'} , (self keysValueInline: aDictionary)
+	^ self unifiedCommand: {'MSET'} withDictionary: aDictionary
