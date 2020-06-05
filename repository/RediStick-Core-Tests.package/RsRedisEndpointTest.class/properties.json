@@ -6,7 +6,8 @@
 	"pools" : [ ],
 	"classvars" : [ ],
 	"instvars" : [
-		"stick"
+		"stick",
+		"redisHashDictionary"
 	],
 	"name" : "RsRedisEndpointTest",
 	"type" : "normal"
