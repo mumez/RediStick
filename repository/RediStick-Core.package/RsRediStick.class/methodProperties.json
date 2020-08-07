@@ -1,0 +1,12 @@
+{
+	"instance" : {
+		"onRedisGenericError:" : "MasashiUmezawa 8/7/2020 22:50",
+		"defaultRedisGenericErrorHandingBlock" : "MasashiUmezawa 8/7/2020 22:59",
+		"createEndpoint" : "MasashiUmezawa 6/26/2016 20:03",
+		"onRedisGenericErrorBlock" : "MasashiUmezawa 8/7/2020 22:49",
+		"onRedisGenericErrorSignaled:" : "MasashiUmezawa 8/7/2020 22:56",
+		"onImageQuit" : "MasashiUmezawa 6/11/2018 15:18",
+		"endpointClassForScheme:" : "MasashiUmezawa 6/26/2016 19:49"
+	},
+	"class" : { }
+}

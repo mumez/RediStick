@@ -2,7 +2,7 @@ private replies
 parseReply
 	| strm replyToken |
 	strm := self socketStream ifNil: [ ^nil ].
-	replyToken := [strm next] on: Error do: [:ex | (SkError kind: #CannotGetReply) signal].
+	replyToken := [strm next] on: Error do: [:ex | (RsError canNotGetReply) signal].
 	replyToken = 43 "$+ asInteger"
 		ifTrue: [^ self parseSingleLine].
 	replyToken = 58 "$: asInteger"
@@ -14,4 +14,4 @@ parseReply
 	replyToken = 45 "$- asInteger"
 		ifTrue: [^ self parseError].
 		
-	(SkError kind: #InvalidReplyToken) signal
+	(RsError invalidReplyToken) signal
