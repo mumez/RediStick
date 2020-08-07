@@ -1,13 +1,13 @@
 {
 	"commentStamp" : "",
-	"super" : "SkStick",
+	"super" : "RsError",
 	"category" : "RediStick-Core",
 	"classinstvars" : [ ],
 	"pools" : [ ],
 	"classvars" : [ ],
 	"instvars" : [
-		"onRedisGenericErrorBlock"
+		"errorPrefix"
 	],
-	"name" : "RsRediStick",
+	"name" : "RsGenericError",
 	"type" : "normal"
 }
