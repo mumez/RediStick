@@ -1,3 +1,3 @@
 accessing
 maxConnectionsPerKey
-	^self class maxRedisConnectionsPerKey
+	^ self class maxRedisConnectionsPerKey
