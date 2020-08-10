@@ -1,4 +1,5 @@
 I'm a redis connectionPool I manage stick connection and creation
+I'm a singleton 
 
 
 HOW TO RUN ME 
@@ -9,4 +10,4 @@ implementation part:
 IVs:
 
 lock 					<Monitor>
-connections 			<Dictionary<aKey , aCollectionOfRsRedisWrappers>>
+connections 			<Dictionary<aKey , aCollectionOfRsRedis>>
