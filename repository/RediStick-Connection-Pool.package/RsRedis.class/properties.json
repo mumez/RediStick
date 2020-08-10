@@ -8,6 +8,6 @@
 	"instvars" : [
 		"stick"
 	],
-	"name" : "RsWrapperRedis",
+	"name" : "RsRedis",
 	"type" : "normal"
 }
