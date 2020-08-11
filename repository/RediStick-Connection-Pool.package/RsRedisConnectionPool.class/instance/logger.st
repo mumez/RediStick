@@ -1,3 +1,3 @@
 logging
 logger
-	^self class logger
+	^ self class logger

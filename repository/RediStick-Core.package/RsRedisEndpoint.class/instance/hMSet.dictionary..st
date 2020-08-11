@@ -3,4 +3,4 @@ hMSet: aKey dictionary: aDictionary
 	^ self
 		unifiedCommand:
 			{'HMSET'.
-			aKey} , aDictionary flattened
+			aKey} , (self keysAndValuesInlined: aDictionary)
