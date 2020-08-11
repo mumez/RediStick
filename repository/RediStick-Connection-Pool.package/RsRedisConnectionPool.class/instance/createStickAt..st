@@ -6,4 +6,5 @@ createStickAt: key
 	stick := RsRediStick targetUrl: self primaryUrl.
 	stick beSticky.
 	stick connect.
+	self authentificateStick: stick.
 	^ stick

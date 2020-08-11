@@ -13,7 +13,9 @@
 	"classvars" : [ ],
 	"instvars" : [
 		"lock",
-		"connections"
+		"connections",
+		"userName",
+		"password"
 	],
 	"name" : "RsRedisConnectionPool",
 	"type" : "normal"
