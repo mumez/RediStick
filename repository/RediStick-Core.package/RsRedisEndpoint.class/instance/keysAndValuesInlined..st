@@ -1,5 +1,5 @@
 private
-keysValueInline: aDictionary
+keysAndValuesInlined: aDictionary
 	| writeStream |
 	writeStream := WriteStream with: #().
 	aDictionary
