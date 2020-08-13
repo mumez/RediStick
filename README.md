@@ -38,3 +38,14 @@ Metacello new
   repository: 'github://mumez/RediStick/repository';
   load: #('Core' 'ConnectionPool').
 ```
+
+## how to setUp test environement
+
+in this repository there is a redis.conf file , redis use it for initialisation
+
+```bash
+docker run -p 6379:6379 \
+-v /my/Absolute/Path/To/redis.conf:/etc/redis/redis.conf \ # copy from my redis.conf file store in this repository to a file store in the docker container 
+-v /home/user/data:/data \ 
+redis-server /usr/local/etc/redis/redis.conf #execute redis-server with redis configuration file
+```
