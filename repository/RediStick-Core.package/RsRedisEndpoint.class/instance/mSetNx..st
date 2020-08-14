@@ -1,3 +1,4 @@
 commands-strings
 mSetNx: aDictionary
-	^ self unifiedCommand: {'MSETNX'} , aDictionary flattened
+	^ self
+		unifiedCommand: {'MSETNX'} withDictionary:  aDictionary

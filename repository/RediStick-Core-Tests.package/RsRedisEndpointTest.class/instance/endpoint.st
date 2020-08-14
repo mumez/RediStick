@@ -1,0 +1,3 @@
+accessing
+endpoint
+	^ stick endpoint

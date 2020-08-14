@@ -5,7 +5,9 @@
 	"classinstvars" : [ ],
 	"pools" : [ ],
 	"classvars" : [ ],
-	"instvars" : [ ],
+	"instvars" : [
+		"onRedisGenericErrorBlock"
+	],
 	"name" : "RsRediStick",
 	"type" : "normal"
 }

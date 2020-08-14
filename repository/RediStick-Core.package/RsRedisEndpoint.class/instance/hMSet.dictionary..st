@@ -2,5 +2,5 @@ commands-hashes
 hMSet: aKey dictionary: aDictionary
 	^ self
 		unifiedCommand:
-			{'HMSET'.
-			aKey} , (self keysAndValuesInlined: aDictionary)
+			{'HMSET'. aKey} , (self keysAndValuesInlined: aDictionary)
+

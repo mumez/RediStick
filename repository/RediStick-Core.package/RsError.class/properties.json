@@ -1,0 +1,11 @@
+{
+	"commentStamp" : "",
+	"super" : "SkError",
+	"category" : "RediStick-Core",
+	"classinstvars" : [ ],
+	"pools" : [ ],
+	"classvars" : [ ],
+	"instvars" : [ ],
+	"name" : "RsError",
+	"type" : "normal"
+}
