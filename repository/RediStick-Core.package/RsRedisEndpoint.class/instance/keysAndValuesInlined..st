@@ -1,5 +1,6 @@
 private
-keysValueInline: aDictionary
+
+keysAndValuesInlined: aDictionary
 	"I'm transforming a dictionary into a flat dictionary"
 
 	"RsRedisEndpoint new keysValueInline: (Dictionary with: ('keyA' -> 'valueB') with: ('keyB' -> 'valueB'))>>> #('keyA' 'valueB' 'keyB' 'valueB')"

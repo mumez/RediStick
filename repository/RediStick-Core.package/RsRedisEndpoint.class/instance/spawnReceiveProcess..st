@@ -9,7 +9,7 @@ spawnReceiveProcess: aBlock
 	listener := [ [ self pubsub ]
 		whileTrue: [ | message |
 			message := [ self parseReply ]
-				on: SkError
+				on: RsError
 				do: [ :ex | nil ]. "Ignore timeout, etc"
 			message ifNotNil:
 					[ self handlePubsubMessage: message callback: aBlock ] ] ] fork
