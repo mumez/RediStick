@@ -1,3 +1,3 @@
 factory
 newRedisConnectionAt: key
-	^self redisWrapperClass on: (self createStickAt: key)
+	^ self redisWrapperClass on: (self createStickAt: key)

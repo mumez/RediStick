@@ -1,3 +1,3 @@
 accessing
 secondaryUrl
-	^self class secondaryUrl
+	^ self class secondaryUrl
