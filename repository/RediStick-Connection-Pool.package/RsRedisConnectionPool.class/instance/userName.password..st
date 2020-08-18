@@ -1,4 +1,4 @@
 accessing
-userName: anUndefinedObject password: aString 
-	userName := anUndefinedObject.
-	password := aString
+userName: aUserName password: aPassword 
+	userName := aUserName.
+	password := aPassword
