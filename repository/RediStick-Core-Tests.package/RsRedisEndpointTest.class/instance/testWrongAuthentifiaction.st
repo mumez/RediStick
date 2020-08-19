@@ -7,4 +7,5 @@ testWrongAuthentifiaction
 	self should: [ self endpoint ping ] raise: RsGenericError.
 	self
 		should: [ self endpoint exists: 'aRandomKey' ]
-		raise: RsGenericError
+		raise: RsGenericError.
+	self sendGoodPassword
