@@ -1,4 +1,4 @@
 actions
 connect
 	super connect.
-	self authentificate
+	self shoudAuthenticate ifTrue: [self authenticate]
