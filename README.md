@@ -39,13 +39,38 @@ Metacello new
   load: #('Core' 'ConnectionPool').
 ```
 
+
 ## how to setUp test environement
 
-in this repository there is a redis.conf file , redis use it for initialisation
+
+
+The test cases includes authentication testing. 
+You will need to setup a redis database with those configuration.
+
+you should add ```requirepass``` entry to your Redis configuration file (redis.conf).
+```
+requirepass goodPassword
+```
+
+in this repository there is a file *redistick-testing.conf* that containing setup information for testing.
+
+### setup with redis-server command
+
+and run the server with configuration file 
+```
+redis-server redis.conf
+```
+For convenience, you can just use 'redistick-testing.conf' file located this directory.
+```
+redis-server redistick-testing.conf
+```
+
+### setup with docker
 
 ```bash
 docker run -p 6379:6379 \
--v /my/Absolute/Path/To/redis.conf:/etc/redis/redis.conf \ # copy from my redis.conf file store in this repository to a file store in the docker container 
+-v /my/Absolute/Path/To/redistick-testing.conf:/etc/redis/redis.conf \ # copy from my redis.conf file store in this repository to a file store in the docker container 
 -v /home/user/data:/data \ 
 redis-server /usr/local/etc/redis/redis.conf #execute redis-server with redis configuration file
 ```
+
