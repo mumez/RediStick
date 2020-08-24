@@ -4,8 +4,8 @@ testHSetWithDictionary
 	dict := Dictionary
 		with: 'god' -> 'Cronos'
 		with: 'location' -> 'tartarus'.
-	self endpoint hMSet: 'keyA' dictionary: dict.
-	self assert: (self endpoint hGetAll: 'keyA') equals: dict.
+	stick endpoint hMSet: 'keyA' dictionary: dict.
+	self assert: (stick endpoint hGetAll: 'keyA') equals: dict.
 	self
-		assert: (self endpoint hGet: 'keyA' field: 'location')
+		assert: (stick endpoint hGet: 'keyA' field: 'location')
 		equals: (dict at: 'location')
