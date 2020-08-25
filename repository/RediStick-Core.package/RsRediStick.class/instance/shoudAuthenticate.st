@@ -1,3 +1,3 @@
 actions
 shoudAuthenticate
-	^ password isNotNil 
+	^ password notNil 
