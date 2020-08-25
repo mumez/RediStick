@@ -1,4 +1,4 @@
 running
 initializeConnectionPool
 	RsRedisConnectionPool initialize.
-	connectionPool := RsRedisConnectionPool default
+	connectionPool := RsRedisConnectionPool new
