@@ -4,8 +4,8 @@ testWrongAuthentifiaction
 	self
 		should: [ stick endpoint auth: 'wrongPassword' ]
 		raise: RsGenericError.
-	self should: [ self endpoint ping ] raise: RsGenericError.
+	self should: [ stick endpoint ping ] raise: RsGenericError.
 	self
-		should: [ self endpoint exists: 'aRandomKey' ]
+		should: [ stick endpoint exists: 'aRandomKey' ]
 		raise: RsGenericError.
 	self sendGoodPassword
