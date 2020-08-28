@@ -1,3 +1,3 @@
 setter
-userName: aPassword 
-	userName := aPassword
+userName: aUserName 
+	userName := aUserName
