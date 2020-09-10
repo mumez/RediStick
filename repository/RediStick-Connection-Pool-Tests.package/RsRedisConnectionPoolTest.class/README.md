@@ -1,0 +1,1 @@
+A RsRedisConnectionPoolTest is a test class for testing the behavior of RsRedisConnectionPool

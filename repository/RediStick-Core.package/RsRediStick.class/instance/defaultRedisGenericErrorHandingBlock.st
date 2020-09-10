@@ -2,5 +2,5 @@ defaults
 defaultRedisGenericErrorHandingBlock
 	^ [:ex | 
 		self logger error: ex.
-		ex isNoAuth ifTrue: [ ex pass ].
+		(ex isNoAuth or: [ ex isInvalidPassword ]) ifTrue: [ ex pass ].
 	]
