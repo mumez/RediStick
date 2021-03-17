@@ -12,4 +12,4 @@ spawnReceiveProcess: aBlock
 				on: RsError
 				do: [ :ex | nil ]. "Ignore timeout, etc"
 			message ifNotNil:
-					[ self handlePubsubMessage: message callback: aBlock ] ] ] fork
+					[ self handlePubsubMessage: message callback: aBlock ] ] ] forkAt: self subscriptionListenPriority
