@@ -1,0 +1,16 @@
+{
+	"commentStamp" : "",
+	"super" : "TestCase",
+	"category" : "RediStick-Tests",
+	"classinstvars" : [
+		"urlString",
+		"dbIndex"
+	],
+	"pools" : [ ],
+	"classvars" : [ ],
+	"instvars" : [
+		"stick"
+	],
+	"name" : "RsRedisEndpointTest",
+	"type" : "normal"
+}
