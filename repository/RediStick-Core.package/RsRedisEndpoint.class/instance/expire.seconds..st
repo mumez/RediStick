@@ -1,4 +1,4 @@
-commands-generic
+commands-expiration
 expire: aKey seconds: seconds
 	^ self
 		unifiedCommand:

@@ -1,3 +1,3 @@
 commands-strings
 mSet: aDictionary
-	^ self unifiedCommand: {'MSET'} , aDictionary flattened
+	^ self unifiedCommand: {'MSET'} , (self flattenedKeysAndValuesFrom: aDictionary )
