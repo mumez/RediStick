@@ -1,4 +1,4 @@
 accessing
 dbIndex: anObject
 
-	dbIndex := anObject
+	DbIndex := anObject

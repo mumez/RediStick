@@ -6,6 +6,6 @@
 	"pools" : [ ],
 	"classvars" : [ ],
 	"instvars" : [ ],
-	"name" : "RsRedisEndpointTest",
+	"name" : "RsRedisConnectionPoolTest",
 	"type" : "normal"
 }

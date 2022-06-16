@@ -1,4 +1,4 @@
 accessing
 urlString: anObject
 
-	urlString := anObject
+	UrlString := anObject

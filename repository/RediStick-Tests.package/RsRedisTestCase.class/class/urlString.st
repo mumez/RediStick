@@ -1,4 +1,4 @@
 accessing
 urlString
 
-	^ urlString
+	^ UrlString

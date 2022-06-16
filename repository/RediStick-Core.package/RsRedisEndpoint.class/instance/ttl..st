@@ -1,4 +1,4 @@
-commands-generic
+commands-expiration
 ttl: aKey
 	^ self
 		unifiedCommand:

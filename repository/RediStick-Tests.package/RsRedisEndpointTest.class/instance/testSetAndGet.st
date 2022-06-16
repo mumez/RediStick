@@ -2,5 +2,5 @@ tests
 testSetAndGet
 	| value |
 	value := self newDateAndTimeValue.
-	stick endpoint set: 'testSet' value: value.
-	self assert: (stick endpoint get: 'testSet') equals: value
+	stick endpoint set: 'testSetAndGet' value: value.
+	self assert: (stick endpoint get: 'testSetAndGet') equals: value
