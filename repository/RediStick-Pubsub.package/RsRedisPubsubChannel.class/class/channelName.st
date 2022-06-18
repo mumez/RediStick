@@ -1,0 +1,3 @@
+constants
+channelName
+	self subclassResponsibility 

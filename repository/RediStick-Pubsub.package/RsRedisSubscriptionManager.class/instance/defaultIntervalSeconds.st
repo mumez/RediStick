@@ -1,0 +1,3 @@
+defaults
+defaultIntervalSeconds
+	^ 33

@@ -1,0 +1,3 @@
+subscribing
+unsubscribeChannels
+	self subscriberRedis unsubscribe: RsRedisPubsubChannel channelNames

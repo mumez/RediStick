@@ -1,0 +1,3 @@
+accessing
+publisherRedis
+	^RsRedisProxy pubsub

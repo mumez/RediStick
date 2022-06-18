@@ -1,0 +1,13 @@
+{
+	"commentStamp" : "",
+	"super" : "RsRedisPubsubChannel",
+	"category" : "RediStick-Pubsub",
+	"classinstvars" : [ ],
+	"pools" : [ ],
+	"classvars" : [ ],
+	"instvars" : [
+		"sentToken"
+	],
+	"name" : "RsRedisPingChannel",
+	"type" : "normal"
+}

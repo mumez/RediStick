@@ -1,0 +1,18 @@
+{
+	"commentStamp" : "",
+	"super" : "Object",
+	"category" : "RediStick-Pubsub",
+	"classinstvars" : [
+		"default",
+		"logger"
+	],
+	"pools" : [ ],
+	"classvars" : [ ],
+	"instvars" : [
+		"intervalSeconds",
+		"subscriberRedis",
+		"connectionKeeper"
+	],
+	"name" : "RsRedisSubscriptionManager",
+	"type" : "normal"
+}
