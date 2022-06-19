@@ -10,7 +10,7 @@
 	"classvars" : [ ],
 	"instvars" : [
 		"intervalSeconds",
-		"subscriberRedis",
+		"subscriberRediStick",
 		"connectionKeeper",
 		"targetUrl"
 	],
