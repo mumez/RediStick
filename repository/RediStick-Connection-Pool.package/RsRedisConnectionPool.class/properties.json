@@ -16,7 +16,6 @@
 		"connections",
 		"primaryUrl",
 		"secondaryUrl",
-		"maxRedisConnectionsPerKey",
 		"maxConnectionsPerKey"
 	],
 	"name" : "RsRedisConnectionPool",

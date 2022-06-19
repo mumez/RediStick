@@ -1,3 +1,3 @@
 subscribing
 unsubscribeChannels
-	self subscriberRedis unsubscribe: RsRedisPubsubChannel channelNames
+	self subscriberRedis endpoint unsubscribe: RsRedisPubsubChannel channelNames

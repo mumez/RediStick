@@ -11,7 +11,8 @@
 	"instvars" : [
 		"intervalSeconds",
 		"subscriberRedis",
-		"connectionKeeper"
+		"connectionKeeper",
+		"targetUrl"
 	],
 	"name" : "RsRedisSubscriptionManager",
 	"type" : "normal"

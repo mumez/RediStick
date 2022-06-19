@@ -2,5 +2,5 @@ startup - shutdown
 subscribeAllOnStartUp
 	<script>
 	self initialize.
-	 RsRedisPubsubChannel initialize.
+	RsRedisPubsubChannel initialize.
 	^self default subscribeAllOnStartUp
