@@ -1,3 +1,3 @@
-accessing
+private
 secondsFromUnixEpoch
-	^ DateAndTime now asUTC secondsFromUnixEpoch 
+	^ (DateAndTime now asUTC - DateAndTime unixEpoch) asSeconds
