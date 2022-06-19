@@ -9,7 +9,7 @@ baseline: spec
 		spec package: 'RediStick-Connection-Pool' with: [
 				spec requires: #('RediStick-Core')].
 		spec package: 'RediStick-Pubsub' with: [
-				spec requires: #('RediStick-Core')].
+				spec requires: #('RediStick-Connection-Pool')].
 		spec package: 'RediStick-Tests' with: [
 				spec requires: #('RediStick-Core' 'RediStick-Connection-Pool' 'RediStick-Pubsub')].
 		spec 

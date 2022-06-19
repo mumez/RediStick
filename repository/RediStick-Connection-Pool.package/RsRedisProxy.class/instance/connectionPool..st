@@ -1,3 +1,3 @@
 factory
 connectionPool: aRedisConnectionPool
-	^ connectionPool := aRedisConnectionPool
+	connectionPool := aRedisConnectionPool
