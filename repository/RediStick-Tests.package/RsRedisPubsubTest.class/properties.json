@@ -6,6 +6,6 @@
 	"pools" : [ ],
 	"classvars" : [ ],
 	"instvars" : [ ],
-	"name" : "RsRedisPubsubTests",
+	"name" : "RsRedisPubsubTest",
 	"type" : "normal"
 }
