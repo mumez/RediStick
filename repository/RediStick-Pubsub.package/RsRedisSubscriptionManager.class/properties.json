@@ -10,9 +10,9 @@
 	"classvars" : [ ],
 	"instvars" : [
 		"intervalSeconds",
-		"subscriberRediStick",
 		"connectionKeeper",
-		"targetUrl"
+		"targetUrl",
+		"subscriber"
 	],
 	"name" : "RsRedisSubscriptionManager",
 	"type" : "normal"

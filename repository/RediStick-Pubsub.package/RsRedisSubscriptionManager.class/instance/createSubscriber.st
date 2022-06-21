@@ -1,5 +1,5 @@
 factory
-createSubscriberRediStick
+createSubscriber
 	| redis |
 	redis := RsRediStick targetUrl: self targetUrl.
 	redis endpoint settings receivingProcessPriority: Processor highIOPriority.
