@@ -4,7 +4,8 @@
 	"category" : "RediStick-Pubsub",
 	"classinstvars" : [
 		"default",
-		"logger"
+		"logger",
+		"subscribeAllOnStartup"
 	],
 	"pools" : [ ],
 	"classvars" : [ ],

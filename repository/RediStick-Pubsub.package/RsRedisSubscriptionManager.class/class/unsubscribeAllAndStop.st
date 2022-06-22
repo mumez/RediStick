@@ -1,3 +1,3 @@
-startup - shutdown
+actions
 unsubscribeAllAndStop
 	^self default unsubscribeAllAndStop

@@ -1,4 +1,4 @@
-startup - shutdown
+actions
 subscribeAllAndStart
 	[ 2 seconds wait.
 	[ self subscribeAll; start ]
