@@ -1,5 +1,5 @@
 startup - shutdown
-unsubscribeAllOnShutDown
+unsubscribeAllAndStop
 	[ self isRunning ifFalse: [ ^ self ].
 	self stop.
 	self unsubscribeAll ]

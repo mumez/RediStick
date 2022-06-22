@@ -2,4 +2,4 @@ class initialization
 reset
 	<script>
 	self initialize.
-	self subscribeAllOnStartUp
+	self subscribeAllAndStart

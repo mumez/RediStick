@@ -1,7 +1,7 @@
 class initialization
 initialize
 	default ifNotNil: [ 
-		default unsubscribeAllOnShutDown.
+		default unsubscribeAllAndStop.
 		default releaseSubscriber.
 	].
 	default := nil.

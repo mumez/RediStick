@@ -1,5 +1,5 @@
 startup - shutdown
-subscribeAllOnStartUp
+subscribeAllAndStart
 	[ 2 seconds wait.
 	[ self subscribeAll; start ]
 		on: SkError
