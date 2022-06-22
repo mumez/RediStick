@@ -1,6 +1,6 @@
 system startup
 startUp: resuming
-	resuming ifTrue: [
+	(resuming and: [self subscribeAllOnStartup]) ifTrue: [
 		3 seconds wait.
 		self subscribeAllAndStart.
 	]
