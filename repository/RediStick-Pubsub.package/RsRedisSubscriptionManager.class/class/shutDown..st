@@ -1,5 +1,6 @@
 system startup
 shutDown: quitting
 	quitting ifTrue: [
-		self unsubscribeAllAndStop
+		self unsubscribeAllAndStop.
+		default := nil.
 	]

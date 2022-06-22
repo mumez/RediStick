@@ -1,5 +1,5 @@
 class initialization
 reset
 	<script>
-	self initialize.
+	self initDefault.
 	self subscribeAllAndStart

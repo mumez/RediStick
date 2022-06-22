@@ -1,9 +1,6 @@
 class initialization
 initialize
-	default ifNotNil: [ 
-		default unsubscribeAllAndStop.
-	].
-	default := nil.
+	self initDefault.
 	
 	logger := nil.
 	subscribeAllOnStartup := true.
