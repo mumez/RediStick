@@ -42,8 +42,7 @@ Nothing happens at this stage. You need to subscribe to the topic, before receiv
 
 
 ## Subscribe
-
-In fact, all channels are automatically subscribed via SubscriptionManager on image snapshots. However, you can do it manually:
+All channel subscriptions are kept in SubscriptionManager. You can refresh the subscriptions by:
 
 `RsRedisSubscriptionManager reset`
 

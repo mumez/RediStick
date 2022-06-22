@@ -27,6 +27,16 @@ Metacello new
   load: #('Core' 'ConnectionPool').
 ```
 
+With Pubsub package:
+
+```smalltalk
+
+Metacello new
+  baseline: 'RediStick';
+  repository: 'github://mumez/RediStick/repository';
+  load: #('Core' 'Pubsub').
+```
+
 ## Sample Code
 
 ### Basic usage
@@ -49,3 +59,11 @@ redis := RsRedisProxy of: #client1.
 redis at: 'a'.
 redis at: 'a' put: 999.
 ```
+
+In this example, the default connection pool is implicitly used through RedisProxy.
+
+### Using Pubsub channel
+
+RediStick provides a channel class for using redis pubsub API very easily.
+
+Please read [Pubsub.md](Pubsub.md).
