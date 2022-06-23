@@ -7,7 +7,7 @@ RediStick provides a simle API for utilizing pubsub feature of Redis.
 A channel is a class that represents a particular subject in RediStick pubsub mechanism.  It supports the publication of messages with a specific subject and also supports the receipt of messages on that subject.
 You can define a new channel class by subclassing `RsRedisPubsubChannel`.
 
-```
+```smalltalk
 RsRedisPubsubChannel subclass: #RsGreetingPubsubChannel
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -16,14 +16,14 @@ RsRedisPubsubChannel subclass: #RsGreetingPubsubChannel
 
 At first, you need to override #channelName class method for indicating the channel name. 
 
-```
+```smalltalk
 RsGreetingPubsubChannel class >> channelName
 	^#greeting
 ```
 
 Then, override #handlePublished: instance method for handling received messages.
 
-```
+```smalltalk
 RsGreetingPubsubChannel >> handlePublished: greeting
 	greeting inspect
 
@@ -33,7 +33,7 @@ RsGreetingPubsubChannel >> handlePublished: greeting
 
 Now, you can publish a greeting  message on that subject.
 
-```
+```smalltalk
 channel := RsRedisPubsubChannel named: #greeting.
 channel publish: 'hello'
 ```
@@ -44,7 +44,9 @@ Nothing happens at this stage. You need to subscribe to the topic, before receiv
 ## Subscribe
 All channel subscriptions are kept in SubscriptionManager. You can refresh the subscriptions by:
 
-`RsRedisSubscriptionManager reset`
+```smalltalk
+RsRedisSubscriptionManager reset
+```
 
 Now, if you evaluate `channel publish: 'hello'` again,  the greeting channel's  #handlePublished: will be called. And you can see that the 'hello' string inspector is open.
 
