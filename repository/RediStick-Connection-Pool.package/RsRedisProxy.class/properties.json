@@ -6,7 +6,8 @@
 	"pools" : [ ],
 	"classvars" : [ ],
 	"instvars" : [
-		"connectionKey"
+		"connectionKey",
+		"connectionPool"
 	],
 	"name" : "RsRedisProxy",
 	"type" : "normal"

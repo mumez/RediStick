@@ -1,3 +1,3 @@
 accessing
 secondaryUrl
-	^self class secondaryUrl
+	^secondaryUrl ifNil: [secondaryUrl := self class secondaryUrl]

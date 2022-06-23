@@ -1,10 +1,8 @@
 tests
 testPutGetWithConnectionPool
-	| done  redis longPadding kvsProc1 kvsProc2 kvsProc3 kvsProc4 times |
+	| done longPadding kvsProc1 kvsProc2 kvsProc3 kvsProc4 times |
 	self timeLimit: 120 seconds.
 	done := Semaphore new.
-	redis := RsRedisProxy of: #test.
-	
 	longPadding := String new: 1024*1024*5 withAll: $a.
 	times := 50.
 	kvsProc1 := [ 

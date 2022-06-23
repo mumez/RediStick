@@ -1,3 +1,3 @@
 factory
 connectionPool
-	^ self connectionPoolClass default
+	^ connectionPool ifNil: [connectionPool := self connectionPoolClass default]

@@ -13,7 +13,10 @@
 	"classvars" : [ ],
 	"instvars" : [
 		"lock",
-		"connections"
+		"connections",
+		"primaryUrl",
+		"secondaryUrl",
+		"maxConnectionsPerKey"
 	],
 	"name" : "RsRedisConnectionPool",
 	"type" : "normal"

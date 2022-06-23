@@ -1,3 +1,3 @@
 accessing
 maxConnectionsPerKey
-	^self class maxRedisConnectionsPerKey
+	^maxConnectionsPerKey ifNil: [maxConnectionsPerKey := self class maxRedisConnectionsPerKey]

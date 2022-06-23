@@ -1,0 +1,3 @@
+subscribing
+subscribeChannels
+	self subscribeChannels: self channelNames

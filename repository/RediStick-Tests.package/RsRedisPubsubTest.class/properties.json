@@ -1,0 +1,14 @@
+{
+	"commentStamp" : "",
+	"super" : "TestCase",
+	"category" : "RediStick-Tests",
+	"classinstvars" : [ ],
+	"pools" : [ ],
+	"classvars" : [ ],
+	"instvars" : [
+		"connectionPool",
+		"subscriptionManager"
+	],
+	"name" : "RsRedisPubsubTest",
+	"type" : "normal"
+}

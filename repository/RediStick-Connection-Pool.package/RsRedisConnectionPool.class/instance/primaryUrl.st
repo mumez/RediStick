@@ -1,3 +1,3 @@
 accessing
 primaryUrl
-	^self class primaryUrl
+	^primaryUrl ifNil: [primaryUrl := self class primaryUrl]
