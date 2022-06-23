@@ -2,4 +2,4 @@ class initialization
 reset
 	<script>
 	self initDefault.
-	self startUp
+	self refreshChannelsAndStart
