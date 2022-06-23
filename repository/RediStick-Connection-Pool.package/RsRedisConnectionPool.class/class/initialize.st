@@ -6,3 +6,4 @@ initialize
 	maxRedisConnectionsPerKey := nil.
 	primaryUrl := secondaryUrl := nil.
 	
+	Smalltalk addToStartUpList: self.

@@ -1,4 +1,4 @@
 class initialization
 refreshChannelsAndStart
-	RsRedisPubsubChannel initialize.
+	self refreshChannels.
 	self default startUp
