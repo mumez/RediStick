@@ -7,4 +7,3 @@ setUp
 	
 	subscriptionManager := RsRedisSubscriptionManager new.
 	subscriptionManager targetUrl: RsRedisTestCase urlString.
-	subscriptionManager subscribeChannels
