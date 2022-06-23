@@ -1,6 +1,6 @@
 class initialization
 initDefault
 	default ifNotNil: [ 
-		default unsubscribeAllAndStop.
+		default shutDown.
 	].
 	default := nil

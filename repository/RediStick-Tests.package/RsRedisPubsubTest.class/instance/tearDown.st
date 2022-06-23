@@ -1,6 +1,6 @@
 running
 tearDown
 	connectionPool releaseConnections.
-	subscriptionManager unsubscribeAll.
+	subscriptionManager unsubscribeChannels.
 	
 	super tearDown.

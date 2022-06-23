@@ -1,3 +1,0 @@
-subscribing
-unsubscribeAll
-	self unsubscribeChannels.

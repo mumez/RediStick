@@ -1,8 +1,8 @@
 actions
-unsubscribeAllAndStop
+shutDown
 	[ self isRunning ifFalse: [ ^ self ].
 	self stop.
-	self unsubscribeAll.
+	self unsubscribeChannels.
 	2 seconds wait.
 	self releaseSubscriber ]
 		on: Error

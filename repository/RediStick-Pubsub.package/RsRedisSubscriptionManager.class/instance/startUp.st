@@ -1,6 +1,6 @@
 actions
-subscribeAllAndStart
+startUp
 	[ 2 seconds wait.
-	[ self subscribeAll; start ]
+	[ self subscribeChannels; start ]
 		on: SkError
 		do: [ :ex | ex inspect ] ] fork

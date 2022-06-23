@@ -3,7 +3,7 @@ initialize
 	self initDefault.
 	
 	logger := nil.
-	subscribeAllOnStartup := true.
+	subscribeChannelsOnStartup := true.
 	
 	Smalltalk addToStartUpList: self.
 	Smalltalk addToShutDownList: self

@@ -1,0 +1,3 @@
+accessing
+channelNames
+	^ RsRedisPubsubChannel subscribingChannelNames

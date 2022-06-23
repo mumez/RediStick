@@ -1,3 +1,0 @@
-actions
-unsubscribeAllAndStop
-	^self default unsubscribeAllAndStop

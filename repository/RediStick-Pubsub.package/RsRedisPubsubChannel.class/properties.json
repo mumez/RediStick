@@ -9,7 +9,8 @@
 	"pools" : [ ],
 	"classvars" : [ ],
 	"instvars" : [
-		"connectionPool"
+		"connectionPool",
+		"shouldBeSubscribed"
 	],
 	"name" : "RsRedisPubsubChannel",
 	"type" : "normal"

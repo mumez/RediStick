@@ -5,7 +5,7 @@
 	"classinstvars" : [
 		"default",
 		"logger",
-		"subscribeAllOnStartup"
+		"subscribeChannelsOnStartup"
 	],
 	"pools" : [ ],
 	"classvars" : [ ],

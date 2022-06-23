@@ -1,3 +1,0 @@
-subscribing
-subscribeAll
-	self subscribeChannels.
