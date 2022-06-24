@@ -42,7 +42,8 @@ Nothing happens at this stage. You need to subscribe to the topic, before receiv
 
 
 ## Subscribe
-All channel subscriptions are kept in SubscriptionManager. You can refresh the subscriptions by:
+
+All channel subscriptions are kept in SubscriptionManager. By default, channels are automatically subscribed to when the image starts. But you can also manually renew the subscriptions by:
 
 ```smalltalk
 RsRedisSubscriptionManager reset
