@@ -1,3 +1,4 @@
 accessing
 subscriber
-	^subscriber ifNil: [ subscriber := self createSubscriber ]
+	subscriber ifNil: [ self prepareSubscriber ].
+	^ subscriber

@@ -9,7 +9,7 @@ restoreSubscriber: oldSubscriber
 		oneShotStick := RsRediStick targetUrl: self targetUrl.
 		oneShotStick onConnected: [ :stick |
 			stick destroy.
-			self releaseSubscriber.
+			self prepareSubscriber.
 			self subscribeChannels.
 			self logger info: '-subscribe again-'.
 			subscribed := true ].
