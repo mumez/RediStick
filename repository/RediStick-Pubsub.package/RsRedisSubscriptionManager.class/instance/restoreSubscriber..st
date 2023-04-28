@@ -10,10 +10,8 @@ restoreSubscriber: oldSubscriber
 		oneShotStick onConnected: [ :stick |
 			stick destroy.
 			self restoreSubscriptions.
-			self logger info: '-subscribe again-'.
 			subscribed := true ].
 		oneShotStick connect.
 		retryMax := retryMax - 1 ].
-	self logger info: '-restoration result-' , {subscribed.retryMax } asString.
-	(self onSubscriberNotRestored notNil and: [ subscribed not ]) ifTrue: [
-		self onSubscriberNotRestored value ]
+	self logger info: '-Subscriber restoration result-' , {subscribed. retryMax } asString.
+	subscribed ifFalse: [ self evaluateOnceSubscriberNotRestored ]
