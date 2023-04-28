@@ -13,7 +13,9 @@
 		"intervalSeconds",
 		"connectionKeeper",
 		"targetUrl",
-		"subscriber"
+		"subscriber",
+		"maxSubscriberRestorationRetries",
+		"onSubscriberNotRestored"
 	],
 	"name" : "RsRedisSubscriptionManager",
 	"type" : "normal"

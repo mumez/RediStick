@@ -6,10 +6,16 @@ spawnReceiveProcess: aBlock
 	than third, so for the client, we will always get type, channel,
 	message, then finally the actual matched channel or nil."
 
-	listener := [ [ self pubsub ]
-		whileTrue: [ | message |
-			message := [ self parseReply ]
-				on: RsError
-				do: [ :ex | nil ]. "Ignore timeout, etc"
-			message ifNotNil:
-					[ self handlePubsubMessage: message callback: aBlock ] ] ] forkAt: self subscriptionListenPriority
+	listener := [
+	            [ self pubsub ] whileTrue: [
+		            | message |
+		            message := [ self parseReply ]
+			                       on: RsError
+			                       do: [ :ex |
+				                       self socketIsConnected ifFalse: [
+					                       self exitPubsub.
+					                       self onErrorSignaled: ex ].
+				                       nil ]. "Ignore timeout, etc"
+		            message ifNotNil: [
+			            self handlePubsubMessage: message callback: aBlock ] ] ]
+		            forkAt: self subscriptionListenPriority

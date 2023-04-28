@@ -1,6 +1,7 @@
 private
 pingConnection: aRedis at: key
 	| pong |
+	aRedis ifNil: [ self ].
 	pong := [ aRedis ping ]
 		on: Error
 		do: [ :ex | self logger error: ex. nil ].
