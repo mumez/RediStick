@@ -1,5 +1,6 @@
 factory
 restoreSubscriptions
-	(subscriber notNil and: [ subscriber isEnded not ]) ifTrue: [ ^self ].
+
+	subscriber ifNotNil: [ subscriber destroy ].
 	self prepareSubscriber.
 	self subscribeChannels
