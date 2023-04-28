@@ -1,7 +1,6 @@
 factory
 prepareSubscriber
 	| stick |
-	Transcript crShow: '-prepareSubscriber-'.
 	stick := RsRediStick targetUrl: self targetUrl.
 	subscriber := stick.
 	stick endpoint settings receivingProcessPriority:
