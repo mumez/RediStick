@@ -15,5 +15,6 @@ restoreSubscriber: oldSubscriber
 			subscribed := true ].
 		oneShotStick connect.
 		retryMax := retryMax - 1 ].
-	self logger info: '-restoration result-', {subscribed. retryMax} asString.
-	self onSubscriberNotRestored ifNotNil: [ self onSubscriberNotRestored value ]
+	self logger info: '-restoration result-' , {subscribed.retryMax } asString.
+	(self onSubscriberNotRestored notNil and: [ retryMax = 0 ]) ifTrue: [
+		self onSubscriberNotRestored value ]
