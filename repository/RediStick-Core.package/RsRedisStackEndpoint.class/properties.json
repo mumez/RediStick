@@ -1,11 +1,14 @@
 {
-	"commentStamp" : "",
-	"super" : "RsRedisEndpoint",
 	"category" : "RediStick-Core",
-	"classinstvars" : [ ],
-	"pools" : [ ],
-	"classvars" : [ ],
-	"instvars" : [ ],
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		 ],
 	"name" : "RsRedisStackEndpoint",
-	"type" : "normal"
-}
+	"pools" : [
+		 ],
+	"super" : "RsRedisEndpoint",
+	"type" : "normal" }

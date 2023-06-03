@@ -1,3 +1,3 @@
 accessing
 sendMutex
-	^sendMutex ifNil: [ sendMutex := Mutex new ]
+  ^ sendMutex ifNil: [ sendMutex := self portableUtil createMutex ]

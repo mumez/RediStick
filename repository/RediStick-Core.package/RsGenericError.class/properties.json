@@ -1,13 +1,14 @@
 {
-	"commentStamp" : "",
-	"super" : "RsError",
 	"category" : "RediStick-Core",
-	"classinstvars" : [ ],
-	"pools" : [ ],
-	"classvars" : [ ],
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
 	"instvars" : [
-		"errorPrefix"
-	],
+		"errorPrefix" ],
 	"name" : "RsGenericError",
-	"type" : "normal"
-}
+	"pools" : [
+		 ],
+	"super" : "RsError",
+	"type" : "normal" }
