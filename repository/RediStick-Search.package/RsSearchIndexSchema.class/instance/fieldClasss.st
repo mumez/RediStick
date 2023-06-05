@@ -1,0 +1,3 @@
+factory
+fieldClasss
+	^ RsSearchIndexField
