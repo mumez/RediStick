@@ -1,3 +1,3 @@
 adding
 tagFieldNamed: fieldName
-	^ self tagFieldNamed: fieldName using: []
+	^ self tagFieldNamed: fieldName using: [:opts|]

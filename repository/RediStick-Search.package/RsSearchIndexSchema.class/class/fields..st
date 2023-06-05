@@ -1,4 +1,4 @@
-accessing
+instance creation
 fields: fields
 
 	| inst |

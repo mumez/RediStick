@@ -1,3 +1,3 @@
 adding
 numericFieldNamed: fieldName
-	^ self numericFieldNamed: fieldName using: []
+	^ self numericFieldNamed: fieldName using: [:opts|]
