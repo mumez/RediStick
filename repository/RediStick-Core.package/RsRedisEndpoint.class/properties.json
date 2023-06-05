@@ -1,19 +1,18 @@
 {
-	"category" : "RediStick-Core",
-	"classinstvars" : [
-		 ],
-	"classvars" : [
-		 ],
 	"commentStamp" : "",
+	"super" : "SkSyncStickEndpoint",
+	"category" : "RediStick-Core",
+	"classinstvars" : [ ],
+	"pools" : [ ],
+	"classvars" : [ ],
 	"instvars" : [
 		"pubsub",
 		"channels",
 		"subscriptionMode",
 		"timeout",
 		"listener",
-		"sendMutex" ],
+		"sendMutex"
+	],
 	"name" : "RsRedisEndpoint",
-	"pools" : [
-		 ],
-	"super" : "SkSyncStickEndpoint",
-	"type" : "normal" }
+	"type" : "normal"
+}

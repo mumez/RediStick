@@ -1,17 +1,16 @@
 {
-	"category" : "RediStick-Core",
-	"classinstvars" : [
-		 ],
-	"classvars" : [
-		 ],
 	"commentStamp" : "",
+	"super" : "Object",
+	"category" : "RediStick-Core",
+	"classinstvars" : [ ],
+	"pools" : [ ],
+	"classvars" : [ ],
 	"instvars" : [
 		"kind",
 		"channel",
 		"numberOfChannels",
-		"payload" ],
+		"payload"
+	],
 	"name" : "RsPubsubMessage",
-	"pools" : [
-		 ],
-	"super" : "Object",
-	"type" : "normal" }
+	"type" : "normal"
+}
