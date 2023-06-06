@@ -8,6 +8,6 @@
 	"instvars" : [
 		"options"
 	],
-	"name" : "RsSearchIndexOptions",
+	"name" : "RsSearchOptions",
 	"type" : "normal"
 }
