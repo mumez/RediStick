@@ -1,3 +1,5 @@
 actions
 language: aLanguage
-    self options add: ('LANGUAGE ' , aLanguage asString).
+	self options addAll: {
+			'LANGUAGE'.
+			aLanguage asString }

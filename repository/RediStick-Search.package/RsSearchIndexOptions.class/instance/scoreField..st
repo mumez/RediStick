@@ -1,3 +1,5 @@
 actions
 scoreField: aScoreField
-    self options add: ('SCORE_FIELD ' , aScoreField asString).
+	self options addAll: {
+			'SCORE_FIELD'.
+			aScoreField asString }

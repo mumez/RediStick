@@ -1,3 +1,3 @@
 actions
 onHash
-    self options add: 'ON HASH'.
+    self options add: 'ON'; add: 'HASH'.

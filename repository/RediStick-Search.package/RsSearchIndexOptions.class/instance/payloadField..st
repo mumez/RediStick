@@ -1,3 +1,5 @@
 actions
 payloadField: aPayloadField
-    self options add: ('PAYLOAD_FIELD ' , aPayloadField asString).
+	self options addAll: {
+			'PAYLOAD_FIELD'.
+			aPayloadField asString }

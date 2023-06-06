@@ -4,5 +4,5 @@ ftCreate: indexName schemaUsing: schemaBuilder optionsUsing: optionsBuilder
 	schema := RsSearchIndexSchema in: schemaBuilder.
 	options := nil.
 	optionsBuilder ifNotNil: [
-		options := RsSearchIndexOptions in: schemaBuilder ].
+		options := RsSearchIndexOptions in: optionsBuilder ].
 	^ self ftCreate: indexName schema: schema options: options

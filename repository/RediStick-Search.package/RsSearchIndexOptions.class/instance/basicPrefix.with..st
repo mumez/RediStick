@@ -1,3 +1,7 @@
 actions
-basicPrefix: aCount with: aPrefix
-    self options add: ('PREFIX ' , aCount asString , ' ' , aPrefix asString).
+basicPrefix: aCount with: prefixes
+	self options
+		addAll: {
+				'PREFIX'.
+				aCount asString };
+		addAll: prefixes

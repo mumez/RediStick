@@ -1,3 +1,3 @@
 *RediStick-Search
 ftDropIndex: indexName
-	^ self ftCommand: 'INDEX' withAll: {} 
+	^ self ftCommand: 'DROP' withAll: {indexName} 

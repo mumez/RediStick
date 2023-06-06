@@ -1,3 +1,5 @@
 actions
 languageField: aLanguageField
-    self options add: ('LANGUAGE_FIELD ' , aLanguageField asString).
+	self options addAll: {
+			'LANGUAGE_FIELD'.
+			aLanguageField asString }

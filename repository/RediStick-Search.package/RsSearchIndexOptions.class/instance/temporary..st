@@ -1,3 +1,5 @@
 actions
 temporary: aTemporaryValue
-    self options add: ('TEMPORARY ' , aTemporaryValue asString).
+	self options addAll: {
+			'TEMPORARY'.
+			aTemporaryValue asString }

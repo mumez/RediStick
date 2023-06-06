@@ -1,3 +1,5 @@
 actions
 filter: aFilter
-    self options add: ('FILTER ' , aFilter asString).
+	self options addAll: {
+			'FILTER'.
+			aFilter asString }

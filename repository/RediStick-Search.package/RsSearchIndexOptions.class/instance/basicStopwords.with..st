@@ -1,3 +1,7 @@
 actions
-basicStopwords: aCount with: aStopword
-    self options add: ('STOPWORDS ' , aCount asString , ' ' , aStopword asString).
+basicStopwords: aCount with: stopwords
+	self options
+		addAll: {
+				'STOPWORDS'.
+				aCount asString };
+		addAll: stopwords

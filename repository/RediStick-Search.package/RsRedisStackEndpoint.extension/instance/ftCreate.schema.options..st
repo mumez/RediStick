@@ -2,6 +2,6 @@
 ftCreate: indexName schema: schema options: options 
 	| args |
 	args := OrderedCollection new.
-	schema createArgumentsOn: args.
 	options ifNotNil: [options createArgumentsOn: args].
+	schema createArgumentsOn: args.
 	^ self ftCommand: 'CREATE' withAll: {indexName},  args 

@@ -1,3 +1,5 @@
 actions
 score: aScore
-    self options add: ('SCORE ' , aScore asString).
+	self options addAll: {
+			'SCORE'.
+			aScore asString }
