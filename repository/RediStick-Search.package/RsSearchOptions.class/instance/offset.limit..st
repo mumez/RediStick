@@ -1,5 +1,5 @@
-instance creation
-limitOffset: offset num: num
+actions
+offset: offset limit: num
 	self options addAll: {
 				'LIMIT'.
 				offset asString.

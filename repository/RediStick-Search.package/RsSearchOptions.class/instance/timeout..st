@@ -1,4 +1,4 @@
-instance creation
+actions
 timeout: aTimeout
 	self options addAll: {
 				'TIMEOUT'.

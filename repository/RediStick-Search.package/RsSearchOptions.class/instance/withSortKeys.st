@@ -1,3 +1,3 @@
-instance creation
+actions
 withSortKeys
     self options add: 'WITHSORTKEYS'.

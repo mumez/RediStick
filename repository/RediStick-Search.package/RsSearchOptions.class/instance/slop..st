@@ -1,4 +1,4 @@
-instance creation
+actions
 slop: aSlop
 	self options addAll: {
 				'SLOP'.

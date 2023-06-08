@@ -1,3 +1,3 @@
-instance creation
+actions
 noContent
     self options add: 'NOCONTENT'.

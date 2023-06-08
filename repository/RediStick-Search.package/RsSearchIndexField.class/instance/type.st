@@ -1,4 +1,4 @@
 accessing
 type
 
-	^ type
+	^ type ifNil: [ type := '' ]

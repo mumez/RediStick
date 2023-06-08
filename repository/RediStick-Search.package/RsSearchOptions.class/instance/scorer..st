@@ -1,4 +1,4 @@
-instance creation
+actions
 scorer: aScorer
 	self options addAll: {
 				'SCORER'.

@@ -1,11 +1,13 @@
 {
 	"commentStamp" : "",
-	"super" : "RsBaseSearchOptions",
+	"super" : "Object",
 	"category" : "RediStick-Search",
 	"classinstvars" : [ ],
 	"pools" : [ ],
 	"classvars" : [ ],
-	"instvars" : [ ],
-	"name" : "RsSearchCreateIndexOptions",
+	"instvars" : [
+		"options"
+	],
+	"name" : "RsBaseSearchOptions",
 	"type" : "normal"
 }

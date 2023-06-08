@@ -1,4 +1,4 @@
-instance creation
+actions
 dialect: aDialect
 	self options addAll: {
 				'DIALECT'.

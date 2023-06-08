@@ -1,4 +1,4 @@
-instance creation
+actions
 summarizeFields: aCount with: fields frags: num len: fragsize separator: separator
 	self options
 		addAll: {

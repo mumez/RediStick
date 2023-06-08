@@ -1,3 +1,3 @@
-instance creation
+actions
 explainScore
 	self options add: 'EXPLAINSCORE'.

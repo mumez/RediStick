@@ -1,3 +1,3 @@
-instance creation
+actions
 withScores
     self options add: 'WITHSCORES'.

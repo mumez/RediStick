@@ -1,4 +1,4 @@
-instance creation
+actions
 geoFilter: aGeoField lon: aLon lat: aLat radius: aRadius unit: aUnit
     self options addAll: {
 				'GEOFILTER'.

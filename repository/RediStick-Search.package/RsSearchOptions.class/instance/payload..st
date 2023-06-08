@@ -1,4 +1,4 @@
-instance creation
+actions
 payload: aPayload
 	self options addAll: {
 				'PAYLOAD'.

@@ -1,4 +1,4 @@
-instance creation
+actions
 highlightFields: aCount with: fields tags: tags
 	self options
 		addAll: {
