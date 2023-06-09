@@ -19,13 +19,13 @@ testSearchSimpleHashes
 	ep hSet:'rs:test:doc:4' dictionary: ({'id'-> 4. 'name'->'VisualAge Smalltalk'} as: Dictionary).
 	
 	result := ep ftSearch: 'test-index' query: 'Smalltalk'.
-	result inspect.
+	"result inspect."
 	
-	result := ep ftSearch: 'test-index' query: 'Smalltalk' optionsUsing: [:opts | opts withScores; noContent ].
+	result := ep ftSearch: 'test-index' query: 'Smalltalk' optionsUsing: [:opts | opts withScores; withPayloads; "withSortKeys;" noContent ].
 	result inspect.
 	
 	result := ep ftSearch: 'test-index' query: 'Smalltalk' optionsUsing: [:opts | opts count ].
-	result inspect.
+	"result inspect."
 	
 	ep ftDropIndexWithDocuments:'test-index'.
 	self assert: ep ftListIndexes size equals: 0.

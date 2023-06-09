@@ -1,9 +1,14 @@
 loading
 loadResultsFrom: anArray parseHints: parseHints
-	| resultCol |
+	| resultCol chunkSize readStream |
 	resultCol := OrderedCollection new.
-	parseHints inspect.
-	anArray pairsDo: [ :id :cont |
-		resultCol add: (RsSearchResult id: id first content: (Dictionary newFromPairs: cont))
+	chunkSize := (parseHints values select: [ :e | e ]) size.
+	
+	readStream := anArray readStream.
+	[ readStream atEnd ] whileFalse: [ | chunk |
+		chunk := readStream next: chunkSize.
+		resultCol add: (RsSearchResult fromChunk: chunk parseHints: parseHints)
 	].
-	self results: resultCol 
+
+	self results: resultCol
+
