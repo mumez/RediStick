@@ -28,5 +28,5 @@ executeOn: aRedisEndpoint
 				add: 'STORE';
 				add: store ].
 	^ args isEmpty
-		ifTrue: [ aRedisEndpoint inlineCommand: 'SORT' key: key ]
-		ifFalse: [ aRedisEndpoint multiBulkCommand: 'SORT' args: {key} , args ]
+		ifTrue: [ aRedisEndpoint sort: key ]
+		ifFalse: [ aRedisEndpoint unifiedCommand: {'SORT'. key}, {args}]

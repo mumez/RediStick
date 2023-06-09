@@ -1,10 +1,10 @@
 {
-	"category" : "RediStick-Core",
-	"classinstvars" : [
-		 ],
-	"classvars" : [
-		 ],
 	"commentStamp" : "",
+	"super" : "Object",
+	"category" : "RediStick-Core",
+	"classinstvars" : [ ],
+	"pools" : [ ],
+	"classvars" : [ ],
 	"instvars" : [
 		"key",
 		"by",
@@ -15,9 +15,8 @@
 		"start",
 		"count",
 		"mGet",
-		"endpoint" ],
+		"endpoint"
+	],
 	"name" : "RsSortQuery",
-	"pools" : [
-		 ],
-	"super" : "Object",
-	"type" : "normal" }
+	"type" : "normal"
+}
