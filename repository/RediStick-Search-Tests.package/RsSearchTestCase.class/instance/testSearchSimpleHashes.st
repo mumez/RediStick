@@ -1,6 +1,6 @@
 tests
 testSearchSimpleHashes
-	| ep schema result |
+	| ep schema result content |
 	ep := stick endpoint.
 	self assert: ep ftListIndexes size equals: 0.
 	schema := RsSearchIndexSchema in: [:sc |  
@@ -13,19 +13,19 @@ testSearchSimpleHashes
 	] optionsUsing: [:opts | opts ].
 	self assert: ep ftListIndexes size equals: 1.
 	
-	ep hSet:'rs:test:doc:1' dictionary: ({'id'-> 1. 'name'->'Pharo Smalltalk'} as: Dictionary).
-	ep hSet:'rs:test:doc:2' dictionary: ({'id'-> 2. 'name'->'Squeak Smalltalk'} as: Dictionary).
-	ep hSet:'rs:test:doc:3' dictionary: ({'id'-> 3. 'name'->'VisualWorks Smalltalk'} as: Dictionary).
-	ep hSet:'rs:test:doc:4' dictionary: ({'id'-> 4. 'name'->'VisualAge Smalltalk'} as: Dictionary).
+	self populateDateOn: ep.
 	
 	result := ep ftSearch: 'test-index' query: 'Smalltalk'.
-	"result inspect."
+	self assert: result size equals: 4.
 	
-	result := ep ftSearch: 'test-index' query: 'Smalltalk' optionsUsing: [:opts | opts withScores; withPayloads; "withSortKeys;" noContent ].
-	result inspect.
+	result := ep ftSearch: 'test-index' query: 'Pharo'.
+	self assert: result size equals: 1.
+	content := (result results at: 1) content.
+	self assert: (content at: 'id') equals: '1'.
+	self assert: (content at: 'name') equals: 'Pharo Smalltalk'.
 	
-	result := ep ftSearch: 'test-index' query: 'Smalltalk' optionsUsing: [:opts | opts count ].
-	"result inspect."
+	result := ep ftSearch: 'test-index' query: 'Visual*'.
+	self assert: result size equals: 2.
 	
 	ep ftDropIndexWithDocuments:'test-index'.
 	self assert: ep ftListIndexes size equals: 0.
