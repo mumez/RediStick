@@ -16,7 +16,7 @@ baseline: spec
 		spec package: 'RediStick-Search' with: [
 				spec requires: #('RediStick-Core')].
 		spec package: 'RediStick-Search-Tests' with: [
-				spec requires: #('RediStick-Search')].
+				spec requires: #('RediStick-Tests' 'RediStick-Search')].
 			
 		spec 
 			group: 'default' with: #('Core');
