@@ -16,7 +16,7 @@ testCreateIndex
 	].
 	self assert: ep ftListIndexes size equals: 1.
 	indexInfo := ep ftInfo: 'test-index'.
-	self assert: (indexInfo at: 'index-name') equals: 'test-index'.
-	self assert: (indexInfo at: 'attbibutes') size equals: 2.
+	self assert: (indexInfo at: 'index_name') equals: 'test-index'.
+	self assert: (indexInfo at: 'attributes') size equals: 2.
 	ep ftDropIndex: 'test-index'.
 	self assert: ep ftListIndexes size equals: 0.
