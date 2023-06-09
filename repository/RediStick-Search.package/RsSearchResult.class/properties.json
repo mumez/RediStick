@@ -7,6 +7,9 @@
 	"classvars" : [ ],
 	"instvars" : [
 		"id",
+		"score",
+		"payloads",
+		"sortKeys",
 		"content"
 	],
 	"name" : "RsSearchResult",

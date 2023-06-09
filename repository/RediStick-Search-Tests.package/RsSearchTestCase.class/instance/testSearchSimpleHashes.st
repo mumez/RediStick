@@ -21,7 +21,7 @@ testSearchSimpleHashes
 	result := ep ftSearch: 'test-index' query: 'Smalltalk'.
 	result inspect.
 	
-	result := ep ftSearch: 'test-index' query: 'Smalltalk' optionsUsing: [:opts | opts noContent ].
+	result := ep ftSearch: 'test-index' query: 'Smalltalk' optionsUsing: [:opts | opts withScores; noContent ].
 	result inspect.
 	
 	result := ep ftSearch: 'test-index' query: 'Smalltalk' optionsUsing: [:opts | opts count ].

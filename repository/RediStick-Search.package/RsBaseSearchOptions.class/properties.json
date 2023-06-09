@@ -6,7 +6,8 @@
 	"pools" : [ ],
 	"classvars" : [ ],
 	"instvars" : [
-		"options"
+		"options",
+		"optionsDict"
 	],
 	"name" : "RsBaseSearchOptions",
 	"type" : "normal"
