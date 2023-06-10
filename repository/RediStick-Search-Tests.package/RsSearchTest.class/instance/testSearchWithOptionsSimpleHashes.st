@@ -1,13 +1,10 @@
 tests
 testSearchWithOptionsSimpleHashes
-	| ep schema rs content |
+	| indexName ep rs content |
+	indexName := 'test-index1'.
 	ep := stick endpoint.
 	self assert: ep ftListIndexes size equals: 0.
-	schema := RsSearchIndexSchema in: [:sc |  
-		sc textFieldNamed: 'name'.
-		sc numericFieldNamed: 'id'.
-	].
-	ep ftCreate: 'test-index' schemaUsing: [:sc | 
+	ep ftCreate: indexName schemaUsing: [:sc | 
 		sc textFieldNamed: 'name'.
 		sc numericFieldNamed: 'id'.
 	] optionsUsing: [:opts | opts ].
@@ -15,20 +12,20 @@ testSearchWithOptionsSimpleHashes
 	
 	self populateDateOn: ep.
 	
-	rs := ep ftSearch: 'test-index' query: 'Visual*' optionsUsing: [:opts | opts noContent ].
+	rs := ep ftSearch: indexName query: 'Visual*' optionsUsing: [:opts | opts noContent ].
 	self assert: rs size equals: 2.
 	self assert: (rs results collect: [:each | each content]) asArray equals: #(nil nil).
 	self assert: rs documentIds sorted asArray equals: #('rs:test:doc:3' 'rs:test:doc:4').
-	rs := ep ftSearch: 'test-index' query: 'Pharo' optionsUsing: [:opts | opts count ].
-	self assert: rs size equals: 1.
+	rs := ep ftSearch: indexName query: 'Pharo' optionsUsing: [:opts | opts count ].
+	self assert: rs total equals: 1.
 	self assert: rs results isEmpty.
 	
-	rs := ep ftSearch: 'test-index' query: 'Pharo' optionsUsing: [:opts | opts withScores; withPayloads; withSortKeys ].
+	rs := ep ftSearch: indexName query: 'Pharo' optionsUsing: [:opts | opts withScores; withPayloads; withSortKeys ].
 	self assert: rs size equals: 1.
 	self assert: (rs result) score > 0.
 	content := (rs result) content.
 	self assert: (content at: 'id') equals: '1'.
 	self assert: (content at: 'name') equals: 'Pharo Smalltalk'.
 	
-	ep ftDropIndexWithDocuments:'test-index'.
+	ep ftDropIndexWithDocuments: indexName.
 	self assert: ep ftListIndexes size equals: 0.

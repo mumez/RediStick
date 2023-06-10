@@ -1,0 +1,4 @@
+accessing
+total
+
+	^ total

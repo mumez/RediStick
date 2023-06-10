@@ -1,15 +1,14 @@
 loading
 loadValueFromChunk: aValue hints: consumingHints
-
-	(consumingHints includesKey: #withScores) ifTrue: [
+	(self isEnabled: #withScores in: consumingHints) ifTrue: [
 		self score: aValue.
 		^ consumingHints removeKey: #withScores ].
-	(consumingHints includesKey: #withPayloads) ifTrue: [
+	(self isEnabled: #withPayloads in: consumingHints) ifTrue: [
 		self payloads: aValue.
 		^ consumingHints removeKey: #withPayloads ].
-	(consumingHints includesKey: #withSortKeys) ifTrue: [
+	(self isEnabled: #withSortKeys in: consumingHints) ifTrue: [
 		self sortKeys: aValue.
 		^ consumingHints removeKey: #withSortKeys ].
-	(consumingHints includesKey: #withContent) ifTrue: [
+	(self isEnabled: #withContent in: consumingHints) ifTrue: [
 		self content: aValue.
 		^ consumingHints removeKey: #withContent ]
