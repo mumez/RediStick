@@ -17,7 +17,7 @@ testSearchWithOptionsSimpleHashes
 	self assert: (rs results collect: [:each | each content]) asArray equals: #(nil nil).
 	self assert: rs documentIds sorted asArray equals: #('rs:test:doc:3' 'rs:test:doc:4').
 	rs := ep ftSearch: indexName query: 'Pharo' optionsUsing: [:opts | opts count ].
-	self assert: rs size equals: 1.
+	self assert: rs total equals: 1.
 	self assert: rs results isEmpty.
 	
 	rs := ep ftSearch: indexName query: 'Pharo' optionsUsing: [:opts | opts withScores; withPayloads; withSortKeys ].

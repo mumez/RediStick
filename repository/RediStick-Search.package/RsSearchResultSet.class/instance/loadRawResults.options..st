@@ -1,7 +1,7 @@
 loading
 loadRawResults: anArray options: options
 	| contentsArray parseHints |
-	self size: anArray first.
+	self total: anArray first.
 	contentsArray := anArray copyFrom: 2 to: anArray size.
 	options ifNil: [ ^ self loadResultsFrom: contentsArray ].
 	parseHints := options searchResultParseHints.

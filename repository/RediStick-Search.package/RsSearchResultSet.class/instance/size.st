@@ -1,4 +1,4 @@
 accessing
 size
 
-	^ size
+	^ self results size
