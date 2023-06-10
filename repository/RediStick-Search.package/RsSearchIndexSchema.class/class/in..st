@@ -1,3 +1,6 @@
 instance creation
 in: aBlock
-	^ self new in: aBlock
+	| inst |
+	inst := self new.
+	aBlock value: inst.
+	^ inst

@@ -1,5 +1,5 @@
 factory
 endpointClassForScheme: schemeName
 	schemeName ifNil: [ ^nil ].
-	schemeName = 'stack' ifTrue: [^RsRedisStackEndpoint].
+	schemeName asString = 'stack' ifTrue: [^RsRedisStackEndpoint].
 	^RsRedisEndpoint

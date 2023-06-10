@@ -6,6 +6,6 @@
 	"pools" : [ ],
 	"classvars" : [ ],
 	"instvars" : [ ],
-	"name" : "RsSearchTestCase",
+	"name" : "RsSearchTest",
 	"type" : "normal"
 }
