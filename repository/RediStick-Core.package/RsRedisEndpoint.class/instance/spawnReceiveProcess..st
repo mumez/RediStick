@@ -9,6 +9,7 @@ spawnReceiveProcess: aBlock
 	listener := [
 	            [ self pubsub ] whileTrue: [
 		            | message |
+		            self socketIsConnected ifFalse: [ self waitFor: 3 ].
 		            message := [ self parseReply ]
 			                       on: RsError
 			                       do: [ :ex |
