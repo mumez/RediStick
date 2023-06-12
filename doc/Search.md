@@ -1,6 +1,6 @@
 # Working with RediSearch in RediStick
 
-RediStick supports [RediSearch](https://redis.io/docs/stack/search/) - a full-text search extension for Redis.
+[RediStick](https://github.com/mumez/RediStick) supports [RediSearch](https://redis.io/docs/stack/search/) - a full-text search extension for Redis.
 
 ## Installation
 
