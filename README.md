@@ -37,6 +37,16 @@ Metacello new
   load: #('Core' 'Pubsub').
 ```
 
+With Search package:
+
+```smalltalk
+
+Metacello new
+  baseline: 'RediStick';
+  repository: 'github://mumez/RediStick/repository';
+  load: #('Core' 'Search').
+```
+
 ## Sample Code
 
 ### Basic usage
@@ -66,4 +76,10 @@ In this example, the default connection pool is implicitly used through RedisPro
 
 RediStick provides a channel class for using redis pubsub API very easily.
 
-Please read [Pubsub.md](Pubsub.md).
+Please read [Pubsub.md](./doc/Pubsub.md).
+
+### Using Search
+
+RediStick supports [RediSearch](https://redis.io/docs/stack/search/) - a full-text search extension for Redis.
+
+Please read [Search.md](./doc/Search.md).
