@@ -1,19 +1,19 @@
-# How to use with RediSearch 
+# Working with RediSearch in RediStick
 
 RediStick supports [RediSearch](https://redis.io/docs/stack/search/) - a full-text search extension for Redis.
 
 ## Installation
 
-### Preparing RediSearch
+### Setting up RediSearch
 
-RediSearch is a part of [Redis Stack](https://redis.io/docs/stack/) and it is not included in Redis by default.
-The easiest way to start RediSearch-enabled redis is using [official docker image](https://hub.docker.com/r/redis/redis-stack).
+RediSearch is a component of the [Redis Stack](https://redis.io/docs/stack/) and it is not included in Redis by default.
+The easiest way to start a RediSearch enabled Redis is to use the [official docker image](https://hub.docker.com/r/redis/redis-stack).
 
 ```bash
 docker run -d --name redis-stack -p 6379:6379 -p 8001:8001 -v /local-data/:/data redis/redis-stack:latest
 ```
 
-### Install RediStick Search packages
+### Installing RediStick Search packages
 
 Now you can install RediStick Search packages into Pharo (or GemStone/S).
 
@@ -25,6 +25,7 @@ Metacello new
 ```
 
 If you need tests:
+
 ```smalltalk
 Metacello new
   baseline: 'RediStick';
@@ -34,7 +35,7 @@ Metacello new
 
 ## Usage
 
-### Creating index
+### Creating an index
 
 ```Smalltalk
 stick := RsRediStick targetUrl: 'stack://localhost'.
@@ -50,14 +51,12 @@ endpoint ftCreate: indexName schemaUsing: [:sc |
 	sc textFieldNamed: 'name'.
 	sc tagFieldNamed: 'tags'.
 ] optionsUsing: [:opts | opts prefixes: #('st') ].
-
 ```
 
 ```Smalltalk
 "List index names -> an OrderedCollection('smalltalk-index')"
 endpoint ftListIndexes.
 ```
-
 
 ### Populating data
 
@@ -68,15 +67,15 @@ endpoint hSet:'st:3' dictionary: ({'id'-> 3. 'name'->'VisualWorks Smalltalk'. 't
 endpoint hSet:'st:4' dictionary: ({'id'-> 4. 'name'->'GemStone Smalltalk'. 'tags'->'Commercial,Seaside,ODB'} as: Dictionary).
 ```
 
-### Search by query
+### Searching by query
 
-#### Basics
+#### Basic usage
 
 ```Smalltalk
 "Search documents that contain 'Smalltalk'"
 resultSet := endpoint ftSearch: indexName query: 'Smalltalk'. "total 4"
 
-"Search documents that contain 'Smalltalk', with score"
+"Search documents that contain 'Smalltalk', with scores"
 resultSet := endpoint ftSearch: indexName query: 'Smalltalk' optionsUsing: [:opts | opts withScores]. "total 4, all scores are 1"
 
 "You can get document content as a dictionary"
@@ -98,11 +97,11 @@ resultSet := endpoint ftSearch: indexName query: 'Visual*'. "total 1"
 resultSet := endpoint ftSearch: indexName query: '"VisualWorks Smalltalk"'. "total 1"
 
 "Specifying numeric field"
-resultSet := ep ftSearch: indexName query: '@id:[1 3]' optionsUsing: [:opts | opts noContent ]. "id from 2 to 3"
+resultSet := ep ftSearch: indexName query: '@id:[1 3]' optionsUsing: [:opts | opts noContent ]. "documents with id 1-3"
 resultSet documentIds asArray sorted. "#('st:1' 'st:2' 'st:3')"
 
 "Specifying tag field"
-resultSet := endpoint ftSearch: indexName query: '@tags:{ OSS }'. "total 2"
+resultSet := endpoint ftSearch: indexName query: '@tags:{ OSS }'. "documents with OSS tag. total 2"
 resultSet := endpoint ftSearch: indexName query: '@tags:{ OSS | Commercial }'. "documents with 'OSS' or 'Commercial' tag. total 4"
 resultSet := endpoint ftSearch: indexName query: '@tags:{ OSS } @tags:{ PharoJS }'. "documents with 'OSS' and 'PharoJS' tag. total 1"
 
@@ -112,12 +111,13 @@ resultSet := endpoint ftSearch: indexName query: '@tags:{ OSS } @tags:{ PharoJS 
 
 ```Smalltalk
 resultSet := endpoint ftSearch: indexName query: 'Smalltalk*' optionsUsing: [:opts | opts offset: 1 limit: 2].
-
+resultSet results collect: [:each | each content]. "an OrderedCollection(a Dictionary('id'->'2' 'name'->'Squeak Smalltalk'
+'tags'->'OSS,Seaside,Etoys' ) a Dictionary('id'->'3' 'name'->'VisualWorks
+Smalltalk' 'tags'->'Commercial,Seaside,AppeX' ))"
 ```
 
-You can see [more detailed query syntax](https://redis.io/docs/stack/search/reference/query_syntax/).
-
+For more query patterns, you can see the [query syntax](https://redis.io/docs/stack/search/reference/query_syntax/) reference.
 
 ## ToDo
-- [] [Aggregations](https://redis.io/docs/stack/search/reference/aggregations/) Support
 
+- [] [Aggregations](https://redis.io/docs/stack/search/reference/aggregations/) Support
