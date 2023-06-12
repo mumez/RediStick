@@ -133,4 +133,4 @@ endpoint ftListIndexes.
 
 ## ToDo
 
-- [] [Aggregations](https://redis.io/docs/stack/search/reference/aggregations/) Support
+- [ ] [Aggregations](https://redis.io/docs/stack/search/reference/aggregations/) Support
