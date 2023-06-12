@@ -103,8 +103,8 @@ resultSet documentIds asArray sorted. "#('st:1' 'st:2' 'st:3')"
 
 "Specifying tag field"
 resultSet := endpoint ftSearch: indexName query: '@tags:{ OSS }'. "total 2"
-resultSet := endpoint ftSearch: indexName query: '@tags:{ OSS | Commercial }'. "total 4"
-resultSet := endpoint ftSearch: indexName query: '@tags:{ OSS } @tags:{ PharoJS }'. "total 1"
+resultSet := endpoint ftSearch: indexName query: '@tags:{ OSS | Commercial }'. "documents with 'OSS' or 'Commercial' tag. total 4"
+resultSet := endpoint ftSearch: indexName query: '@tags:{ OSS } @tags:{ PharoJS }'. "documents with 'OSS' and 'PharoJS' tag. total 1"
 
 ```
 
@@ -115,7 +115,7 @@ resultSet := endpoint ftSearch: indexName query: 'Smalltalk*' optionsUsing: [:op
 
 ```
 
-https://redis.io/docs/stack/search/reference/query_syntax/
+You can see [more detailed query syntax](https://redis.io/docs/stack/search/reference/query_syntax/).
 
 
 ## ToDo
