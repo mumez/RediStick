@@ -118,6 +118,19 @@ Smalltalk' 'tags'->'Commercial,Seaside,AppeX' ))"
 
 For more query patterns, you can see the [query syntax](https://redis.io/docs/stack/search/reference/query_syntax/) reference.
 
+### Dropping an index
+
+```Smalltalk
+"Drop index only"
+endpoint ftDropIndex: indexName.
+
+"Drop index and documents"
+endpoint ftDropIndexWithDocuments: indexName.
+
+"List index names -> an OrderedCollection()"
+endpoint ftListIndexes.
+```
+
 ## ToDo
 
 - [] [Aggregations](https://redis.io/docs/stack/search/reference/aggregations/) Support
