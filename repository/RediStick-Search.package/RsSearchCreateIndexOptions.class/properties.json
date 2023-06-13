@@ -1,0 +1,11 @@
+{
+	"commentStamp" : "",
+	"super" : "RsBaseSearchOptions",
+	"category" : "RediStick-Search",
+	"classinstvars" : [ ],
+	"pools" : [ ],
+	"classvars" : [ ],
+	"instvars" : [ ],
+	"name" : "RsSearchCreateIndexOptions",
+	"type" : "normal"
+}

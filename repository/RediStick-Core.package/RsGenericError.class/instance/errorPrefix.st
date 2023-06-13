@@ -1,3 +1,3 @@
 accessing
 errorPrefix
-	^errorPrefix 
+	^errorPrefix

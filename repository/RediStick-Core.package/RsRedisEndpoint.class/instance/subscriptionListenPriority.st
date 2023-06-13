@@ -1,3 +1,3 @@
 accessing
 subscriptionListenPriority
-	^ self settings receivingProcessPriority 
+	^ self settings receivingProcessPriority

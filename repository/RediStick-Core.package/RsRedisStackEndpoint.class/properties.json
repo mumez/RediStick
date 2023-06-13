@@ -1,0 +1,11 @@
+{
+	"commentStamp" : "",
+	"super" : "RsRedisEndpoint",
+	"category" : "RediStick-Core",
+	"classinstvars" : [ ],
+	"pools" : [ ],
+	"classvars" : [ ],
+	"instvars" : [ ],
+	"name" : "RsRedisStackEndpoint",
+	"type" : "normal"
+}

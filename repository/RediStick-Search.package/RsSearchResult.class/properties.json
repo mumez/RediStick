@@ -1,0 +1,17 @@
+{
+	"commentStamp" : "",
+	"super" : "Object",
+	"category" : "RediStick-Search",
+	"classinstvars" : [ ],
+	"pools" : [ ],
+	"classvars" : [ ],
+	"instvars" : [
+		"id",
+		"score",
+		"payloads",
+		"sortKeys",
+		"content"
+	],
+	"name" : "RsSearchResult",
+	"type" : "normal"
+}

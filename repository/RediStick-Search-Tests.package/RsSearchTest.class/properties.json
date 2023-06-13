@@ -1,0 +1,11 @@
+{
+	"commentStamp" : "",
+	"super" : "RsRedisTestCase",
+	"category" : "RediStick-Search-Tests",
+	"classinstvars" : [ ],
+	"pools" : [ ],
+	"classvars" : [ ],
+	"instvars" : [ ],
+	"name" : "RsSearchTest",
+	"type" : "normal"
+}

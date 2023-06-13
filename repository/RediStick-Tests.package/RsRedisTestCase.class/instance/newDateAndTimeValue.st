@@ -1,3 +1,3 @@
 private
 newDateAndTimeValue
-	^ DateAndTime current asString
+	^ DateAndTime now asString

@@ -1,3 +1,3 @@
 commands-pubsub
-pubsubNumsub: channels
-	^self unifiedCommand: {'PUBSUB'. 'NUMSUB'} , channels
+pubsubNumsub: channelsCollection
+	^self unifiedCommand: {'PUBSUB'. 'NUMSUB'} , channelsCollection
