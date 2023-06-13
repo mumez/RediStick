@@ -97,7 +97,7 @@ resultSet := endpoint ftSearch: indexName query: 'Visual*'. "total 1"
 resultSet := endpoint ftSearch: indexName query: '"VisualWorks Smalltalk"'. "total 1"
 
 "Specifying numeric field"
-resultSet := ep ftSearch: indexName query: '@id:[1 3]' optionsUsing: [:opts | opts noContent ]. "documents with id 1-3"
+resultSet := endpoint ftSearch: indexName query: '@id:[1 3]' optionsUsing: [:opts | opts noContent ]. "documents with id 1-3"
 resultSet documentIds asArray sorted. "#('st:1' 'st:2' 'st:3')"
 
 "Specifying tag field"
