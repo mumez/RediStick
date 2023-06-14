@@ -54,8 +54,11 @@ Metacello new
 ```smalltalk
 stick := RsRediStick targetUrl: 'sync://localhost'.
 stick connect.
+
 stick beSticky. "Auto reconnect when server is not accessible"
-stick onError: [ :e | e pass ].
+stick beSwitchy: 'sync://otherhost'. "Or connect to the secondary server"
+stick onError: [ :e | e pass ]. "Or just pass an error (not reconnect) - mainly for debug"
+
 stick endpoint info.
 stick endpoint get: 'a'.
 stick endpoint set: 'a' value: 999.
