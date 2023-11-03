@@ -6,6 +6,6 @@ xAdd: key createNotExists: createNotExists trimOptions: trimOptions id: id field
 		        key } asOrderedCollection.
 	createNotExists ifFalse: [ args add: 'NOMKSTREAM' ].
 	trimOptions ifNotNil: [ args addAll: trimOptions asArray ].
-	args add: id.
+	id ifNil: [ args add: '*' ] ifNotNil: [ args add: id asString ].
 	^ self unifiedCommand:
 		  args , (fieldAndValues gather: [ :each | {each key. each value}])
