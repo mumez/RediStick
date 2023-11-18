@@ -11,4 +11,4 @@ xRange: command key: key start: startId end: endId count: count
 				'COUNT'.
 				count } ].
 	vals := self unifiedCommand: args.
-	^ vals collect: [ :each | RsStreamEntry fromOrderedCollection: each ]
+	^ self createStreamEntryFrom: vals

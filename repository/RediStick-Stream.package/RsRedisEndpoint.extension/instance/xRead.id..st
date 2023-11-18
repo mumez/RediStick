@@ -1,5 +1,3 @@
 *RediStick-Stream
 xRead: key id: id
-	| keysAndValues |
-	keysAndValues := { key -> id }.
-	^ self xReadKeysAndIds: keysAndValues using: [ :opts | ]
+	^ self xRead: key id: id using: [ :opts | ] 
