@@ -3,7 +3,7 @@ xGroupDestroy: key group: group
 	| args |
 	args := {
 		        'XGROUP'.
-		        'DELCONSUMER'.
+		        'DESTROY'.
 		        key.
 		        group } asOrderedCollection.
 	^ self unifiedCommand: args
