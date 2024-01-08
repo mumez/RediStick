@@ -4,7 +4,6 @@ xAck: key group: group ids: ids
 	args := {
 		        'XACK'.
 		        key.
-		        group.
-		        'STREAM' } asOrderedCollection.
+		        group } asOrderedCollection.
 	args addAll: ids.
 	^ self unifiedCommand: args
