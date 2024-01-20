@@ -1,0 +1,16 @@
+{
+	"commentStamp" : "",
+	"super" : "Object",
+	"category" : "RediStick-Stream",
+	"classinstvars" : [ ],
+	"pools" : [ ],
+	"classvars" : [ ],
+	"instvars" : [
+		"size",
+		"minId",
+		"maxId",
+		"consumers"
+	],
+	"name" : "RsPendingMessagesSummary",
+	"type" : "normal"
+}

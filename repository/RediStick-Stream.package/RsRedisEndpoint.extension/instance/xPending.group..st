@@ -1,6 +1,8 @@
 *RediStick-Stream
 xPending: key group: group
-	^ self unifiedCommand: {
-			  'XPENDING'.
-			  key.
-			  group }
+	| ord |
+	ord := self unifiedCommand: {
+			       'XPENDING'.
+			       key.
+			       group }.
+	^ RsPendingMessagesSummary fromOrderedCollection: ord
