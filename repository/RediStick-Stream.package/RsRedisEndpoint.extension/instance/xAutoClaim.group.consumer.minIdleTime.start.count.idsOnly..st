@@ -13,4 +13,4 @@ xAutoClaim: key group: group consumer: consumer minIdleTime: minIdleTime start: 
 				'COUNT'.
 				count } ].
 	idsOnly ifTrue: [ args add: 'JUSTID' ].
-	^ self unifiedCommand: args
+	^ RsAutoClaimResult fromOrderedCollection: (self unifiedCommand: args)

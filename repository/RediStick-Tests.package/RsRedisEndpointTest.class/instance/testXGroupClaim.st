@@ -1,6 +1,6 @@
 tests-stream
 testXGroupClaim
-	| streamKey groupKey consumerKeyA consumerKeyB created summary pendingsA pendingsB destroyedSize |
+	| streamKey groupKey consumerKeyA consumerKeyB created summary pendingsB destroyedSize |
 	streamKey := 'stream-testXGroupClaim'.
 	groupKey := 'group-a'.
 	consumerKeyA := 'consumer-a'.
