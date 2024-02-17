@@ -1,0 +1,22 @@
+{
+	"commentStamp" : "",
+	"super" : "RsStreamObject",
+	"category" : "RediStick-Stream",
+	"classinstvars" : [ ],
+	"pools" : [ ],
+	"classvars" : [ ],
+	"instvars" : [
+		"length",
+		"radixTreeKeys",
+		"radixTreeNodes",
+		"groups",
+		"lastGeneratedId",
+		"maxDeletedEntryId",
+		"entriesAdded",
+		"firstEntry",
+		"lastEntry",
+		"entries"
+	],
+	"name" : "RsStreamInfo",
+	"type" : "normal"
+}

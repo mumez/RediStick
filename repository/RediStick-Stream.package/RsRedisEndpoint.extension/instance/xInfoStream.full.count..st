@@ -1,6 +1,6 @@
 *RediStick-Stream
 xInfoStream: key full: full count: count
-	| args |
+	| args entries |
 	args := {
 		        'XINFO'.
 		        'STREAM'.
@@ -12,7 +12,8 @@ xInfoStream: key full: full count: count
 					'COUNT'.
 					count } ] ].
 
-	^ self unifiedCommand: {
+	entries :=  self unifiedCommand: {
 			  'XINFO'.
 			  'STREAM'.
-			  key }
+			  key }.
+	^ RsStreamInfo fromOrderedCollection: entries 
