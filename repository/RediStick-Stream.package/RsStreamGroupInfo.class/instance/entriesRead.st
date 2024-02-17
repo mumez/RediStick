@@ -1,0 +1,4 @@
+accessing
+entriesRead
+
+	^ entriesRead

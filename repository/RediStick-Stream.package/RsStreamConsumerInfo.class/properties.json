@@ -6,10 +6,11 @@
 	"pools" : [ ],
 	"classvars" : [ ],
 	"instvars" : [
-		"nextId",
-		"claimedMessages",
-		"deletedMessages"
+		"name",
+		"pending",
+		"idle",
+		"inactive"
 	],
-	"name" : "RsAutoClaimResult",
+	"name" : "RsStreamConsumerInfo",
 	"type" : "normal"
 }

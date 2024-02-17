@@ -1,0 +1,3 @@
+initialization
+initFromOrderedCollection: rawValues
+	self subclassResponsibility 

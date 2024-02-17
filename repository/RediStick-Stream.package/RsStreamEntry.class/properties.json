@@ -1,6 +1,6 @@
 {
 	"commentStamp" : "",
-	"super" : "Object",
+	"super" : "RsStreamObject",
 	"category" : "RediStick-Stream",
 	"classinstvars" : [ ],
 	"pools" : [ ],

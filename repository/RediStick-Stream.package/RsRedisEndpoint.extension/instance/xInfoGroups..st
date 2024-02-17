@@ -1,4 +1,5 @@
 *RediStick-Stream
 xInfoGroups: key
-
-	^ self unifiedCommand: { 'XINFO'. 'GROUPS'. key }
+	| entries |
+	entries := self unifiedCommand: { 'XINFO'. 'GROUPS'. key }.
+	^ entries collect: [ :each | RsStreamGroupInfo fromOrderedCollection: each ]

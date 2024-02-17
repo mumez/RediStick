@@ -1,15 +1,11 @@
 {
 	"commentStamp" : "",
-	"super" : "RsStreamObject",
+	"super" : "Object",
 	"category" : "RediStick-Stream",
 	"classinstvars" : [ ],
 	"pools" : [ ],
 	"classvars" : [ ],
-	"instvars" : [
-		"nextId",
-		"claimedMessages",
-		"deletedMessages"
-	],
-	"name" : "RsAutoClaimResult",
+	"instvars" : [ ],
+	"name" : "RsStreamObject",
 	"type" : "normal"
 }
