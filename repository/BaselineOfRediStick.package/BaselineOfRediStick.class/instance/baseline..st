@@ -22,9 +22,10 @@ baseline: spec
 			
 		spec 
 			group: 'default' with: #('Core');
-			group: 'Core' with: #('RediStick-Core' 'RediStick-Stream');
+			group: 'Core' with: #('RediStick-Core');
 			group: 'ConnectionPool' with: #('RediStick-Connection-Pool');
 			group: 'Pubsub' with: #('RediStick-Pubsub');
+			group: 'Stream' with: #('RediStick-Stream');
 			group: 'Tests' with: #('RediStick-Tests').
 			
 		spec
