@@ -6,14 +6,11 @@
 	"pools" : [ ],
 	"classvars" : [ ],
 	"instvars" : [
-		"name",
-		"consumers",
-		"pending",
-		"lastDeliveredId",
-		"entriesRead",
-		"lag",
-		"pelCount"
+		"id",
+		"owner",
+		"deliveredTimestamp",
+		"deliveredCount"
 	],
-	"name" : "RsStreamGroupInfo",
+	"name" : "RsStreamPendingEntry",
 	"type" : "normal"
 }

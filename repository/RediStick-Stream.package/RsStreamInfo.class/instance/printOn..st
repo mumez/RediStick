@@ -18,5 +18,7 @@ printOn: aStream
     self firstEntry printOn: aStream.
     aStream cr; nextPutAll: 'lastEntry: '.
     self lastEntry printOn: aStream.
+    aStream cr; nextPutAll: 'recordedFirstEntryId: '.
+    self recordedFirstEntryId printOn: aStream.
     aStream cr; nextPutAll: 'entries: '.
     self entries printOn: aStream.

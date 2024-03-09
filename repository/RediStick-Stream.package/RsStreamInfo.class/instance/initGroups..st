@@ -1,9 +1,9 @@
 initialization
-initGroup: value
+initGroups: value
 	| grps |
 	grps := value isInteger
 		        ifTrue: [ value ]
 		        ifFalse: [
 			        value collect: [ :each |
-				        RsStreamConsumerInfo fromOrderedCollection: each ] ].
+				        RsStreamGroupInfo fromOrderedCollection: each ] ].
 	^ self groups: grps

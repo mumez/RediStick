@@ -15,6 +15,7 @@
 		"entriesAdded",
 		"firstEntry",
 		"lastEntry",
+		"recordedFirstEntryId",
 		"entries"
 	],
 	"name" : "RsStreamInfo",

@@ -12,8 +12,5 @@ xInfoStream: key full: full count: count
 					'COUNT'.
 					count } ] ].
 
-	entries :=  self unifiedCommand: {
-			  'XINFO'.
-			  'STREAM'.
-			  key }.
+	entries :=  self unifiedCommand: args.
 	^ RsStreamInfo fromOrderedCollection: entries 
