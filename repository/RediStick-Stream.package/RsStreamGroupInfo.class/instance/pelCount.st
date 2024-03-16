@@ -1,0 +1,4 @@
+accessing
+pelCount
+
+	^ pelCount

@@ -1,4 +1,7 @@
 # RediStick
+
+[![CI](https://github.com/mumez/RediStick/actions/workflows/main.yml/badge.svg)](https://github.com/mumez/RediStick/actions/workflows/main.yml)
+
 A Redis client for Pharo using Stick auto-reconnection layer
 
 Many parts are borrowed from RedisClient.
@@ -35,6 +38,16 @@ Metacello new
   baseline: 'RediStick';
   repository: 'github://mumez/RediStick/repository';
   load: #('Core' 'Pubsub').
+```
+
+With Stream package:
+
+```smalltalk
+
+Metacello new
+  baseline: 'RediStick';
+  repository: 'github://mumez/RediStick/repository';
+  load: #('Core' 'Stream').
 ```
 
 With Search package:
@@ -80,6 +93,12 @@ In this example, the default connection pool is implicitly used through RedisPro
 RediStick provides a channel class for using redis pubsub API very easily.
 
 Please read [Pubsub.md](./doc/Pubsub.md).
+
+### Using Stream
+
+RediStick supports [Redis Streams](https://redis.io/docs/data-types/streams/) - distributed event streaming API.
+
+(Basic usage will be documented soon).
 
 ### Using Search
 
