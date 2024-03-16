@@ -1,0 +1,18 @@
+{
+	"commentStamp" : "",
+	"super" : "Object",
+	"category" : "RediStick-Stream",
+	"classinstvars" : [ ],
+	"pools" : [ ],
+	"classvars" : [ ],
+	"instvars" : [
+		"idleMilliseconds",
+		"idleTimeAt",
+		"retryCount",
+		"idsOnly",
+		"lastId",
+		"forceCreate"
+	],
+	"name" : "RsStreamClaimOptions",
+	"type" : "normal"
+}

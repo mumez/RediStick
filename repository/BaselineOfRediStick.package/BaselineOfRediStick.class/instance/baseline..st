@@ -13,6 +13,11 @@ baseline: spec
 		spec package: 'RediStick-Tests' with: [
 				spec requires: #('RediStick-Core' 'RediStick-Connection-Pool' 'RediStick-Pubsub')].
 			
+		spec package: 'RediStick-Stream' with: [
+				spec requires: #('RediStick-Core')].
+		spec package: 'RediStick-Stream-Tests' with: [
+				spec requires: #('RediStick-Tests' 'RediStick-Stream')].
+			
 		spec package: 'RediStick-Search' with: [
 				spec requires: #('RediStick-Core')].
 		spec package: 'RediStick-Search-Tests' with: [
@@ -24,6 +29,10 @@ baseline: spec
 			group: 'ConnectionPool' with: #('RediStick-Connection-Pool');
 			group: 'Pubsub' with: #('RediStick-Pubsub');
 			group: 'Tests' with: #('RediStick-Tests').
+			
+		spec
+			group: 'Stream' with: #('RediStick-Stream');
+			group: 'StreamTests' with: #('RediStick-Stream-Tests').
 			
 		spec
 			group: 'Search' with: #('RediStick-Search');

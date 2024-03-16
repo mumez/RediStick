@@ -1,0 +1,4 @@
+accessing
+millisecondsFromLastDelivery
+
+	^ millisecondsFromLastDelivery
