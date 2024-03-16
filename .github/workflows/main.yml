@@ -6,7 +6,7 @@ jobs:
   test:
     runs-on: ubuntu-22.04
     services:
-      meilisearch:
+      redis:
         image: redis/redis-stack:latest
         ports:
           - "6379:6379"
