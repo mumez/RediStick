@@ -1,4 +1,4 @@
-tests-stream
+*RediStick-Stream-Tests
 testXGroupAutoClaim
 	| streamKey groupKey consumerKeyA consumerKeyB created summary claimedA claimedB destroyedSize |
 	streamKey := 'stream-testXGroupAutoClaim'.

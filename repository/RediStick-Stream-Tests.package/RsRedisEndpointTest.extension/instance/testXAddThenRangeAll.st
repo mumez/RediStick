@@ -1,4 +1,4 @@
-tests-stream
+*RediStick-Stream-Tests
 testXAddThenRangeAll
 	| streamKey messages size |
 	streamKey := 'stream-testXAddThenRangeAll'.

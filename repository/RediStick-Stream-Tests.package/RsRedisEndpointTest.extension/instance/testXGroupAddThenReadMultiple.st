@@ -1,4 +1,4 @@
-tests-stream
+*RediStick-Stream-Tests
 testXGroupAddThenReadMultiple
 	| streamKey groupKey consumerKeyA consumerKeyB created messagesA messagesB ack pendingSize destroyedSize |
 	streamKey := 'stream-testXGroupAddThenReadMultiple'.

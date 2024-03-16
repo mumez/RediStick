@@ -1,7 +1,7 @@
-tests-stream
-testXInfoStream
-	| streamKey groupKey consumerKeyA consumerKeyB created ents1 ents2 streamInfo destroyedSize |
-	streamKey := 'stream-testXInfoStream'.
+*RediStick-Stream-Tests
+testXInfoGroups
+	| streamKey groupKey consumerKeyA consumerKeyB created ents1 ents2 groupInfoCol groupInfo lastDeliveredId destroyedSize |
+	streamKey := 'stream-testXInfoGroups'.
 	groupKey := 'group-a'.
 	consumerKeyA := 'consumer-a'.
 	consumerKeyB := 'consumer-b'.
@@ -19,20 +19,17 @@ testXInfoStream
 	
 	ents1 := stick endpoint xGroupRead: streamKey id: '>' group: groupKey consumer: consumerKeyA count: 1.
 	ents2 := stick endpoint xGroupRead: streamKey id: '>' group: groupKey consumer: consumerKeyB count: 2.
-	
 	stick endpoint xAck: streamKey group: groupKey id: ents1 first id.
-	(Delay forMilliseconds: 100) wait.
 	
-	streamInfo := stick endpoint xInfoStream: streamKey.
-	self assert: streamInfo size equals: 3.
-	self assert: streamInfo radixTreeKeys equals: 1.
-	self assert: streamInfo radixTreeNodes equals: 2.
-	self assert: streamInfo groups equals: 1.
-	self assert: streamInfo lastGeneratedId equals: ents2 last id.
-	self assert: streamInfo maxDeletedEntryId equals: '0-0'.
-	self assert: streamInfo entriesAdded equals: 3.
-	self assert: streamInfo firstEntry id equals: ents1 first id.
-	self assert: streamInfo lastEntry id equals: ents2 last id.
+	groupInfoCol := stick endpoint xInfoGroups: streamKey.
+	self assert: groupInfoCol size equals: 1.
+	groupInfo := groupInfoCol first.
+	self assert: groupInfo name equals: groupKey.
+	self assert: groupInfo consumers equals: 2.
+	self assert: groupInfo pending equals: 2.
+	lastDeliveredId := ents2 last id.
+	self assert: groupInfo lastDeliveredId equals: lastDeliveredId.
+	self assert: groupInfo entriesRead equals: 3.
 	
 	destroyedSize := stick endpoint xGroupDestroy: streamKey group: groupKey.
 	self assert: destroyedSize equals: 1.

@@ -1,4 +1,4 @@
-tests-stream
+*RediStick-Stream-Tests
 testXGroupCreateThenDestroy
 	| streamKey groupKey consumerKey created createdSize pendingSize destroyedSize |
 	streamKey := 'stream-testXGroupCreateThenDestroy'.

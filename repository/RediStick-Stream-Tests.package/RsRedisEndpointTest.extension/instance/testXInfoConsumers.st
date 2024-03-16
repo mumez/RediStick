@@ -1,4 +1,4 @@
-tests-stream
+*RediStick-Stream-Tests
 testXInfoConsumers
 	| streamKey groupKey consumerKeyA consumerKeyB created ents1 ents2 consumerInfoCol consumerInfoA consumerInfoB destroyedSize |
 	streamKey := 'stream-testXInfoConsumers'.

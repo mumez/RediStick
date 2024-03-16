@@ -6,14 +6,17 @@ baseline: spec
 		self stick: spec.
 		spec 
 			package: 'RediStick-Core' with: [spec requires: 'Stick'].
-		spec package: 'RediStick-Stream' with: [
-				spec requires: #('RediStick-Core')].
 		spec package: 'RediStick-Connection-Pool' with: [
 				spec requires: #('RediStick-Core')].
 		spec package: 'RediStick-Pubsub' with: [
 				spec requires: #('RediStick-Connection-Pool')].
 		spec package: 'RediStick-Tests' with: [
-				spec requires: #('RediStick-Core' 'RediStick-Stream' 'RediStick-Connection-Pool' 'RediStick-Pubsub')].
+				spec requires: #('RediStick-Core' 'RediStick-Connection-Pool' 'RediStick-Pubsub')].
+			
+		spec package: 'RediStick-Stream' with: [
+				spec requires: #('RediStick-Core')].
+		spec package: 'RediStick-Stream-Tests' with: [
+				spec requires: #('RediStick-Tests' 'RediStick-Stream')].
 			
 		spec package: 'RediStick-Search' with: [
 				spec requires: #('RediStick-Core')].
@@ -25,8 +28,11 @@ baseline: spec
 			group: 'Core' with: #('RediStick-Core');
 			group: 'ConnectionPool' with: #('RediStick-Connection-Pool');
 			group: 'Pubsub' with: #('RediStick-Pubsub');
-			group: 'Stream' with: #('RediStick-Stream');
 			group: 'Tests' with: #('RediStick-Tests').
+			
+		spec
+			group: 'Stream' with: #('RediStick-Stream');
+			group: 'StreamTests' with: #('RediStick-Stream-Tests').
 			
 		spec
 			group: 'Search' with: #('RediStick-Search');

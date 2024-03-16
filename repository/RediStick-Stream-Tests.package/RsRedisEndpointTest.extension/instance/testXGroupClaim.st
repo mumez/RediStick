@@ -1,4 +1,4 @@
-tests-stream
+*RediStick-Stream-Tests
 testXGroupClaim
 	| streamKey groupKey consumerKeyA consumerKeyB created summary pendingsB destroyedSize |
 	streamKey := 'stream-testXGroupClaim'.

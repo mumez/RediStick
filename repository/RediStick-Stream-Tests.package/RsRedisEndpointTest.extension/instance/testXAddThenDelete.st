@@ -1,4 +1,4 @@
-tests-stream
+*RediStick-Stream-Tests
 testXAddThenDelete
 	| streamKey lastId size |
 	streamKey := 'stream-testXAddThenDelete'.

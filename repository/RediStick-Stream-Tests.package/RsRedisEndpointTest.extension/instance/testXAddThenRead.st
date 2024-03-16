@@ -1,7 +1,7 @@
-tests-stream
-testXAddThenRange
+*RediStick-Stream-Tests
+testXAddThenRead
 	| streamKey id messages size |
-	streamKey := 'stream-testXAddThenRange'.
+	streamKey := 'stream-testXAddThenRead'.
 	stick endpoint xTrim: streamKey maxLen: 1000.
 	stick endpoint xAdd: streamKey field: 'a' value: '1'.
 	id := stick endpoint xAdd: streamKey field: 'b' value: '2'.
@@ -9,7 +9,7 @@ testXAddThenRange
 	stick endpoint xAdd: streamKey field: 'd' value: '4'.
 	stick endpoint xAdd: streamKey field: 'e' value: '5'.
 	
-	messages := stick endpoint xRange: streamKey nextFrom: id count: 2.
+	messages := stick endpoint xRead: streamKey id: id count: 2.
 	size := messages size.
 	self assert: size equals: 2.
 	
