@@ -1,16 +1,11 @@
 {
 	"commentStamp" : "",
-	"super" : "Object",
+	"super" : "SkSettings",
 	"category" : "RediStick-Stream-Objects",
 	"classinstvars" : [ ],
 	"pools" : [ ],
 	"classvars" : [ ],
-	"instvars" : [
-		"stick",
-		"settings",
-		"name",
-		"createNotExists"
-	],
-	"name" : "RsStream",
+	"instvars" : [ ],
+	"name" : "RsStreamSettings",
 	"type" : "normal"
 }
