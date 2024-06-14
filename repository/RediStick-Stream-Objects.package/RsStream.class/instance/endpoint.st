@@ -1,3 +1,3 @@
 accessing
 endpoint
-	^self stick endpoint
+	^ self stick endpoint

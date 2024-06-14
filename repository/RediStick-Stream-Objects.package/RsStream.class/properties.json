@@ -9,7 +9,7 @@
 		"stick",
 		"settings",
 		"name",
-		"createNotExists"
+		"autoCreate"
 	],
 	"name" : "RsStream",
 	"type" : "normal"
