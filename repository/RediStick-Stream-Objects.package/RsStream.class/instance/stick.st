@@ -1,3 +1,3 @@
 accessing
 stick
-	^ stick
+	^ stick ifNil: [ stick := self createStick ]

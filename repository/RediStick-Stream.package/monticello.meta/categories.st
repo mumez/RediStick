@@ -1,1 +1,1 @@
-SystemOrganization addCategory: #'RediStick-Stream'!
+self packageOrganizer ensurePackage: #'RediStick-Stream' withTags: #()!
