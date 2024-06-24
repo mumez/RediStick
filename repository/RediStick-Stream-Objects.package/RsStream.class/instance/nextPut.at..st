@@ -1,3 +1,3 @@
 adding
-nextPut: keyValueAssoc at: streamMessageId
-	^ self nextPutAll: { keyValueAssoc } at: streamMessageId trimUsing: [:opts |]
+nextPut: keyValuesOrAssociation at: streamMessageId
+	^ self nextPutAssociations: (self ensureAssociations: keyValuesOrAssociation) at: streamMessageId trimUsing: [:opts |]

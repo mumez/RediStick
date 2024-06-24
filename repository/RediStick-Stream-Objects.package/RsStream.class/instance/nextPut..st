@@ -1,3 +1,3 @@
 adding
-nextPut: keyValueAssoc
-	^ self nextPutAll: { keyValueAssoc }
+nextPut: keyValuesOrAssociation
+	^ self nextPutAssociations: (self ensureAssociations: keyValuesOrAssociation)
