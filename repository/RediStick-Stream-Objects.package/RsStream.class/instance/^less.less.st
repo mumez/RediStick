@@ -1,3 +1,3 @@
 adding
 << keyValuesOrAssociation
-	^ self nextPut: keyValuesOrAssociation
+	self nextPut: keyValuesOrAssociation
