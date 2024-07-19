@@ -1,0 +1,3 @@
+constants
+zero
+	^ self all

@@ -1,4 +1,6 @@
 initialization
 initFromId: fromIdLikeThing
-	fromIdLikeThing ifNil: [ ^ fromId := '' ].
-	fromId := fromIdLikeThing asStreamMessageId
+	fromId := fromIdLikeThing
+		          ifNil: [ RsStreamMessageId zero ]
+		          ifNotNil: [ fromIdLikeThing asStreamMessageId ].
+	currentId := fromId
