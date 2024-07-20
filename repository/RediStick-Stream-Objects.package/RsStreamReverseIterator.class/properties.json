@@ -1,0 +1,11 @@
+{
+	"commentStamp" : "",
+	"super" : "RsStreamIterator",
+	"category" : "RediStick-Stream-Objects",
+	"classinstvars" : [ ],
+	"pools" : [ ],
+	"classvars" : [ ],
+	"instvars" : [ ],
+	"name" : "RsStreamReverseIterator",
+	"type" : "normal"
+}
