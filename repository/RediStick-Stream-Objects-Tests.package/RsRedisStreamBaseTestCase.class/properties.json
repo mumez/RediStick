@@ -1,11 +1,11 @@
 {
 	"commentStamp" : "",
-	"super" : "RsRedisStreamBaseTestCase",
+	"super" : "RsRedisTestCase",
 	"category" : "RediStick-Stream-Objects-Tests",
 	"classinstvars" : [ ],
 	"pools" : [ ],
 	"classvars" : [ ],
 	"instvars" : [ ],
-	"name" : "RsRedisStreamTest",
+	"name" : "RsRedisStreamBaseTestCase",
 	"type" : "normal"
 }
