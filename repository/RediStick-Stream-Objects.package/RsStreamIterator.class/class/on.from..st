@@ -1,3 +1,3 @@
 instance creation
-on: aStream from: fromId
-	^ (self on: aStream) initFromId: fromId 
+on: aRsStream from: fromId
+	^ (self on: aRsStream) initFromId: fromId 
