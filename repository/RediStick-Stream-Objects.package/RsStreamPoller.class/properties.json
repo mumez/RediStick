@@ -9,7 +9,11 @@
 		"shouldKeepPolling",
 		"stream",
 		"currentId",
-		"onReceived"
+		"pollingPriority",
+		"onReceived",
+		"onReceiveNotAccepted",
+		"onPollFailed",
+		"logger"
 	],
 	"name" : "RsStreamPoller",
 	"type" : "normal"

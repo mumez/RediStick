@@ -1,17 +1,13 @@
 actions
 poll
 	| received |
-	received := self currentId
-		            ifNil: [
-			            self stream
-				            comingAtMost: self settings iterationReadChunkSize
-				            waitFor: self settings waitMilliseconds ]
-		            ifNotNil: [
-			            self stream
-				            nextAtMost: self settings iterationReadChunkSize
-				            after: self currentId
-				            waitFor: self settings waitMilliseconds ].
-
+	received := self basicPoll.
 	received do: [ :each |
-		self onReceived value: each.
-		self currentId: each id ]
+		| processed |
+		processed := true.
+		[ self onReceived value: each ]
+			on: Error
+			do: [ :ex |
+				processed := false.
+				self onReceiveNotAccepted value: ex value: each ].
+		processed ifTrue: [ self currentId: each id ] ]

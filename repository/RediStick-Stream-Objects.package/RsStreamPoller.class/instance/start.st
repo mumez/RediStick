@@ -1,4 +1,5 @@
 actions
 start
+	self shouldKeepPolling ifTrue: [ ^self ].
 	self shouldKeepPolling: true.
-	self keepPolling
+	[self keepPolling] forkAt: self pollingPriority
