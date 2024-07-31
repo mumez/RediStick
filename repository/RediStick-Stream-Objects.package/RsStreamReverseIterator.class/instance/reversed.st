@@ -1,3 +1,3 @@
 converting
 reversed
-	^ RsStreamIterator on: self stream from: self currentId 
+	^ RsStreamIterator on: self stream nextFrom: self currentId 

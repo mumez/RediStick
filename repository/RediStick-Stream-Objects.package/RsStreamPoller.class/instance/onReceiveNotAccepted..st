@@ -1,4 +1,4 @@
-accessing
+callback
 onReceiveNotAccepted: anObject
 
 	onReceiveNotAccepted := anObject

@@ -10,14 +10,14 @@ testReversedNextAtMost
 	four := 'four' -> '4'.
 	five := 'five' -> '5'.
 	strm << one << two << three << four << five.
-	ite1 := strm iteratorFromLast reversed.
+	ite1 := strm iteratorNextFromLast reversed.
 	self assert: strm last content equals: five.
 	entries1 := OrderedCollection new.
 	ite1 nextAtMost: 2 do: [ :each | entries1 add: each ].
 	self assert: entries1 size equals: 2.
 	self assert: entries1 first content equals: four.
 	self assert: entries1 second content equals: three.
-	ite2 := (strm iteratorFrom: entries1 second) reversed.
+	ite2 := (strm iteratorNextFrom: entries1 second) reversed.
 	entries2 := OrderedCollection new.
 	ite2 nextAtMost: 5 do: [ :each | entries2 add: each ].
 	self assert: entries2 size equals: 2.

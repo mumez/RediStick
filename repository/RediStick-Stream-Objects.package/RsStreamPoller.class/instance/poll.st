@@ -5,7 +5,7 @@ poll
 	received do: [ :each |
 		| processed |
 		processed := true.
-		[ self onReceived value: each ]
+		[ self onReceive value: each ]
 			on: Error
 			do: [ :ex |
 				processed := false.

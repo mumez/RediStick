@@ -10,10 +10,10 @@
 		"stream",
 		"currentId",
 		"pollingPriority",
-		"onReceived",
 		"onReceiveNotAccepted",
 		"onPollFailed",
-		"logger"
+		"logger",
+		"onReceive"
 	],
 	"name" : "RsStreamPoller",
 	"type" : "normal"

@@ -1,3 +1,3 @@
 instance creation
-on: aRsStream from: fromId
+on: aRsStream nextFrom: fromId
 	^ (self on: aRsStream) initFromId: fromId 

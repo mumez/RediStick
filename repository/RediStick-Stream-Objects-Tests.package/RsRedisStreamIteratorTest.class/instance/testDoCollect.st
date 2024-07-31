@@ -10,7 +10,7 @@ testDoCollect
 	four := 'four' -> '4'.
 	five := 'five' -> '5'.
 	strm << one << two << three << four << five.
-	ite1 := strm iteratorFromFirst.
+	ite1 := strm iteratorNextFromFirst.
 	self assert: strm first content equals: one.
 	entries1 := OrderedCollection new.
 	ite1 do: [ :each | entries1 add: each ].
@@ -18,7 +18,7 @@ testDoCollect
 	self assert: entries1 first content equals: two.
 	self assert: entries1 second content equals: three.
 	self assert: entries1 last content equals: five.
-	ite2 := strm iteratorFrom: entries1 second.
+	ite2 := strm iteratorNextFrom: entries1 second.
 	entries2 := ite2 collect: [ :each | each ].
 	self assert: entries2 size equals: 2.
 	self assert: entries2 first content equals: four.

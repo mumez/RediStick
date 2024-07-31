@@ -1,4 +1,4 @@
-accessing
+callback
 onReceiveNotAccepted
 	^ onReceiveNotAccepted ifNil: [
 		  onReceiveNotAccepted := [ :ex :each |
