@@ -15,5 +15,5 @@ basicPoll
 		  on: Error
 		  do: [ :ex |
 			  (Delay forMilliseconds: 500) wait.
-			  self onPollFailed value: ex.
+			  self onPollFail value: ex.
 			  #(  ) ]

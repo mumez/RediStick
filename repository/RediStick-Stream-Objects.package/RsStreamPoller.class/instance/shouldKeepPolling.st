@@ -1,3 +1,3 @@
 accessing
 shouldKeepPolling
-	^ shouldKeepPolling ifNil: [ shouldKeepPolling := true ]
+	^ shouldKeepPolling ifNil: [ shouldKeepPolling := false ]

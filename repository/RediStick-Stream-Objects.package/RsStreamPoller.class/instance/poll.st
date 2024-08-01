@@ -9,5 +9,5 @@ poll
 			on: Error
 			do: [ :ex |
 				processed := false.
-				self onReceiveNotAccepted value: ex value: each ].
+				self onReceiveFail value: ex value: each ].
 		processed ifTrue: [ self currentId: each id ] ]

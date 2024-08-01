@@ -1,7 +1,7 @@
 callback
-onReceiveNotAccepted
-	^ onReceiveNotAccepted ifNil: [
-		  onReceiveNotAccepted := [ :ex :each |
+onReceiveFail
+	^ onReceiveFail ifNil: [
+		  onReceiveFail := [ :ex :each |
 		                          self logger error: {
 				                          #ReceiveNotAccepted.
 				                          ex description.
