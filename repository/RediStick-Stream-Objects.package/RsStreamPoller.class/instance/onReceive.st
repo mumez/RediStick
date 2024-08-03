@@ -1,4 +1,4 @@
 callback
 onReceive
 
-	^ onReceive
+	^ onReceive ifNil: [ onReceive := [ :received |  ] ]

@@ -1,4 +1,5 @@
 actions
 kill
 	pollingProcess ifNil: [ ^self ].
-	pollingProcess terminate
+	pollingProcess terminate.
+	shouldKeepPolling := false
