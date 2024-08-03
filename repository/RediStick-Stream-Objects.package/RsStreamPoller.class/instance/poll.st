@@ -1,6 +1,7 @@
 actions
 poll
 	| received |
+	self isConnected ifFalse: [ ^ self waitAndRefresh ].
 	received := self basicPoll.
 	received do: [ :each |
 		| processed |

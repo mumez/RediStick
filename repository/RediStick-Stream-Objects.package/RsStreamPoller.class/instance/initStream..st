@@ -1,3 +1,3 @@
 initialization
-initStrean: aRsStream
+initStream: aRsStream
 	stream := aRsStream sameNamed

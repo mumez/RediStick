@@ -1,3 +1,3 @@
 instance creation
 on: aStream
-	^ self new initStrean: aStream; yourself
+	^ self new initStream: aStream; yourself
