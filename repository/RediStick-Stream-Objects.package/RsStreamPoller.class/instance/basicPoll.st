@@ -10,7 +10,7 @@ basicPoll
 		  ifNotNil: [
 			  self stream
 				  nextAtMost: self readChunkSize
-				  after: self currentId
+				  after: self currentId asStreamMessageId
 				  waitFor: self waitMilliseconds ] ]
 		  on: Error
 		  do: [ :ex |

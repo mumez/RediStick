@@ -11,4 +11,4 @@ poll
 			do: [ :ex |
 				processed := false.
 				self onReceiveFail value: ex value: each ].
-		processed ifTrue: [ self currentId: each id ] ]
+		processed ifTrue: [ self currentId: each asStreamMessageId ] ]

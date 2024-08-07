@@ -29,6 +29,10 @@ testSimplePoll
 	
 	self assert: entries1 size equals: 5.
 	self assert: entries2 size equals: 5.
+	self assert: entries1 first content equals: one.
+	self assert: entries2 first content equals: one.
+	self assert: entries1 last content equals: five.
+	self assert: entries2 last content equals: five.
 	strm trimTo: 0.
 	self assert: strm length equals: 0.
 	
