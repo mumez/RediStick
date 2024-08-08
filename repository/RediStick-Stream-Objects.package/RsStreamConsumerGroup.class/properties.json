@@ -1,0 +1,16 @@
+{
+	"commentStamp" : "",
+	"super" : "Object",
+	"category" : "RediStick-Stream-Objects",
+	"classinstvars" : [ ],
+	"pools" : [ ],
+	"classvars" : [ ],
+	"instvars" : [
+		"name",
+		"fromId",
+		"autoCreateStream",
+		"streamName"
+	],
+	"name" : "RsStreamConsumerGroup",
+	"type" : "normal"
+}
