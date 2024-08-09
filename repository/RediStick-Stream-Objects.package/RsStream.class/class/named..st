@@ -1,3 +1,3 @@
 instance creation
 named: streamName
-	^ self new name: streamName
+	^ self new name: streamName; yourself

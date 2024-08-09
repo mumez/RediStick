@@ -7,12 +7,9 @@
 	"classvars" : [ ],
 	"instvars" : [
 		"name",
-		"fromId",
-		"currentId",
-		"autoCreateStream",
-		"stream",
+		"groupName",
 		"streamName"
 	],
-	"name" : "RsStreamConsumerGroup",
+	"name" : "RsStreamConsumer",
 	"type" : "normal"
 }

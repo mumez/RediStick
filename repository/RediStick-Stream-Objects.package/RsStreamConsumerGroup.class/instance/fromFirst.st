@@ -1,3 +1,3 @@
 initialization
 fromFirst
-	fromId := RsStreamMessageId zero
+	self initMessageId: RsStreamMessageId zero

@@ -1,0 +1,3 @@
+actions
+changeLastDeliveredMessageId: aStreamMessageId
+	self changeLastDeliveredMessageId: aStreamMessageId entriesRead: nil
