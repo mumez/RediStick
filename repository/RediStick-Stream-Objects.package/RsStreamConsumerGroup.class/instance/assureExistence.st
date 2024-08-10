@@ -1,3 +1,3 @@
 actions
 assureExistence
-	self stream xGroupCreate: self streamName group: self name id: self fromId createNotExists: true
+	self endpoint xGroupCreate: self streamName group: self name id: self fromId createNotExists: true

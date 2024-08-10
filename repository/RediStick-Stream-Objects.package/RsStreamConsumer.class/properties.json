@@ -8,6 +8,7 @@
 	"instvars" : [
 		"name",
 		"groupName",
+		"stream",
 		"streamName"
 	],
 	"name" : "RsStreamConsumer",
