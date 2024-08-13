@@ -1,8 +1,8 @@
 reading
-nextAfter: latestMessageId waitFor: milliseconds on: consumerName
+nextNoAckAfter: latestMessageId on: consumerName
 	^ self endpoint
 		  xGroupRead: self streamName
 		  id: latestMessageId
 		  group: self name
 		  consumer: consumerName
-		  blocking: milliseconds
+		  using: [ :opts | opts noAck ]

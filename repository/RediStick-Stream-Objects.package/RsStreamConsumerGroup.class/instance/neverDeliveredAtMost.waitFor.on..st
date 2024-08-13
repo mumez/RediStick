@@ -1,8 +1,8 @@
 reading
-nextAtMost: count after: latestMessageId waitFor: milliseconds on: consumerName
+neverDeliveredAtMost: count waitFor: milliseconds on: consumerName
 	^ self endpoint
 		  xGroupRead: self streamName
-		  id: latestMessageId
+		  id:  RsStreamMessageId neverDelivered
 		  group: self name
 		  consumer: consumerName
 		  blocking: milliseconds
