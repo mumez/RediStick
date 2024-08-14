@@ -1,4 +1,4 @@
 accessing
 streamName
 
-	^ streamName
+	^ self stream name

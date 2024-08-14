@@ -10,8 +10,7 @@
 		"fromId",
 		"currentId",
 		"autoCreateStream",
-		"stream",
-		"streamName"
+		"stream"
 	],
 	"name" : "RsStreamConsumerGroup",
 	"type" : "normal"

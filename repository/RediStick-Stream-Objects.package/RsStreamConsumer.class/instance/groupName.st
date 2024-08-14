@@ -1,4 +1,3 @@
 accessing
 groupName
-
-	^ groupName
+	^ self group name
