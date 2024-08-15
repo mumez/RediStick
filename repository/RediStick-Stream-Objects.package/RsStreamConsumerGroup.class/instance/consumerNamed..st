@@ -1,3 +1,3 @@
 consumers
 consumerNamed: consumerName
-	^ self consumerClass named: consumerName on: self
+	^ (self consumerClass named: consumerName on: self) assureExistence

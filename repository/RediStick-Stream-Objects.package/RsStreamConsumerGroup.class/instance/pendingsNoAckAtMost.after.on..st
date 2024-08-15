@@ -1,5 +1,5 @@
 reading
-nextNoAckAtMost: count after: latestMessageId on: consumerName
+pendingsNoAckAtMost: count after: latestMessageId on: consumerName
 	^ self endpoint
 		  xGroupRead: self streamName
 		  id: latestMessageId

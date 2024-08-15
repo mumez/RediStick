@@ -1,4 +1,4 @@
 accessing
 fromId
 
-	^ fromId ifNil: [ fromId := RsStreamMessageId newest ]
+	^ fromId ifNil: [ fromId := RsStreamMessageId zero ]

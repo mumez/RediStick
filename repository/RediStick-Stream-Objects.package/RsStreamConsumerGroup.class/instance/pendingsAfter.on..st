@@ -1,5 +1,5 @@
 reading
-nextAfter: latestMessageId on: consumerName
+pendingsAfter: latestMessageId on: consumerName
 	^ self endpoint
 		  xGroupRead: self streamName
 		  id: latestMessageId
