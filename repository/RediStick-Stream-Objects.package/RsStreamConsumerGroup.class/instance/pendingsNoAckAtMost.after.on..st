@@ -1,6 +1,6 @@
 reading
 pendingsNoAckAtMost: count after: latestMessageId on: consumerName
-	^ self endpoint
+	^ self wrapAsAcceptableEntries: ( self endpoint
 		  xGroupRead: self streamName
 		  id: latestMessageId
 		  group: self name
@@ -8,4 +8,4 @@ pendingsNoAckAtMost: count after: latestMessageId on: consumerName
 		  using: [ :opts |
 			  opts
 				  noAck;
-				  count: count ]
+				  count: count ])
