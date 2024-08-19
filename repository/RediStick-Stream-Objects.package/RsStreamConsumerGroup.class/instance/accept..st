@@ -1,3 +1,6 @@
 reading
 accept: aStreamEntry
-	self endpoint xAck: self streamName group: self name id: aStreamEntry asStreamMessageId 
+	| msgId |
+	msgId := aStreamEntry asStreamMessageId. 
+	self endpoint xAck: self streamName group: self name id: msgId.
+	currentId := msgId

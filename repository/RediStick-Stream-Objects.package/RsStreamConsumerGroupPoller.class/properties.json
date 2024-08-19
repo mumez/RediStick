@@ -6,8 +6,8 @@
 	"pools" : [ ],
 	"classvars" : [ ],
 	"instvars" : [
-		"stream"
+		"consumer"
 	],
-	"name" : "RsStreamPoller",
+	"name" : "RsStreamConsumerGroupPoller",
 	"type" : "normal"
 }

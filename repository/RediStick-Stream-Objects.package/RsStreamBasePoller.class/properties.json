@@ -1,0 +1,20 @@
+{
+	"commentStamp" : "",
+	"super" : "Object",
+	"category" : "RediStick-Stream-Objects",
+	"classinstvars" : [ ],
+	"pools" : [ ],
+	"classvars" : [ ],
+	"instvars" : [
+		"shouldKeepPolling",
+		"currentId",
+		"pollingPriority",
+		"logger",
+		"onReceive",
+		"onPollFail",
+		"onReceiveFail",
+		"pollingProcess"
+	],
+	"name" : "RsStreamBasePoller",
+	"type" : "normal"
+}

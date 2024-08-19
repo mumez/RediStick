@@ -1,8 +1,7 @@
 private
 basicPoll
 
-	^ [
-	  self currentId
+	^ self currentId
 		  ifNil: [
 			  self stream
 				  comingAtMost: self readChunkSize
@@ -11,9 +10,4 @@ basicPoll
 			  self stream
 				  nextAtMost: self readChunkSize
 				  after: self currentId asStreamMessageId
-				  waitFor: self waitMilliseconds ] ]
-		  on: Error
-		  do: [ :ex |
-			  (Delay forMilliseconds: 500) wait.
-			  self onPollFail value: ex.
-			  #(  ) ]
+				  waitFor: self waitMilliseconds ]
