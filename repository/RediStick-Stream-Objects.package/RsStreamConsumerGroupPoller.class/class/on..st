@@ -1,3 +1,3 @@
 instance creation
 on: aStreamConsumer
-	^ self new initStream: aStreamConsumer; yourself
+	^ self new initConsumer: aStreamConsumer; yourself
