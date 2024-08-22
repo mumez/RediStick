@@ -1,3 +1,3 @@
 accessing
 settings
-	^ self stream settings
+	^ self subclassResponsibility 
