@@ -1,8 +1,7 @@
 private
 basicPoll
-	| entries pendings |
+	| entries |
 	entries := OrderedCollection new.
-	[ (pendings := self pollPending) notEmpty ] whileTrue: [
-		entries addAll: pendings ].
-	entries ifEmpty: [ entries := self pollNeverDelivered ].
+	entries addAll: self pollPending.
+	entries addAll: self pollNeverDelivered.
 	^ entries
