@@ -1,3 +1,3 @@
 accessing
 readChunkSize
-	^ self settings iterationReadChunkSize
+	^ self settings pollReadChunkSize
