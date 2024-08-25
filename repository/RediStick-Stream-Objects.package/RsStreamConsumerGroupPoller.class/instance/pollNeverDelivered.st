@@ -1,5 +1,5 @@
 private
 pollNeverDelivered
 	^ self consumer
-		  neverDeliveredNoAckAtMost: self readChunkSize
+		  neverDeliveredAtMost: self readChunkSize
 		  waitFor: self waitMilliseconds

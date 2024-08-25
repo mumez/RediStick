@@ -1,6 +1,6 @@
 reading
 neverDeliveredAtMost: count waitFor: milliseconds on: consumerName
-	^ self wrapAsAcceptableEntries: ( self endpoint
+	^ self wrapAsAcceptableEntries: (self endpoint
 		  xGroupRead: self streamName
 		  id:  RsStreamMessageId neverDelivered
 		  group: self name
