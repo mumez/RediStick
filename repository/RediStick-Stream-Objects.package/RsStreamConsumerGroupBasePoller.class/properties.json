@@ -1,11 +1,13 @@
 {
 	"commentStamp" : "",
-	"super" : "RsStreamConsumerGroupBasePoller",
+	"super" : "RsStreamBasePoller",
 	"category" : "RediStick-Stream-Objects",
 	"classinstvars" : [ ],
 	"pools" : [ ],
 	"classvars" : [ ],
-	"instvars" : [ ],
-	"name" : "RsStreamConsumerGroupNoAckPoller",
+	"instvars" : [
+		"consumer"
+	],
+	"name" : "RsStreamConsumerGroupBasePoller",
 	"type" : "normal"
 }

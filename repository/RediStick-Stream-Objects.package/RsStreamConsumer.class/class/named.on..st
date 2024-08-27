@@ -1,3 +1,3 @@
 instance creation
 named: consumerName on: aStreamConsumerGroup
-	^ (self named: consumerName) initGroup: aStreamConsumerGroup
+	^ self named: consumerName groupNamed: aStreamConsumerGroup name streamNamed: aStreamConsumerGroup streamName
