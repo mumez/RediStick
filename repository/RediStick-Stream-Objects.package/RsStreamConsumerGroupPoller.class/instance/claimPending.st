@@ -1,3 +1,3 @@
 private
 claimPending
-	^ self consumer autoClaimIdling
+	^ self consumer autoClaimIdleMoreThan: self claimMinIdleMilliseconds

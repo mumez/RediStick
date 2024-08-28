@@ -6,7 +6,8 @@
 	"pools" : [ ],
 	"classvars" : [ ],
 	"instvars" : [
-		"shouldAutoClaimBlock"
+		"shouldAutoClaimBlock",
+		"claimMinIdleMilliseconds"
 	],
 	"name" : "RsStreamConsumerGroupPoller",
 	"type" : "normal"
