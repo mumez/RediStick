@@ -9,18 +9,17 @@ testSimpleGroupPoll
 	entries1 := OrderedCollection new.
 	consumer1 := consumerGroup consumerNamed: 'consumer1'.
 	poller1 := consumer1 poller.
-	poller1 onReceive: [ :each | entries1 add: each].
+	poller1 onReceive: [ :each | entries1 add: each. (Delay forMilliseconds: 5) wait].
 	poller1 start.
 	consumer2 := consumerGroup consumerNamed: 'consumer2'.
 	poller2 := consumer2 poller.
 	entries2 := OrderedCollection new.
-	poller2 onReceive: [ :each | entries2 add: each].
+	poller2 onReceive: [ :each | entries2 add: each. (Delay forMilliseconds: 5) wait].
 	poller2 start.
 	
 	1 to: 10 do: [ :idx |
 		strm nextPut: (('idx:', idx asString) -> idx).
 	].
-
 	[consumerGroup summaryPendingList isEmpty] whileFalse: [ (Delay forMilliseconds: 100) wait].
 	
 	poller1 stop.
