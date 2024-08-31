@@ -25,6 +25,8 @@ testPollWithPendingsAutoClaimed
 	self assert: pendings first content key equals: '4'.
 	self assert: pendings last content key equals: '9'.
 	
+	poller1 kill.
+	
 	entries2 := OrderedCollection new.
 	consumer2 := consumerGroup consumerNamed: 'consumer2'.
 	poller2 := consumer2 poller.
@@ -32,16 +34,16 @@ testPollWithPendingsAutoClaimed
 	poller2 shouldAutoClaim: true.
 	poller2 claimMinIdleMilliseconds: 10.
 	poller2 start.
-	#(10 11 12 13 14 15) doWithIndex: [ :each :idx | 
+	#(10 11 12) doWithIndex: [ :each :idx | 
 		strm nextPut: (idx  -> each).
 	].
 	[consumerGroup summaryPendingList isEmpty] whileFalse: [(Delay forMilliseconds: 100) wait].
 
 	self assert: consumer1 allPendings size equals: 0.
 	self assert: consumer2 allPendings size equals: 0.
-	self assert: entries2 size equals: 8.
+	self assert: entries2 size equals: 5.
+	self assert: (entries2 collect: [:each | each content key]) sorted asArray equals: #('1' '2' '3' '4' '9').
 	
-	poller1 stop.
 	poller2 stop.
 	consumerGroup destroy.
 	strm trimTo: 0.
