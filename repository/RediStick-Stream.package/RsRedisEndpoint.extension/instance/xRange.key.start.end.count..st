@@ -4,8 +4,8 @@ xRange: command key: key start: startId end: endId count: count
 	args := {
 		        command.
 		        key.
-		        startId.
-		        endId } asOrderedCollection.
+		        startId asString.
+		        endId asString} asOrderedCollection.
 	count ifNotNil: [
 		args addAll: {
 				'COUNT'.

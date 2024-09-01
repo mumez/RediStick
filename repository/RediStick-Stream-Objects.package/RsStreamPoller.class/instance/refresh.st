@@ -1,0 +1,3 @@
+private
+refresh
+	self refreshStream

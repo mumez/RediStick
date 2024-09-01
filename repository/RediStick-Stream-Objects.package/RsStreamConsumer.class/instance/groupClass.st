@@ -1,0 +1,3 @@
+factory
+groupClass
+	^ RsStreamConsumerGroup 

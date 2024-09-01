@@ -1,0 +1,3 @@
+private
+basicPoll
+	self subclassResponsibility 
