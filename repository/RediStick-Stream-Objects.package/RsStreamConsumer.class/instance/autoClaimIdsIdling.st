@@ -1,3 +1,3 @@
 claiming
-autoClaimIdling
+autoClaimIdsIdling
 	^ self autoClaimIdsIdleMoreThan: self settings claimMinIdleMilliseconds
