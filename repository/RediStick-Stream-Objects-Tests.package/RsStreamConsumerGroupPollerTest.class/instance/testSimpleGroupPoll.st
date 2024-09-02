@@ -21,6 +21,7 @@ testSimpleGroupPoll
 		strm nextPut: (('idx:', idx asString) -> idx).
 	].
 	[consumerGroup summaryPendingList isEmpty] whileFalse: [ (Delay forMilliseconds: 100) wait].
+	(Delay forMilliseconds: 10) wait.
 	
 	poller1 stop.
 	poller2 stop.
