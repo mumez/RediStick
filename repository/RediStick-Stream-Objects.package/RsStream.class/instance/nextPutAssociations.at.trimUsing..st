@@ -1,8 +1,8 @@
 adding
 nextPutAssociations: keyValueAssocs at: streamMessageId trimUsing: optionsBlock
-	^ self endpoint
-		  xAdd: self name
-		  createNotExists: self autoCreate
-		  trimUsing: optionsBlock
-		  id: streamMessageId
-		  fieldsAndValues: keyValueAssocs
+	^ RsStreamMessageId fromStringOrNil: (self endpoint
+			   xAdd: self name
+			   createNotExists: self autoCreate
+			   trimUsing: optionsBlock
+			   id: streamMessageId
+			   fieldsAndValues: keyValueAssocs)

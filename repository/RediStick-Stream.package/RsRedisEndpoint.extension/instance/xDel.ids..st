@@ -1,7 +1,8 @@
 *RediStick-Stream
 xDel: key ids: ids
-
-	^ self unifiedCommand: {
-			  'XDEL'.
-			  key.
-			  }, ids asArray
+	| args |
+	args := {
+		        'XDEL'.
+		        key } asOrderedCollection.
+	args addAll: (ids collect: [ :each | each asString ]).
+	^ self unifiedCommand: args
