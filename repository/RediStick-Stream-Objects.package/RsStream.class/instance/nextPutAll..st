@@ -1,3 +1,3 @@
 adding
 nextPutAll: keyValuesOrAssociations
-	^ keyValuesOrAssociations do: [ :each | self nextPut: each ]
+	^ keyValuesOrAssociations collect: [ :each | self nextPut: each ]

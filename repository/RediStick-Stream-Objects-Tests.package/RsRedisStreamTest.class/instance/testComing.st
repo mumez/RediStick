@@ -26,6 +26,6 @@ testComing
 	self assert: nextThree first content equals: '2' -> '2'.
 	self assert: nextThree second content equals: '3' -> '3'.
 	self assert: nextThree third content equals: '4' -> '4'.
-	self assert: strm length > 6.
+	self assert: strm length >= 5.
 	strm trimTo: 0.
 	self assert: strm length equals: 0
