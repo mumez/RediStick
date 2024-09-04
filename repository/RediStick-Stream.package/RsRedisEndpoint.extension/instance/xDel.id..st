@@ -4,4 +4,4 @@ xDel: key id: id
 	^ self unifiedCommand: {
 			  'XDEL'.
 			  key.
-			  id  asString }
+			  id asString }
