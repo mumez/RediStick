@@ -94,3 +94,49 @@ moreContents
 ```
 
 </details>
+
+#### Iterating Over Stream Data
+
+You can also use an iterator to process each element in a block.
+
+```Smalltalk
+reader3 := RsStream new.
+reader3 name: 'chat-room-0001'.
+
+Transcript clear.
+
+"Forward iterator"
+"Get an iterator which begins from the second element"
+iterator := reader3 iteratorNextFrom: reader3 first id.
+iterator do: [:each |
+	Transcript crShow: each.
+].
+
+Transcript crShow: '----'.
+
+"Reverse iterator"
+iterator reversed do: [:each |
+	Transcript crShow: each.
+]
+```
+
+<details>
+<summary>
+Transcript
+</summary>
+
+```Smalltalk
+1725711950458-0:{'message'->'Hello'. 'user'->'john'}
+1725711950459-0:{'message'->'Hi'. 'user'->'lily'}
+1725711950460-0:{'message'->'Nice to meet you'. 'user'->'john'}
+1725712771881-0:{'message'->'Nice to meet you, too'. 'user'->'lily'}
+1725715484466-0:{'time'->'10:24:44.465 pm'}
+----
+1725712771881-0:{'message'->'Nice to meet you, too'. 'user'->'lily'}
+1725711950460-0:{'message'->'Nice to meet you'. 'user'->'john'}
+1725711950459-0:{'message'->'Hi'. 'user'->'lily'}
+1725711950458-0:{'message'->'Hello'. 'user'->'john'}
+1725711950457-0:{'message'->'Root 0001 created'. 'user'->'system'}
+```
+
+</details>
