@@ -1,7 +1,7 @@
 tests
 testSimplePoll
 	| strm one two three four five ite1 entries1 ite2 entries2 |
-	strm := self newStreamNamed: 'testDoCollect'.
+	strm := self newStreamNamed: 'testSimplePoll'.
 	strm trimTo: 0.
 	self assert: strm length equals: 0.
 	one := 'one' -> '1'.
