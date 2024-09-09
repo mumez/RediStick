@@ -95,7 +95,7 @@ moreContents
 
 </details>
 
-#### Iterating Over Stream Data
+### Iterating Over Stream Data
 
 You can also use an iterator to process each element in a block.
 
@@ -140,3 +140,59 @@ Transcript
 ```
 
 </details>
+
+### Polling Incoming Data
+
+It is also possible to process incoming stream data asynchronously using Poller.
+
+```Smalltalk
+poller1 := strm pollerIncoming.
+poller1 onReceive: [ :each | Transcript crShow: ('poller1: ', each asString) ].
+poller1 start.
+
+poller2 := strm pollerIncoming.
+poller2 onReceive: [ :each | Transcript crShow: ('poller1: ', each asString)  ].
+poller2 start.
+```
+
+In this example, poller1 and poller2 can receive incoming data in their own threads.
+
+Let's add new entries to the stream.
+
+```Smalltalk
+1 to: 10 do: [ :idx |
+	strm nextPut: idx -> Time now printString.
+]
+```
+
+<details>
+<summary>
+Transcript
+</summary>
+
+```Smalltalk
+poller2: 1725889267322-0:{'1'->'10:41:07.321 pm'}
+poller1: 1725889267322-0:{'1'->'10:41:07.321 pm'}
+poller2: 1725889267323-0:{'2'->'10:41:07.323 pm'}
+poller2: 1725889267324-0:{'3'->'10:41:07.324 pm'}
+poller1: 1725889267323-0:{'2'->'10:41:07.323 pm'}
+poller2: 1725889267325-0:{'4'->'10:41:07.325 pm'}
+poller1: 1725889267324-0:{'3'->'10:41:07.324 pm'}
+poller1: 1725889267325-0:{'4'->'10:41:07.325 pm'}
+poller2: 1725889267325-1:{'5'->'10:41:07.325 pm'}
+poller2: 1725889267326-0:{'6'->'10:41:07.326 pm'}
+poller1: 1725889267325-1:{'5'->'10:41:07.325 pm'}
+poller1: 1725889267326-0:{'6'->'10:41:07.326 pm'}
+poller2: 1725889267327-0:{'7'->'10:41:07.327 pm'}
+poller1: 1725889267327-0:{'7'->'10:41:07.327 pm'}
+poller2: 1725889267328-0:{'8'->'10:41:07.327 pm'}
+poller1: 1725889267328-0:{'8'->'10:41:07.327 pm'}
+poller1: 1725889267329-0:{'9'->'10:41:07.329 pm'}
+poller2: 1725889267329-0:{'9'->'10:41:07.329 pm'}
+poller2: 1725889267331-0:{'10'->'10:41:07.33 pm'}
+poller1: 1725889267331-0:{'10'->'10:41:07.33 pm'}
+```
+
+</details>
+
+By using Poller, you can easily fan out event data to multiple clients.
