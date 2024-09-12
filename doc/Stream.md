@@ -196,3 +196,62 @@ poller1: 1725889267331-0:{'10'->'10:41:07.33 pm'}
 </details>
 
 By using Poller, you can easily fan out event data to multiple clients.
+
+## Advanced Usage
+
+### Using Consumer Groups
+
+Consumer groups allow multiple stream consumers to cooperate and process data from the same stream. Each stream entry is delivered to only one consumer in the group, ensuring that the workload is distributed.
+
+#### Creating a Consumer Group and Consumers
+
+Let's create a consumer group named 'group1' and register four consumers named 'C1' to 'C4'.
+
+```smalltalk
+strm := RsStream new.
+strm name: 'time-events'.
+consumerGroup := strm consumerGroupNamed: 'group1'.
+consumer1 := consumerGroup consumerNamed: 'C1'.
+consumer2 := consumerGroup consumerNamed: 'C2'.
+consumer3 := consumerGroup consumerNamed: 'C3'.
+consumer4 := consumerGroup consumerNamed: 'C4'.
+consumersInfo := consumerGroup consumersInfo.
+```
+
+<details>
+<summary>
+consumersInfo
+</summary>
+
+```smalltalk
+an OrderedCollection(name: 'C1'
+pending: 0
+idle: 321797
+inactive: -1 name: 'C2'
+pending: 0
+idle: 321796
+inactive: -1 name: 'C3'
+pending: 0
+idle: 321794
+inactive: -1 name: 'C4'
+pending: 0
+idle: 321793
+inactive: -1)
+```
+
+</details>
+
+#### Processing Sharded Stream Entries
+
+```Smalltalk
+
+"Putting data"
+1 to: 20 do: [ :idx |
+	strm nextPut: idx -> Time now printString.
+].
+
+"Picking subset of data by four consumers"
+5 timesRepeat: [
+	{consumer1. consumer2. consumer3. consumer4} shuffled do: [: each | each neverDeliveredAtMost: 2 ]
+].
+```
