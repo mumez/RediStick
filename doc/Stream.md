@@ -209,7 +209,7 @@ Let's create a consumer group named 'group1' and register four consumers named '
 
 ```smalltalk
 strm := RsStream new.
-strm name: 'time-events'.
+strm name: 'time-events-001'.
 consumerGroup := strm consumerGroupNamed: 'group1'.
 consumer1 := consumerGroup consumerNamed: 'C1'.
 consumer2 := consumerGroup consumerNamed: 'C2'.
@@ -243,15 +243,111 @@ inactive: -1)
 
 #### Processing Sharded Stream Entries
 
-```Smalltalk
+Typically, a consumer waits for incoming data using a loop. Therefore, we should define a polling process for that purpose.
 
+```Smalltalk
+poller := [:consumer |
+    5 timesRepeat: [ | entries |
+        "Pick two incoming entries"
+        entries := consumer neverDeliveredAtMost: 2.
+        entries do: [ :each |
+            "Show each entry with the consumer's name"
+            Transcript crShow: (consumer name, '>', each asString)
+        ]
+    ]
+].
+```
+
+Each consumer can process at most 10 entries in this case. After adding 20 entries to the stream, we apply the looping process to each consumer and observe the results.
+
+```Smalltalk
 "Putting data"
 1 to: 20 do: [ :idx |
-	strm nextPut: idx -> Time now printString.
+    strm nextPut: idx -> Time now printString.
 ].
 
-"Picking subset of data by four consumers"
-5 timesRepeat: [
-	{consumer1. consumer2. consumer3. consumer4} shuffled do: [: each | each neverDeliveredAtMost: 2 ]
+"Make all consumers start polling"
+{consumer1. consumer2. consumer3. consumer4} do: [:each | [poller value: each] fork ].
+```
+
+<details>
+<summary>
+Transcript
+</summary>
+
+```Smalltalk
+C1>1726236992833-0:{'1'->'11:16:32.833 pm'}
+C1>1726236992834-0:{'2'->'11:16:32.834 pm'}
+C2>1726236992834-1:{'3'->'11:16:32.834 pm'}
+C2>1726236992835-0:{'4'->'11:16:32.835 pm'}
+C3>1726236992835-1:{'5'->'11:16:32.835 pm'}
+C3>1726236992836-0:{'6'->'11:16:32.836 pm'}
+C4>1726236992836-1:{'7'->'11:16:32.836 pm'}
+C4>1726236992837-0:{'8'->'11:16:32.837 pm'}
+C1>1726236992838-0:{'9'->'11:16:32.838 pm'}
+C1>1726236992838-1:{'10'->'11:16:32.838 pm'}
+C2>1726236992839-0:{'11'->'11:16:32.839 pm'}
+C2>1726236992839-1:{'12'->'11:16:32.839 pm'}
+C3>1726236992840-0:{'13'->'11:16:32.84 pm'}
+C3>1726236992841-0:{'14'->'11:16:32.84 pm'}
+C4>1726236992841-1:{'15'->'11:16:32.841 pm'}
+C4>1726236992842-0:{'16'->'11:16:32.842 pm'}
+C1>1726236992842-1:{'17'->'11:16:32.842 pm'}
+C1>1726236992843-0:{'18'->'11:16:32.843 pm'}
+C2>1726236992843-1:{'19'->'11:16:32.843 pm'}
+C2>1726236992844-0:{'20'->'11:16:32.844 pm'}
+
+```
+
+</details>
+
+Now you can see that consumers process some part of all entries. The same entry is never delivered to multiple consumers.
+
+#### Accept Pending Entries
+
+In fact, in the previous example, the consumers never finish processing the data. Each consumer has its own list of pending entries.
+
+```Smalltalk
+pendings := consumer1 allPendings.
+```
+
+<details>
+<summary>
+pendings
+</summary>
+
+```Smalltalk
+an OrderedCollection(1726236992833-0:{'1'->'11:16:32.833 pm'}
+1726236992834-0:{'2'->'11:16:32.834 pm'} 1726236992838-0:{'9'->'11:16:32.838
+pm'} 1726236992838-1:{'10'->'11:16:32.838 pm'}
+1726236992842-1:{'17'->'11:16:32.842 pm'} 1726236992843-0:{'18'->'11:16:32.843
+pm'})
+```
+
+</details>
+
+This happens because you did not send an #accept message for the entries you received. The following code clears the pending entries list:
+
+```Smalltalk
+"Mark that entries are correctly processed"
+pendings do: [:each | each accept].
+```
+
+Pending entries are messages that have been delivered to the consumer but have not yet been acknowledged. The pending list is provided for retry purposes. By explicitly accepting an entry, you ensure that it is processed only once by one client.
+
+Typically, you should write a loop that sends #accept if there are no errors in data processing.
+
+```Smalltalk
+poller := [:consumer |
+    5 timesRepeat: [ | entries |
+        "Pick two incoming entries"
+        entries := consumer neverDeliveredAtMost: 2.
+        entries do: [ :each |
+            "Show each entry with the consumer's name"
+            Transcript crShow: (consumer name, '>', each asString).
+            each accept. "Acknowledge the reception"
+        ]
+    ]
 ].
+
 ```
