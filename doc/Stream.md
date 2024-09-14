@@ -141,7 +141,7 @@ Transcript
 
 </details>
 
-### Polling Incoming Data
+### Polling Incoming Data with Poller
 
 It is also possible to process incoming stream data asynchronously using Poller.
 
@@ -246,7 +246,7 @@ inactive: -1)
 Typically, a consumer waits for incoming data using a loop. Therefore, we should define a polling process for that purpose.
 
 ```Smalltalk
-poller := [:consumer |
+pollingProcess := [:consumer |
     5 timesRepeat: [ | entries |
         "Pick two incoming entries"
         entries := consumer neverDeliveredAtMost: 2.
@@ -267,7 +267,7 @@ Each consumer can process at most 10 entries in this case. After adding 20 entri
 ].
 
 "Make all consumers start polling"
-{consumer1. consumer2. consumer3. consumer4} do: [:each | [poller value: each] fork ].
+{consumer1. consumer2. consumer3. consumer4} do: [:each | [pollingProcess value: each] fork ].
 ```
 
 <details>
@@ -338,7 +338,7 @@ Pending entries are messages that have been delivered to the consumer but have n
 Typically, you should write a loop that sends #accept if there are no errors in data processing.
 
 ```Smalltalk
-poller := [:consumer |
+pollingProcess := [:consumer |
     5 timesRepeat: [ | entries |
         "Pick two incoming entries"
         entries := consumer neverDeliveredAtMost: 2.
@@ -350,4 +350,105 @@ poller := [:consumer |
     ]
 ].
 
+```
+
+#### Using Consumer Group Poller
+
+Writing such a polling loop every time is not a good development experience.
+Instead, you can use [Poller](#polling-incoming-data-with-poller) again for consumer groups.
+
+Let's create two pollers.
+
+```Smalltalk
+"Prepare a new stream and consumer group for clarity"
+strm := RsStream new.
+strm name: 'number-events-001'.
+consumerGroup := strm consumerGroupNamed: 'group'.
+consumerA := consumerGroup consumerNamed: 'CA'.
+consumerB := consumerGroup consumerNamed: 'CB'.
+
+"Create Poller 1"
+poller1 := consumerA poller.
+poller1 onReceive: [ :each | Transcript crShow: (poller1 consumer name, '>', each asString)].
+poller1 start.
+
+"Create Poller 2"
+poller2 := consumerB poller.
+poller2 onReceive: [ :each | Transcript crShow: (poller2 consumer name, '>', each asString)].
+poller2 start.
+```
+
+After starting the pollers, try adding some entries to the stream.
+
+```Smalltalk
+1 to: 20 do: [ :idx |
+    strm nextPut: idx -> idx.
+].
+```
+
+Now you can see:
+
+<details>
+
+<summary>
+Transcript
+</summary>
+
+```Smalltalk
+CB>1726325364695-0:{'1'->'1'}
+CA>1726325364696-0:{'2'->'2'}
+CB>1726325364698-0:{'3'->'3'}
+CB>1726325364699-0:{'4'->'4'}
+CA>1726325364699-1:{'5'->'5'}
+CB>1726325364700-0:{'6'->'6'}
+CA>1726325364702-1:{'9'->'9'}
+CB>1726325364701-0:{'7'->'7'}
+CB>1726325364702-0:{'8'->'8'}
+CA>1726325364703-0:{'10'->'10'}
+CB>1726325364705-0:{'13'->'13'}
+CA>1726325364703-1:{'11'->'11'}
+CB>1726325364706-0:{'14'->'14'}
+CA>1726325364704-0:{'12'->'12'}
+CB>1726325364707-0:{'15'->'15'}
+CA>1726325364711-0:{'19'->'19'}
+CB>1726325364708-0:{'16'->'16'}
+CB>1726325364709-0:{'17'->'17'}
+CA>1726325364711-1:{'20'->'20'}
+CB>1726325364710-0:{'18'->'18'}
+```
+
+</details>
+
+Using Poller makes the code much simpler: Poller runs in its own thread, so there's no need to send #fork.
+Furthermore, if there are no errors in the #onReceive block, Poller automatically acknowledges incoming entries.
+As a result, with this code, there are no pending entries, even if you don't explicitly send an #accept message.
+
+```Smalltalk
+pendings := consumerA allPendings.
+```
+
+This code just returns an empty ordered collection, because of no pending entries.
+
+```Smalltalk
+an OrderedCollection()
+```
+
+Let's add invalid entries that raises ZeroDivide error.
+
+```Smalltalk
+
+poller2 := consumerB poller.
+poller2 onReceive: [ :each |
+	Transcript crShow: (poller2 consumer name, '>').
+	Transcript space; show: (each content key asInteger / each content value asInteger)
+].
+poller2 start.
+
+consumerB allPendings.
+
+#(0 0 0 0)  do: [ :idx |
+    strm nextPut: idx -> idx.
+].
+
+consumerB allPendings do: [:e | e accept].
 ```
