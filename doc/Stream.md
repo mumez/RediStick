@@ -2,6 +2,8 @@
 
 [RediStick](https://github.com/mumez/RediStick) provides high-level streaming data API which is based on [Redis Streams](https://redis.io/docs/latest/develop/data-types/streams/).
 
+Redis Streams is a newer API for distributed streaming applications. Unlike Redis Pub/Sub, which only delivers messages to currently connected subscribers, Streams preserves messages in an append-only structure. This allows disconnected subscribers to catch up on missed messages or replay specific ranges. Redis Streams offer greater flexibility for handling message persistence and delivery in distributed systems.
+
 ## Installation
 
 You can easily install StreamObjects packages into Pharo (or GemStone/S).
@@ -433,22 +435,78 @@ This code just returns an empty ordered collection, because of no pending entrie
 an OrderedCollection()
 ```
 
-Let's add invalid entries that raises ZeroDivide error.
+#### Poller Error Handing on Receiving an Entry
+
+What happens if an error occurs in the #onReceive: block?
+Let's modify the #onReceive: handler to raise an error when bad data is received.
 
 ```Smalltalk
-
-poller2 := consumerB poller.
+poller1 onReceive: [ :each |
+	Transcript crShow: (poller1 consumer name, '>').
+	Transcript space; show: (Integer readFrom: each content value)
+].
 poller2 onReceive: [ :each |
 	Transcript crShow: (poller2 consumer name, '>').
-	Transcript space; show: (each content key asInteger / each content value asInteger)
+	Transcript space; show: (Integer readFrom: each content value)
 ].
-poller2 start.
+```
 
-consumerB allPendings.
+Next, add new entries to the stream.
 
-#(0 0 0 0)  do: [ :idx |
-    strm nextPut: idx -> idx.
-].
+```Smalltalk
+strm nextPut: 21 -> 21. "processed normally"
+strm nextPut: 22 -> nil. "parse error occurs"
+```
 
-consumerB allPendings do: [:e | e accept].
+Transcript shows the error log, which indicates that the parsing error was caused by the entry `'1726411054685-0:{''22''->''nil''}'`.
+
+```Smalltalk
+ERROR:#(#ReceiveNotAccepted 'Error: Reading a number failed: a digit between 0 and 9 expected' '1726411054685-0:{''22''->''nil''}')
+```
+
+You can see more detailed information by sending #consumersInfo to the Consumer Group.
+
+```
+consumerGroup consumersInfo.
+```
+
+This returns:
+
+```Smalltalk
+an OrderedCollection(name: 'CA'
+pending: 1
+idle: 461
+inactive: 233135 name: 'CB'
+pending: 0
+idle: 461
+inactive: 483547)
+```
+
+The statistics information shows that consumerA('CA') has the pending entry.
+
+```Smalltalk
+consumerA allPendings.
+```
+
+This returns:
+
+```Smalltalk
+an OrderedCollection(1726411054685-0:{'22'->'nil'})
+```
+
+By default, Poller logs an error if it fails to accept an incoming entry. This can result in many log messages in Transcript as the Poller continues to retry.
+You can change this behavior by sending #onReceiveFail: to the Poller.
+
+For example, you can set a handler to stop receiving further entries after an occurs:
+
+```Smalltalk
+poller1 onReceiveFail: [ :error :entry | poller1 stop ].
+```
+
+#### Taking over pending entries
+
+Consumer Group Poller supports "claiming" - taking over other consumer's pending entries.
+
+```Smalltalk
+"TBD"
 ```
