@@ -20,8 +20,8 @@ testSimpleGroupPoll
 	1 to: 10 do: [ :idx |
 		strm nextPut: (('idx:', idx asString) -> idx).
 	].
+	(Delay forMilliseconds: 100) wait.
 	[consumerGroup summaryPendingList isEmpty] whileFalse: [ (Delay forMilliseconds: 100) wait].
-	(Delay forMilliseconds: 10) wait.
 	
 	poller1 stop.
 	poller2 stop.
