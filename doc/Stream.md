@@ -482,7 +482,7 @@ idle: 461
 inactive: 483547)
 ```
 
-The statistics information shows that consumerA('CA') has the pending entry.
+The statistics information shows that consumerA(named 'CA') has the pending entry.
 
 ```Smalltalk
 consumerA allPendings.
@@ -505,8 +505,63 @@ poller1 onReceiveFail: [ :error :entry | poller1 stop ].
 
 #### Taking over pending entries
 
-Consumer Group Poller supports "claiming" - taking over other consumer's pending entries.
+Consumer Group Poller supports "claiming" - taking over pending entries of other consumers.
+
+Suppose `poller1` in the previous example will not start again because it was running on a broken remote host. In such a case, another consumer on a healthy node can take over the pending entries.
+
+First, let's see the current status of the Consumer Group.
 
 ```Smalltalk
-"TBD"
+consumerGroup consumersInfo.
+```
+
+It returns:
+
+```
+a Dictionary('CA'->name: 'CA'
+pending: 1
+idle: 1142742
+inactive: 85467129 'CB'->name: 'CB'
+pending: 0
+idle: 3091957
+inactive: 85717541 )
+```
+
+The `consumerA` ('CA') has one pending message.
+Since the consumer has been inactive for a long time, it can be considered dead.
+
+You can also send #summaryPendingList to the Consumer Group for listing consumers' pending entries.
+
+```Smalltalk
+consumerGroup summaryPendingList.
+```
+
+It returns:
+
+```Smalltalk
+size: 1
+minId: '1726411054685-0'
+maxId: '1726411054685-0'
+consumers:a Dictionary('CA'->1 )
+```
+
+Assume that the poller of `consumerB` is still healthy, so that it can take over the pending entry.
+You can send #claimPending for this purpose.
+
+```Smalltalk
+poller2 claimPending.
+```
+
+More conveniently, you can enable Poller's auto-claim feature.
+
+```Smalltalk
+poller2 shouldAutoClaim: true.
+```
+
+This will automatically claim pending entries and process them.
+By default, Poller claims items that have been idle for more than 6o minutes.
+You can change this setting by sending #claimMinIdleMilliseconds:
+
+```Smalltalk
+poller2 claimMinIdleMilliseconds: 10.
 ```
