@@ -44,9 +44,9 @@ strm << { #message -> 'Nice to meet you, too'. #user -> 'lily' }.
 strm nextPut: #time -> Time now printString.
 ```
 
-### Reading stream data
+### Reading Stream Data
 
-#### Read all data in the stream (not recommended for large streams)
+#### Read All Data in the Stream (Not Recommended for Large Streams)
 
 ```Smalltalk
 reader1 := RsStream new.
@@ -70,7 +70,7 @@ an OrderedCollection(1725711950457-0:{'message'->'Root 0001 created'.
 
 </details>
 
-#### Read data in chunks
+#### Read Data in Chunks
 
 ```Smalltalk
 reader2 := RsStream new.
@@ -153,13 +153,13 @@ poller1 onReceive: [ :each | Transcript crShow: ('poller1: ', each asString) ].
 poller1 start.
 
 poller2 := strm pollerIncoming.
-poller2 onReceive: [ :each | Transcript crShow: ('poller1: ', each asString)  ].
+poller2 onReceive: [ :each | Transcript crShow: ('poller2: ', each asString)  ].
 poller2 start.
 ```
 
 In this example, poller1 and poller2 can receive incoming data in their own threads.
 
-Let's add new entries to the stream.
+Let's add new entries to the stream:
 
 ```Smalltalk
 1 to: 10 do: [ :idx |
@@ -305,7 +305,7 @@ C2>1726236992844-0:{'20'->'11:16:32.844 pm'}
 
 Now you can see that consumers process some part of all entries. The same entry is never delivered to multiple consumers.
 
-#### Accept Pending Entries
+#### Accepting Pending Entries
 
 In fact, in the previous example, the consumers never finish processing the data. Each consumer has its own list of pending entries.
 
@@ -359,7 +359,7 @@ pollingProcess := [:consumer |
 Writing such a polling loop every time is not a good development experience.
 Instead, you can use [Poller](#polling-incoming-data-with-poller) again for consumer groups.
 
-Let's create two pollers.
+Let's create two pollers:
 
 ```Smalltalk
 "Prepare a new stream and consumer group for clarity"
@@ -397,26 +397,26 @@ Transcript
 </summary>
 
 ```Smalltalk
-CB>1726325364695-0:{'1'->'1'}
-CA>1726325364696-0:{'2'->'2'}
-CB>1726325364698-0:{'3'->'3'}
-CB>1726325364699-0:{'4'->'4'}
-CA>1726325364699-1:{'5'->'5'}
-CB>1726325364700-0:{'6'->'6'}
-CA>1726325364702-1:{'9'->'9'}
-CB>1726325364701-0:{'7'->'7'}
-CB>1726325364702-0:{'8'->'8'}
-CA>1726325364703-0:{'10'->'10'}
-CB>1726325364705-0:{'13'->'13'}
-CA>1726325364703-1:{'11'->'11'}
-CB>1726325364706-0:{'14'->'14'}
-CA>1726325364704-0:{'12'->'12'}
-CB>1726325364707-0:{'15'->'15'}
-CA>1726325364711-0:{'19'->'19'}
-CB>1726325364708-0:{'16'->'16'}
-CB>1726325364709-0:{'17'->'17'}
-CA>1726325364711-1:{'20'->'20'}
-CB>1726325364710-0:{'18'->'18'}
+CA>1726669124649-0:{'1'->'1'}
+CB>1726669124650-0:{'2'->'2'}
+CA>1726669124651-0:{'3'->'3'}
+CA>1726669124652-0:{'4'->'4'}
+CB>1726669124653-1:{'6'->'6'}
+CA>1726669124653-0:{'5'->'5'}
+CB>1726669124654-0:{'7'->'7'}
+CA>1726669124655-0:{'8'->'8'}
+CB>1726669124658-0:{'12'->'12'}
+CA>1726669124655-1:{'9'->'9'}
+CA>1726669124656-0:{'10'->'10'}
+CA>1726669124657-0:{'11'->'11'}
+CB>1726669124659-0:{'13'->'13'}
+CB>1726669124660-0:{'14'->'14'}
+CA>1726669124661-0:{'16'->'16'}
+CB>1726669124660-1:{'15'->'15'}
+CA>1726669124662-0:{'17'->'17'}
+CA>1726669124662-1:{'18'->'18'}
+CB>1726669124663-0:{'19'->'19'}
+CB>1726669124664-0:{'20'->'20'}
 ```
 
 </details>
@@ -445,23 +445,23 @@ poller1 onReceive: [ :each |
 	Transcript crShow: (poller1 consumer name, '>').
 	Transcript space; show: (Integer readFrom: each content value)
 ].
-poller2 onReceive: [ :each |
-	Transcript crShow: (poller2 consumer name, '>').
-	Transcript space; show: (Integer readFrom: each content value)
-].
 ```
 
 Next, add new entries to the stream.
 
 ```Smalltalk
-strm nextPut: 21 -> 21. "processed normally"
-strm nextPut: 22 -> nil. "parse error occurs"
+21 to: 30 do: [ :idx |
+    strm nextPut: idx -> nil. "parse error occurs"
+].
 ```
 
-Transcript shows the error log, which indicates that the parsing error was caused by the entry `'1726411054685-0:{''22''->''nil''}'`.
+Transcript shows error logs, which indicate that the parsing errors are caused by the entry like: `'1726669224340-0:{''21''->''nil''}`.
+
+(If you don't see any error logs, try adding more error entries to the stream. Normally each poller processes stream entries in the same ratio, so it is very rare that the `poller1` does not process any error entries).
 
 ```Smalltalk
-ERROR:#(#ReceiveNotAccepted 'Error: Reading a number failed: a digit between 0 and 9 expected' '1726411054685-0:{''22''->''nil''}')
+ERROR:#(#ReceiveNotAccepted 'Error: Reading a number failed: a digit between 0 and 9 expected' '1726669224340-0:{''21''->''nil''}')
+...
 ```
 
 You can see more detailed information by sending #consumersInfo to the Consumer Group.
@@ -473,16 +473,16 @@ consumerGroup consumersInfo.
 This returns:
 
 ```Smalltalk
-an OrderedCollection(name: 'CA'
-pending: 1
-idle: 461
-inactive: 233135 name: 'CB'
+a Dictionary('CA'->name: 'CA'
+pending: 5
+idle: 840
+inactive: 167023 'CB'->name: 'CB'
 pending: 0
-idle: 461
-inactive: 483547)
+idle: 840
+inactive: 167021 )
 ```
 
-The statistics information shows that consumerA(named 'CA') has the pending entry.
+The statistics information shows that consumerA (named 'CA') has five pending entries.
 
 ```Smalltalk
 consumerA allPendings.
@@ -491,46 +491,26 @@ consumerA allPendings.
 This returns:
 
 ```Smalltalk
-an OrderedCollection(1726411054685-0:{'22'->'nil'})
+an OrderedCollection(1726669224340-0:{'21'->'nil'} 1726669224343-0:{'23'->'nil'}
+1726669224345-1:{'26'->'nil'} 1726669224346-0:{'27'->'nil'}
+1726669224347-0:{'28'->'nil'})
 ```
 
-By default, Poller logs an error if it fails to accept an incoming entry. This can result in many log messages in Transcript as the Poller continues to retry.
-You can change this behavior by sending #onReceiveFail: to the Poller.
-
-For example, you can set a handler to stop receiving further entries after an occurs:
+By default, Poller continues to retry even if it failed to process an incoming entry. This would result in many error log messages in Transcript. You can change the behavior by sending #onReceiveFail: to the Poller.
 
 ```Smalltalk
 poller1 onReceiveFail: [ :error :entry | poller1 stop ].
 ```
 
-#### Taking over pending entries
+Now `poller1` stops receiving further entries after an error.
 
-Consumer Group Poller supports "claiming" - taking over pending entries of other consumers.
+#### Taking Over Pending Entries
 
-Suppose `poller1` in the previous example will not start again because it was running on a broken remote host. In such a case, another consumer on a healthy node can take over the pending entries.
+Consumer group pollers support "claiming" - taking over pending entries from other consumers.
 
-First, let's see the current status of the Consumer Group.
+Suppose `poller1` in the previous example fails to restart because it was running on a broken remote host. In such a case, another consumer on a healthy node can take over the pending entries.
 
-```Smalltalk
-consumerGroup consumersInfo.
-```
-
-It returns:
-
-```
-a Dictionary('CA'->name: 'CA'
-pending: 1
-idle: 1142742
-inactive: 85467129 'CB'->name: 'CB'
-pending: 0
-idle: 3091957
-inactive: 85717541 )
-```
-
-The `consumerA` ('CA') has one pending message.
-Since the consumer has been inactive for a long time, it can be considered dead.
-
-You can also send #summaryPendingList to the Consumer Group for listing consumers' pending entries.
+You can send #summaryPendingList to the consumer group to list the pending entries of all consumers in the group.
 
 ```Smalltalk
 consumerGroup summaryPendingList.
@@ -539,29 +519,64 @@ consumerGroup summaryPendingList.
 It returns:
 
 ```Smalltalk
-size: 1
-minId: '1726411054685-0'
-maxId: '1726411054685-0'
-consumers:a Dictionary('CA'->1 )
+size: 5
+minId: '1726669224340-0'
+maxId: '1726669224347-0'
+consumers:a Dictionary('CA'->5 )
 ```
 
-Assume that the poller of `consumerB` is still healthy, so that it can take over the pending entry.
-You can send #claimPending for this purpose.
+`consumerB` is still healthy, so that it can take over the pending entries.
 
-```Smalltalk
-poller2 claimPending.
-```
-
-More conveniently, you can enable Poller's auto-claim feature.
+There is a low-level API for manually claiming pending entries by specifying entry IDs but in real case you may want to keep claiming periodically.
+It is more convenient to simply enable Poller's auto-claim feature.
 
 ```Smalltalk
 poller2 shouldAutoClaim: true.
 ```
 
-This will automatically claim pending entries and process them.
-By default, Poller claims items that have been idle for more than 6o minutes.
-You can change this setting by sending #claimMinIdleMilliseconds:
+This will automatically claim and process pending items.
+By default, Poller claims entries that have been idle for more than 60 minutes.
+You can change this setting by sending #claimMinIdleMilliseconds: to Poller:
 
 ```Smalltalk
 poller2 claimMinIdleMilliseconds: 10.
+```
+
+Now in Transcript, you will see that all pending entries are processed.
+
+<details>
+<summary>
+Transcript
+</summary>
+```Smalltalk
+CB>1726669224340-0:{'21'->'nil'}
+CB>1726669224343-0:{'23'->'nil'}
+CB>1726669224345-1:{'26'->'nil'}
+CB>1726669224346-0:{'27'->'nil'}
+CB>1726669224347-0:{'28'->'nil'}
+```
+</details>
+
+There is no pending list in Consumer Group.
+
+```Smalltalk
+consumerGroup summaryPendingList.
+```
+
+It returns:
+
+```Smalltalk
+size: 0
+minId: nil
+maxId: nil
+consumers:a Dictionary()
+```
+
+#### Killing All Pollers
+
+Pollers should be killed gracefully under normal circumstances.
+But when you are in development, it would be convenient to kill all pollers at once for cleanup.
+
+```Smalltalk
+RsStreamBasePoller killAll
 ```
