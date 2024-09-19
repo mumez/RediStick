@@ -1,4 +1,4 @@
 accessing
 minId: id
 	self beMinId.
-	self threshold: id.
+	self threshold: id asString.

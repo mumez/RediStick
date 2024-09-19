@@ -17,6 +17,10 @@ baseline: spec
 				spec requires: #('RediStick-Core')].
 		spec package: 'RediStick-Stream-Tests' with: [
 				spec requires: #('RediStick-Tests' 'RediStick-Stream')].
+		spec package: 'RediStick-Stream-Objects' with: [
+				spec requires: #('RediStick-Stream')].
+		spec package: 'RediStick-Stream-Objects-Tests' with: [
+				spec requires: #('RediStick-Tests' 'RediStick-Stream-Objects')].
 			
 		spec package: 'RediStick-Search' with: [
 				spec requires: #('RediStick-Core')].
@@ -33,6 +37,10 @@ baseline: spec
 		spec
 			group: 'Stream' with: #('RediStick-Stream');
 			group: 'StreamTests' with: #('RediStick-Stream-Tests').
+			
+		spec
+			group: 'StreamObjects' with: #('RediStick-Stream-Objects');
+			group: 'StreamObjectsTests' with: #('RediStick-Stream-Objects-Tests').
 			
 		spec
 			group: 'Search' with: #('RediStick-Search');

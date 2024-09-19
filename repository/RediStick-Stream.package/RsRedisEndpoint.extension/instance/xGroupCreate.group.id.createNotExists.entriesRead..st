@@ -6,7 +6,7 @@ xGroupCreate: key group: group id: id createNotExists: createNotExists entriesRe
 		        'CREATE'.
 		        key.
 		        group.
-		        id } asOrderedCollection.
+		        id asString } asOrderedCollection.
 	createNotExists ifTrue: [ args add: 'MKSTREAM' ].
 	entriesRead ifNotNil: [
 		args addAll: {

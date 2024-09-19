@@ -8,7 +8,7 @@ initVariableAt: key value: value
 		^ self maxDeletedEntryId: value ].
 	key = 'entries-added' ifTrue: [ ^ self entriesAdded: value ].
 	key = 'groups' ifTrue: [ ^ self initGroups: value].
-	key = 'first-entry' ifTrue: [ ^ self firstEntry: (RsStreamEntry fromOrderedCollection: value) ].
-	key = 'last-entry' ifTrue: [ ^ self lastEntry: (RsStreamEntry fromOrderedCollection: value) ].
+	(key = 'first-entry' and: [value notNil]) ifTrue: [ ^ self firstEntry: (RsStreamEntry fromOrderedCollection: value) ].
+	(key = 'last-entry' and: [value notNil]) ifTrue: [ ^ self lastEntry: (RsStreamEntry fromOrderedCollection: value) ].
 	key = 'recorded-first-entry-id' ifTrue: [ ^ self recordedFirstEntryId: value ].
 	key = 'entries' ifTrue: [ ^ self initEntries: value ].

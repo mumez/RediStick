@@ -1,1 +1,1 @@
-SystemOrganization addCategory: #BaselineOfRediStick!
+self packageOrganizer ensurePackage: #BaselineOfRediStick withTags: #()!

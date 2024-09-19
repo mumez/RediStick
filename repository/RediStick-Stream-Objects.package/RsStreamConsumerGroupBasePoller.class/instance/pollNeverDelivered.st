@@ -1,0 +1,4 @@
+private
+pollNeverDelivered
+
+	self subclassResponsibility 

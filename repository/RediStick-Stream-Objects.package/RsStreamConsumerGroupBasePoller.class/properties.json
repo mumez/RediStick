@@ -1,0 +1,13 @@
+{
+	"commentStamp" : "",
+	"super" : "RsStreamBasePoller",
+	"category" : "RediStick-Stream-Objects",
+	"classinstvars" : [ ],
+	"pools" : [ ],
+	"classvars" : [ ],
+	"instvars" : [
+		"consumer"
+	],
+	"name" : "RsStreamConsumerGroupBasePoller",
+	"type" : "normal"
+}

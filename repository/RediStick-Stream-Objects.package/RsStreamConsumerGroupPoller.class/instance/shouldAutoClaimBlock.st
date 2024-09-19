@@ -1,0 +1,4 @@
+accessing
+shouldAutoClaimBlock
+
+	^ shouldAutoClaimBlock

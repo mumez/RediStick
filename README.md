@@ -98,7 +98,7 @@ Please read [Pubsub.md](./doc/Pubsub.md).
 
 RediStick supports [Redis Streams](https://redis.io/docs/data-types/streams/) - distributed event streaming API.
 
-(Basic usage will be documented soon).
+Please read [Stream.md](./doc/Stream.md).
 
 ### Using Search
 
