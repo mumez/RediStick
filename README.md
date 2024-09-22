@@ -10,50 +10,59 @@ However RediStick use [Stick](https://github.com/mumez/Stick) for supporting aut
 
 ## Installation
 
-Default (Core only):
+### Default (Core only)
 
 ```smalltalk
-
 Metacello new
   baseline: 'RediStick';
   repository: 'github://mumez/RediStick/repository';
   load.
 ```
 
-With Connection-Pool package:
+### With Connection-Pool package
 
 ```smalltalk
-
 Metacello new
   baseline: 'RediStick';
   repository: 'github://mumez/RediStick/repository';
   load: #('Core' 'ConnectionPool').
 ```
 
-With Pubsub package:
+### With Pubsub package
 
 ```smalltalk
-
 Metacello new
   baseline: 'RediStick';
   repository: 'github://mumez/RediStick/repository';
   load: #('Core' 'Pubsub').
 ```
 
-With Stream package:
+### With Stream package
 
 ```smalltalk
+Metacello new
+  baseline: 'RediStick';
+  repository: 'github://mumez/RediStick/repository';
+  load: #('StreamObjects').
+```
 
+<details>
+<summary>
+stream low-level API only
+</summary>
+
+```smalltalk
 Metacello new
   baseline: 'RediStick';
   repository: 'github://mumez/RediStick/repository';
   load: #('Core' 'Stream').
 ```
 
-With Search package:
+</details>
+
+### With Search package
 
 ```smalltalk
-
 Metacello new
   baseline: 'RediStick';
   repository: 'github://mumez/RediStick/repository';
