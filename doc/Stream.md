@@ -6,7 +6,7 @@ Redis Streams is a newer API for distributed streaming applications. Unlike Redi
 
 ## Installation
 
-You can easily install StreamObjects packages into Pharo.
+You can easily install StreamObjects packages into Pharo (or GemStone/S).
 
 ```smalltalk
 Metacello new
