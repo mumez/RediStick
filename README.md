@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/mumez/RediStick/actions/workflows/main.yml/badge.svg)](https://github.com/mumez/RediStick/actions/workflows/main.yml)
 
-A Redis client for Pharo using Stick auto-reconnection layer
+A Redis client for Pharo (and GemStone/S) using Stick auto-reconnection layer
 
 Many parts are borrowed from RedisClient.
 
