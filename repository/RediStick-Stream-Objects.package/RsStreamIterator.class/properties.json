@@ -9,7 +9,8 @@
 		"name",
 		"stream",
 		"fromId",
-		"currentId"
+		"currentId",
+		"isInclusive"
 	],
 	"name" : "RsStreamIterator",
 	"type" : "normal"

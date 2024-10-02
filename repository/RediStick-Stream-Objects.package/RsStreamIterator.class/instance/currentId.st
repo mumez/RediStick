@@ -1,4 +1,4 @@
 accessing
 currentId
-
-	^ currentId
+	currentId ifNil: [ ^ self fallbackId ].
+	^ currentId 
