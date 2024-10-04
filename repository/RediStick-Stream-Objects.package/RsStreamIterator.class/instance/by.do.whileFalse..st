@@ -1,7 +1,7 @@
 actions
 by: step do: aBlock whileFalse: endConditionBlock
 	| entries |
-	entries := self contentsNextFrom: self currentId count: step.
+	entries := self entriesFrom: self currentId count: step.
 	entries do: [ :each |
 		aBlock value: each.
 		self currentId: each id ].
