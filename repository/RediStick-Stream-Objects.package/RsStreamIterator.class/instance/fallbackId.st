@@ -1,3 +1,5 @@
 private
 fallbackId
-	^ self stream first id
+	^ self stream first
+		  ifNotNil: [ :first | first id ]
+		  ifNil: [ RsStreamMessageId zero ]
