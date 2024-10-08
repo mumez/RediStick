@@ -1,6 +1,5 @@
 tests
 testComing
-
 	| strm strm2 nextComing nextThree |
 	strm := self newStreamNamed: 'testComing'.
 	strm2 := self newStreamNamed: 'testComing'.
