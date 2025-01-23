@@ -1,1 +1,1 @@
-SystemOrganization addCategory: #'RediStick-Core'!
+self packageOrganizer ensurePackage: #'RediStick-Core' withTags: #()!
