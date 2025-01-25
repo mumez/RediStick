@@ -1,1 +1,1 @@
-SystemOrganization addCategory: #'RediStick-Tests'!
+self packageOrganizer ensurePackage: #'RediStick-Tests' withTags: #()!
