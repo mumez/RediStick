@@ -1,0 +1,3 @@
+comparing
+> other
+	^ other < self
