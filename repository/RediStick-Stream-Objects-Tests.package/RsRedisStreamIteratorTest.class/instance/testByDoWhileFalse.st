@@ -23,7 +23,7 @@ testByDoWhileFalse
 	entries := OrderedCollection new.
 	ite1 by: 50 do: [:ent | entries add: ent ] whileFalse: [:ents :ent | ents isEmpty ].
 	self assert: entries size equals: 80.
-	self assert: entries last id equals: ite1 currentId.
-	self assert: strm last id equals: ite1 currentId.
+	self assert: entries last id equals: ite1 currentId asString.
+	self assert: strm last id equals: ite1 currentId asString.
 	strm trimTo: 0.
 	self assert: strm length equals: 0.

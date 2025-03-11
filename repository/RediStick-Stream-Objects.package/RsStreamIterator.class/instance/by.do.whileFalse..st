@@ -12,5 +12,5 @@ by: step do: aBlock whileFalse: endConditionBlock
 		(endConditionBlock cull: chunkEnts cull: eachEnt) not ] ] whileTrue: [
 		aBlock value: eachEnt.
 		self currentId: eachEnt id ].
-	(entries isEmpty or: [entries last id > currentId]) ifTrue: [ ^ self ].
+	(entries isEmpty or: [entries last id asStreamMessageId > self currentId]) ifTrue: [ ^ self ].
 	self by: step do: aBlock whileFalse: endConditionBlock

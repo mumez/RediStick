@@ -1,4 +1,4 @@
 accessing
 currentId: anObject
 
-	currentId := anObject
+	currentId := anObject asStreamMessageId
