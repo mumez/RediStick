@@ -1,3 +1,0 @@
-defaults
-defaultIntervalSeconds
-	^ 33

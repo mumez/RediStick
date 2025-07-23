@@ -1,3 +1,0 @@
-private
-enterPubsub
-	pubsub := true.

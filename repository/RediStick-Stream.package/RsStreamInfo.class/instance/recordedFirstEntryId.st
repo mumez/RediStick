@@ -1,4 +1,0 @@
-accessing
-recordedFirstEntryId
-
-	^ recordedFirstEntryId

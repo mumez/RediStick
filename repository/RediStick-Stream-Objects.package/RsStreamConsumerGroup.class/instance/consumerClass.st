@@ -1,3 +1,0 @@
-factory
-consumerClass
-	^ RsStreamConsumer

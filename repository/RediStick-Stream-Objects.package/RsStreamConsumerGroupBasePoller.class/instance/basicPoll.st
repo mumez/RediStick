@@ -1,3 +1,0 @@
-private
-basicPoll
-	^ self pollNeverDelivered.

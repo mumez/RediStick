@@ -20,7 +20,7 @@ Now you can install RediStick Search packages into Pharo (or GemStone/S).
 ```smalltalk
 Metacello new
   baseline: 'RediStick';
-  repository: 'github://mumez/RediStick/repository';
+  repository: 'github://mumez/RediStick/src';
   load: #('Search').
 ```
 
@@ -29,7 +29,7 @@ If you need tests:
 ```smalltalk
 Metacello new
   baseline: 'RediStick';
-  repository: 'github://mumez/RediStick/repository';
+  repository: 'github://mumez/RediStick/src';
   load: #('Search' 'SearchTests').
 ```
 

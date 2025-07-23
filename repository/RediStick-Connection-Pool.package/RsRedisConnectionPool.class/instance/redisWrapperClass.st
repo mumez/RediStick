@@ -1,3 +1,0 @@
-factory
-redisWrapperClass
-	^ RsRedis

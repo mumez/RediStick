@@ -1,3 +1,0 @@
-factory
-streamClass
-	^ RsStream

@@ -1,3 +1,0 @@
-factory
-noAckPollerClass
-	^ RsStreamConsumerGroupNoAckPoller
