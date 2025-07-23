@@ -1,3 +1,0 @@
-testing
-isPubsub
-	^ subscriptionMode notNil

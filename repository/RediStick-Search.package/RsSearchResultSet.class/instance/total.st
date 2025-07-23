@@ -1,4 +1,0 @@
-accessing
-total
-
-	^ total

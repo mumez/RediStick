@@ -1,3 +1,0 @@
-accessing
-shouldDeleteEntryAfterAcceptance: aBoolean
-	shouldDeleteEntryAfterAcceptance := aBoolean 

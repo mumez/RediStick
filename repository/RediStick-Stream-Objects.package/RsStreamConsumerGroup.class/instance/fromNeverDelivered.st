@@ -1,3 +1,0 @@
-initialization
-fromNeverDelivered
-	self initMessageId: RsStreamMessageId neverDelivered

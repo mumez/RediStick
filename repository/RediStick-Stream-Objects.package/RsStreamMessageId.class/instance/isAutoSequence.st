@@ -1,3 +1,0 @@
-testing
-isAutoSequence
-	^ self subId = '*'

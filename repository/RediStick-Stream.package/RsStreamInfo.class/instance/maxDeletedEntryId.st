@@ -1,4 +1,0 @@
-accessing
-maxDeletedEntryId
-
-	^ maxDeletedEntryId

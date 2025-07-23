@@ -1,3 +1,0 @@
-defaults
-defaultPollingPriority
-	^ Processor userBackgroundPriority

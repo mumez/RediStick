@@ -1,4 +1,0 @@
-accessing
-deletedMessages
-
-	^ deletedMessages

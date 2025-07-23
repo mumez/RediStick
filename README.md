@@ -15,7 +15,7 @@ However RediStick use [Stick](https://github.com/mumez/Stick) for supporting aut
 ```smalltalk
 Metacello new
   baseline: 'RediStick';
-  repository: 'github://mumez/RediStick/repository';
+  repository: 'github://mumez/RediStick/src';
   load.
 ```
 
@@ -24,7 +24,7 @@ Metacello new
 ```smalltalk
 Metacello new
   baseline: 'RediStick';
-  repository: 'github://mumez/RediStick/repository';
+  repository: 'github://mumez/RediStick/src';
   load: #('Core' 'ConnectionPool').
 ```
 
@@ -33,7 +33,7 @@ Metacello new
 ```smalltalk
 Metacello new
   baseline: 'RediStick';
-  repository: 'github://mumez/RediStick/repository';
+  repository: 'github://mumez/RediStick/src';
   load: #('Core' 'Pubsub').
 ```
 
@@ -42,7 +42,7 @@ Metacello new
 ```smalltalk
 Metacello new
   baseline: 'RediStick';
-  repository: 'github://mumez/RediStick/repository';
+  repository: 'github://mumez/RediStick/src';
   load: #('StreamObjects').
 ```
 
@@ -54,7 +54,7 @@ stream low-level API only
 ```smalltalk
 Metacello new
   baseline: 'RediStick';
-  repository: 'github://mumez/RediStick/repository';
+  repository: 'github://mumez/RediStick/src';
   load: #('Core' 'Stream').
 ```
 
@@ -65,7 +65,7 @@ Metacello new
 ```smalltalk
 Metacello new
   baseline: 'RediStick';
-  repository: 'github://mumez/RediStick/repository';
+  repository: 'github://mumez/RediStick/src';
   load: #('Core' 'Search').
 ```
 

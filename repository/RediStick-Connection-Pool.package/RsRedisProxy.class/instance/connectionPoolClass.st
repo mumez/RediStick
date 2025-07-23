@@ -1,4 +1,0 @@
-factory
-connectionPoolClass
-	"override"
-	^ RsRedisConnectionPool
