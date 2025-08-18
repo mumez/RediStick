@@ -50,6 +50,10 @@ BaselineOfRediStick >> baseline: spec [
 			group: 'StreamObjectsTests' with: #('RediStick-Stream-Objects-Tests').
 			
 		spec
+			group: 'Json' with: #('RediStick-Json');
+			group: 'JsonTests' with: #('RediStick-Json-Tests').
+			
+		spec
 			group: 'Search' with: #('RediStick-Search');
 			group: 'SearchTests' with: #('RediStick-Search-Tests')].
 
