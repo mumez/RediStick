@@ -11,10 +11,10 @@ RsJsonTest >> testJsonGetSetBasic [
 	key := 'test:json:basic'.
 	value := '{"name": "John", "age": 30, "city": "Tokyo"}'.
 	
-	stick endpoint jsonSet: key path: '$' value: value.
-	result := stick endpoint jsonGet: key path: '$'.
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	result := stick endpoint jsonGet: key path: SjJsonPath root.
 	
-	self assert: ((STONJSON fromString: result) at: 1) equals: (STONJSON fromString: value)
+	self assert: result first equals: (STONJSON fromString: value)
 ]
 
 { #category : 'tests' }
@@ -23,13 +23,13 @@ RsJsonTest >> testJsonGetSetNestedPath [
 	key := 'test:json:nested'.
 	value := '{"user": {"name": "Alice", "profile": {"age": 25}}}'.
 	
-	stick endpoint jsonSet: key path: '$' value: value.
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
 	
-	result := stick endpoint jsonGet: key path: '$.user.name'.
-	self assert: ((STONJSON fromString: result) at: 1) equals: 'Alice'.
+	result := stick endpoint jsonGet: key path: (SjJsonPath root / 'user' / 'name').
+	self assert: result first equals: 'Alice'.
 	
-	result := stick endpoint jsonGet: key path: '$.user.profile.age'.
-	self assert: ((STONJSON fromString: result) at: 1) equals: 25
+	result := stick endpoint jsonGet: key path: (SjJsonPath root / 'user' / 'profile' / 'age').
+	self assert: result first equals: 25
 ]
 
 { #category : 'tests' }
@@ -38,12 +38,12 @@ RsJsonTest >> testJsonSetUpdateValue [
 	key := 'test:json:update'.
 	initialValue := '{"name": "Bob", "age": 20}'.
 	
-	stick endpoint jsonSet: key path: '$' value: initialValue.
+	stick endpoint jsonSet: key path: SjJsonPath root value: initialValue.
 	
 	newAge := '25'.
-	stick endpoint jsonSet: key path: '$.age' value: newAge.
+	stick endpoint jsonSet: key path: (SjJsonPath root / 'age') value: newAge.
 	
-	result := stick endpoint jsonGet: key path: '$.age'.
-	self assert: ((STONJSON fromString: result) at: 1) equals: newAge asInteger
+	result := stick endpoint jsonGet: key path: (SjJsonPath root / 'age').
+	self assert: result first equals: newAge asInteger
 ]
 

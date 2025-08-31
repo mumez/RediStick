@@ -2,13 +2,14 @@ Extension { #name : 'RsRedisEndpoint' }
 
 { #category : '*RediStick-Json' }
 RsRedisEndpoint >> jsonGet: key options: options paths: paths [
-	| args |
+	| args result |
 	args := {
 		        'JSON.GET'.
 		        key } asOrderedCollection.
 	options ifNotNil: [ args addAll: options asArray ].
 	paths ifNotNil: [ args addAll: paths asArray ].
-	^ self unifiedCommand: args
+	result := self unifiedCommand: args.
+	^ STONJSON fromString: result
 ]
 
 { #category : '*RediStick-Json' }
