@@ -24,8 +24,10 @@ RsRedisEndpoint >> jsonGet: key path: path using: optionsBlock [
 { #category : '*RediStick-Json' }
 RsRedisEndpoint >> jsonGet: key paths: paths using: optionsBlock [
 	| options |
-	options := RsJsonGetOptions new.
-	optionsBlock value: options.
+	optionsBlock ifNotNil: [
+		options := RsJsonGetOptions new.
+		optionsBlock value: options.
+	].
 	^ self jsonGet: key options: options paths: paths
 ]
 
