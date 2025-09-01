@@ -15,9 +15,14 @@ RsJsonGetOptions >> asArray [
 	| opts |
 	opts := {} asOrderedCollection.
 	self indent ifNotNil: [ :op | opts addAll: {'INDENT'. op} ].
-	self newLine ifNotNil: [ :op | opts addAll: {'NEWLINE '. op} ].
+	self newLine ifNotNil: [ :op | opts addAll: {'NEWLINE'. op} ].
 	self space ifNotNil: [ :op | opts addAll: {'SPACE'. op} ].
 	^ opts asArray
+]
+
+{ #category : 'testing' }
+RsJsonGetOptions >> hasPrettyFormattingOptions [
+	^ self indent notNil or: [ self newLine notNil or: [ self space notNil ] ]
 ]
 
 { #category : 'accessing' }

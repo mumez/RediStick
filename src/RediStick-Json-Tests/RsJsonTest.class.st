@@ -47,3 +47,74 @@ RsJsonTest >> testJsonSetUpdateValue [
 	self assert: result first equals: newAge asInteger
 ]
 
+{ #category : 'tests' }
+RsJsonTest >> testJsonSetWithIfNotExistsOption [
+	| key value1 value2 result |
+	key := 'test:json:ifnotexists'.
+	value1 := '{"name": "Alice", "status": "active"}'.
+	value2 := '{"name": "Bob", "status": "inactive"}'.
+	
+	"First set should succeed"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value1 using: [:opts | opts ifNotExists].
+	result := stick endpoint jsonGet: key path: SjJsonPath root.
+	self assert: result first equals: (STONJSON fromString: value1).
+	
+	"Second set with ifNotExists should be ignored since key already exists"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value2 using: [:opts | opts ifNotExists].
+	result := stick endpoint jsonGet: key path: SjJsonPath root.
+	self assert: result first equals: (STONJSON fromString: value1).
+	self deny: result first equals: (STONJSON fromString: value2)
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonSetWithIfAlreadyExistsOption [
+	| key value1 value2 result |
+	key := 'test:json:ifalreadyexists'.
+	value1 := '{"name": "Charlie", "status": "pending"}'.
+	value2 := '{"name": "David", "status": "approved"}'.
+	
+	"First set with ifAlreadyExists should be ignored since key doesn't exist"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value1 using: [:opts | opts ifAlreadyExists].
+	[result := stick endpoint jsonGet: key path: SjJsonPath root]
+		on: Error 
+		do: [:ex | result := nil].
+	self assert: result isNil.
+	
+	"Set without options to create the key"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value1.
+	
+	"Second set with ifAlreadyExists should succeed since key exists"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value2 using: [:opts | opts ifAlreadyExists].
+	result := stick endpoint jsonGet: key path: SjJsonPath root.
+	self assert: result first equals: (STONJSON fromString: value2)
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonGetWithPrettyFormatting [
+	| key value result normalResult |
+	key := 'test:json:prettyformat'.
+	value := '{"user":{"name":"Alice","profile":{"age":25,"active":true}}}'.
+	
+	"Set JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Get with pretty formatting using INDENT, NEWLINE, and SPACE options"
+	result := stick endpoint jsonGet: key path: SjJsonPath root using: [:opts | 
+		opts indent: String tab.
+		opts newLine: String lf.
+		opts space: ' '].
+	
+	"When pretty formatting options are used, result should be raw string"
+	self assert: result isString.
+	
+	"Verify pretty formatting is applied"
+	self assert: (result includesSubstring: String tab) description: 'Result should contain tab characters for indentation'.
+	self assert: (result includesSubstring: String lf) description: 'Result should contain line feed characters for newlines'.
+	self assert: (result includesSubstring: ': ') description: 'Result should contain space after colons'.
+	self assert: (result includesSubstring: 'Alice') description: 'Result should contain the data'.
+	
+	"Get without options for comparison - should return parsed object"
+	normalResult := stick endpoint jsonGet: key path: SjJsonPath root.
+	self assert: normalResult first isDictionary
+]
+

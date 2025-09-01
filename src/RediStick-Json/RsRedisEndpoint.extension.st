@@ -9,7 +9,9 @@ RsRedisEndpoint >> jsonGet: key options: options paths: paths [
 	options ifNotNil: [ args addAll: options asArray ].
 	paths ifNotNil: [ args addAll: paths asArray ].
 	result := self unifiedCommand: args.
-	^ STONJSON fromString: result
+	^ (options notNil and: [ options hasPrettyFormattingOptions ]) 
+		ifTrue: [ result ]
+		ifFalse: [ STONJSON fromString: result ]
 ]
 
 { #category : '*RediStick-Json' }

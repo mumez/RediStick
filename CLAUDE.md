@@ -14,7 +14,7 @@ RediStick is a Redis client for Pharo Smalltalk (and GemStone/S) that uses the S
 smalltalkci -s Pharo64-13
 
 # Run specific test groups via Metacello
-# Tests are defined in .smalltalk.ston with groups: Tests, StreamTests, StreamObjectsTests, SearchTests
+# Tests are defined in .smalltalk.ston with groups: Tests, StreamTests, StreamObjectsTests, SearchTests, JsonTests
 ```
 
 ### CI/CD
@@ -43,6 +43,8 @@ smalltalkci -s Pharo64-13
 Extensions to core classes are used for modular features:
 - `RsRedisEndpoint` extensions in Json, Stream, Search packages
 - Example: `RsRedisEndpoint >> jsonGet:path:` in RediStick-Json package
+- JSON operations support options: `jsonSet:path:value:using:` with `ifNotExists`/`ifAlreadyExists`
+- JSON GET supports pretty-formatting with `jsonGet:path:using:` (INDENT, NEWLINE, SPACE options)
 
 ### Dependencies
 - **Stick**: Auto-reconnection framework (github://mumez/Stick/src)
@@ -69,15 +71,24 @@ Available Metacello groups:
 - `BaselineOfRediStick`: Package structure and dependencies
 - Stream objects: `RsStream`, `RsStreamInfo`, etc. for Redis Streams
 - Connection pool: `RsRedisConnectionPool`, `RsRedisProxy`
+- JSON classes: `RsJsonSetOptions`, `RsJsonGetOptions` for JSON operation options
 
-## Plan
-Add RedisJson support.
-- Overview:
-https://redis.io/docs/latest/develop/data-types/json/
+## Redis JSON Implementation Status
 
-- API:
-https://redis.io/docs/latest/operate/oss_and_stack/stack-with-enterprise/json/commands/
+### Completed Features
+- Basic JSON operations: `jsonGet:path:`, `jsonSet:path:value:`
+- JSON SET with options: `jsonSet:path:value:using:` supporting `ifNotExists`, `ifAlreadyExists`
+- JSON GET with pretty-formatting: `jsonGet:path:using:` supporting INDENT, NEWLINE, SPACE options
+- Comprehensive test coverage in `RsJsonTest` class
 
-- API:
-https://valkey.io/commands/#json
+### Implementation Details
+- `RsJsonSetOptions`: Handles NX (if not exists) and XX (if already exists) modes
+- `RsJsonGetOptions`: Handles pretty-formatting with indent, newline, and space options
+- Smart result handling: Returns parsed JSON objects by default, raw strings when formatting options are used
+- Integration with SJsonPath for JSON path operations
+
+### References
+- Overview: https://redis.io/docs/latest/develop/data-types/json/
+- Commands: https://redis.io/docs/latest/operate/oss_and_stack/stack-with-enterprise/json/commands/
+- Valkey API: https://valkey.io/commands/#json
 
