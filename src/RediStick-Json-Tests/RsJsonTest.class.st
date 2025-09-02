@@ -118,3 +118,91 @@ RsJsonTest >> testJsonGetWithPrettyFormatting [
 	self assert: normalResult first isDictionary
 ]
 
+{ #category : 'tests' }
+RsJsonTest >> testJsonGetMultiplePaths [
+	| key value result userNamePath statusPath scorePath |
+	key := 'test:json:multiplepaths'.
+	value := '{"user": {"name": "Alice", "age": 25}, "status": "active", "score": 100}'.
+	userNamePath := SjJsonPath root / 'user' / 'name'.
+	statusPath := SjJsonPath root / 'status'.
+	scorePath := SjJsonPath root / 'score'.
+	
+	"Set JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Get multiple paths at once"
+	result := stick endpoint jsonGet: key paths: {
+		userNamePath.
+		statusPath.
+		scorePath
+	}.
+	
+	"Result should be a dictionary with paths as keys and arrays as values"
+	self assert: result isDictionary.
+	self assert: result size equals: 3.
+	self assert: (result at: userNamePath asString) first equals: 'Alice'.
+	self assert: (result at: statusPath asString) first equals: 'active'.
+	self assert: (result at: scorePath asString) first equals: 100
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonGetMultiplePathsWithNonExistentPath [
+	| key value result userNamePath nonExistentPath statusPath |
+	key := 'test:json:multiplepaths:nonexistent'.
+	value := '{"user": {"name": "Bob"}, "status": "inactive"}'.
+	userNamePath := SjJsonPath root / 'user' / 'name'.
+	nonExistentPath := SjJsonPath root / 'nonexistent'.
+	statusPath := SjJsonPath root / 'status'.
+	
+	"Set JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Get multiple paths including a non-existent path"
+	result := stick endpoint jsonGet: key paths: {
+		userNamePath.
+		nonExistentPath.
+		statusPath
+	}.
+	
+	"Result should be a dictionary with paths as keys"
+	self assert: result isDictionary.
+	self assert: result size equals: 3.
+	self assert: (result at: userNamePath asString) first equals: 'Bob'.
+	"Non-existent path should be included in result with empty array"
+	self assert: (result includesKey: nonExistentPath asString).
+	self assert: (result at: nonExistentPath asString) isEmpty.
+	self assert: (result at: statusPath asString) first equals: 'inactive'
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonGetMultiplePathsWithPrettyFormatting [
+	| key value result dataPath metaPath |
+	key := 'test:json:multiplepaths:pretty'.
+	value := '{"data": {"items": [1,2,3]}, "meta": {"count": 3}}'.
+	dataPath := SjJsonPath root / 'data'.
+	metaPath := SjJsonPath root / 'meta'.
+	
+	"Set JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Get multiple paths with pretty formatting"
+	result := stick endpoint jsonGet: key paths: {
+		dataPath.
+		metaPath
+	} using: [:opts | 
+		opts indent: '  '.
+		opts newLine: String lf].
+	
+	"When pretty formatting is used, result should be raw string"
+	self assert: result isString.
+	
+	"Verify the result contains formatted JSON for both paths"
+	self assert: (result includesSubstring: 'items').
+	self assert: (result includesSubstring: 'count').
+	self assert: (result includesSubstring: String lf).
+	
+	"Result should be a JSON object with paths as keys"
+	self assert: (result includesSubstring: (dataPath asString)).
+	self assert: (result includesSubstring: (metaPath asString))
+]
+

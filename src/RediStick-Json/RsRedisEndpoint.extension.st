@@ -20,6 +20,11 @@ RsRedisEndpoint >> jsonGet: key path: path [
 ]
 
 { #category : '*RediStick-Json' }
+RsRedisEndpoint >> jsonGet: key paths: paths [
+	^ self jsonGet: key paths: paths using: nil
+]
+
+{ #category : '*RediStick-Json' }
 RsRedisEndpoint >> jsonGet: key path: path using: optionsBlock [
 	^ self jsonGet: key paths: {path} using: optionsBlock
 ]
