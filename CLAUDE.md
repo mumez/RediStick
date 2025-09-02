@@ -77,14 +77,19 @@ Available Metacello groups:
 
 ### Completed Features
 - Basic JSON operations: `jsonGet:path:`, `jsonSet:path:value:`
+- Multiple path JSON GET: `jsonGet:paths:` for retrieving multiple JSON paths at once
 - JSON SET with options: `jsonSet:path:value:using:` supporting `ifNotExists`, `ifAlreadyExists`
 - JSON GET with pretty-formatting: `jsonGet:path:using:` supporting INDENT, NEWLINE, SPACE options
+- JSON object key retrieval: `jsonObjKeys:` and `jsonObjKeys:path:` for getting object keys
 - Comprehensive test coverage in `RsJsonTest` class
 
 ### Implementation Details
 - `RsJsonSetOptions`: Handles NX (if not exists) and XX (if already exists) modes
 - `RsJsonGetOptions`: Handles pretty-formatting with indent, newline, and space options
 - Smart result handling: Returns parsed JSON objects by default, raw strings when formatting options are used
+- Multiple path support: Returns dictionary with paths as keys, arrays as values
+- JSON.OBJKEYS support: Returns nested collections with object keys, handles edge cases (nil for non-objects, empty for non-existent paths)
+- Safe JSON parsing with `safeParseJson:` helper method
 - Integration with SJsonPath for JSON path operations
 
 ### References
