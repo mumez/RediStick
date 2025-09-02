@@ -206,3 +206,90 @@ RsJsonTest >> testJsonGetMultiplePathsWithPrettyFormatting [
 	self assert: (result includesSubstring: (metaPath asString))
 ]
 
+{ #category : 'tests' }
+RsJsonTest >> testJsonObjKeysBasic [
+	| key value result |
+	key := 'test:json:objkeys:basic'.
+	value := '{"name": "Alice", "age": 30, "city": "Tokyo", "active": true}'.
+	
+	"Set JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Get object keys at root"
+	result := stick endpoint jsonObjKeys: key path: SjJsonPath root.
+	
+	"Result should be a nested collection with object keys in first element"
+	self assert: result isSequenceable.
+	self assert: result size equals: 1.
+	self assert: result first isSequenceable.
+	self assert: result first size equals: 4.
+	self assert: (result first includes: 'name').
+	self assert: (result first includes: 'age').
+	self assert: (result first includes: 'city').
+	self assert: (result first includes: 'active')
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonObjKeysNestedObject [
+	| key value result |
+	key := 'test:json:objkeys:nested'.
+	value := '{"user": {"profile": {"name": "Bob", "email": "bob@example.com"}, "preferences": {"theme": "dark"}}, "meta": {"version": 1}}'.
+	
+	"Set JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Get object keys at nested path"
+	result := stick endpoint jsonObjKeys: key path: (SjJsonPath root / 'user' / 'profile').
+	
+	"Result should contain keys from the nested object"
+	self assert: result isSequenceable.
+	self assert: result size equals: 1.
+	self assert: result first isSequenceable.
+	self assert: result first size equals: 2.
+	self assert: (result first includes: 'name').
+	self assert: (result first includes: 'email')
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonObjKeysNonObjectPath [
+	| key value result |
+	key := 'test:json:objkeys:nonobject'.
+	value := '{"data": [1, 2, 3], "count": 3}'.
+	
+	"Set JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Try to get object keys from an array path (should return null)"
+	result := stick endpoint jsonObjKeys: key path: (SjJsonPath root / 'data').
+	
+	"Result should contain nil for non-object paths"
+	self assert: result isSequenceable.
+	self assert: result size equals: 1.
+	self assert: result first isNil
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonObjKeysNonExistentKey [
+	| key result |
+	key := 'test:json:objkeys:nonexistent'.
+	result := stick endpoint jsonObjKeys: key.
+	self assert: result isNil
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonObjKeysNonExistentPath [
+	| key value result |
+	key := 'test:json:objkeys:nonexistentpath'.
+	value := '{"user": {"name": "Charlie"}}'.
+	
+	"Set JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Try to get object keys from non-existent path"
+	result := stick endpoint jsonObjKeys: key path: (SjJsonPath root / 'nonexistent').
+	
+	"Result should be empty collection for non-existent paths"
+	self assert: result isSequenceable.
+	self assert: result isEmpty
+]
+

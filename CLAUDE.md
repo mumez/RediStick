@@ -92,3 +92,15 @@ Available Metacello groups:
 - Commands: https://redis.io/docs/latest/operate/oss_and_stack/stack-with-enterprise/json/commands/
 - Valkey API: https://valkey.io/commands/#json
 
+
+# Test tips for debug in pharo
+
+```smalltalk
+| stick |
+"You can instantiate a stick for test and send messages" 
+stick := RsRediStick targetUrl: RsRedisTestCase urlString.
+stick connect.
+stick endpoint select: RsRedisTestCase dbIndex.
+
+[stick endpoint jsonXXX ] on: Error do: [:ex | ex description]. "returns error description if error occures"
+```

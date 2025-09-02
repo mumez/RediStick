@@ -11,7 +11,7 @@ RsRedisEndpoint >> jsonGet: key options: options paths: paths [
 	result := self unifiedCommand: args.
 	^ (options notNil and: [ options hasPrettyFormattingOptions ]) 
 		ifTrue: [ result ]
-		ifFalse: [ STONJSON fromString: result ]
+		ifFalse: [ self safeParseJson: result ]
 ]
 
 { #category : '*RediStick-Json' }
@@ -62,4 +62,25 @@ RsRedisEndpoint >> jsonSet: key path: path value: value using: optionsBlock [
 	options := RsJsonSetOptions new.
 	optionsBlock value: options.
 	^ self jsonSet: key path: path value: value options: options
+]
+
+{ #category : '*RediStick-Json' }
+RsRedisEndpoint >> jsonObjKeys: key [
+	^ self jsonObjKeys: key path: nil
+]
+
+{ #category : '*RediStick-Json' }
+RsRedisEndpoint >> jsonObjKeys: key path: path [
+	| args result pathString |
+	args := {
+		        'JSON.OBJKEYS'.
+		        key } asOrderedCollection.
+	path ifNotNil: [ args add: path asString ].
+	^ self unifiedCommand: args.
+]
+
+{ #category : '*RediStick-Json' }
+RsRedisEndpoint >> safeParseJson: result [
+	result ifNil: [ ^ result ].
+	^ STONJSON fromString: result
 ]
