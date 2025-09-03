@@ -293,3 +293,32 @@ RsJsonTest >> testJsonObjKeysNonExistentPath [
 	self assert: result isEmpty
 ]
 
+{ #category : 'tests' }
+RsJsonTest >> testJsonSetWithNonStringValues [
+	| key numberResult booleanTrueResult booleanFalseResult nilResult |
+	key := 'test:json:nonstring'.
+	
+	"Create root object first"
+	stick endpoint jsonSet: key path: SjJsonPath root value: '{}'. 
+	
+	"Test setting a number value"
+	stick endpoint jsonSet: key path: (SjJsonPath root / 'number') value: 42.
+	numberResult := stick endpoint jsonGet: key path: (SjJsonPath root / 'number').
+	self assert: numberResult first equals: 42.
+	
+	"Test setting a boolean true value"
+	stick endpoint jsonSet: key path: (SjJsonPath root / 'boolTrue') value: true.
+	booleanTrueResult := stick endpoint jsonGet: key path: (SjJsonPath root / 'boolTrue').
+	self assert: booleanTrueResult first equals: true.
+	
+	"Test setting a boolean false value"
+	stick endpoint jsonSet: key path: (SjJsonPath root / 'boolFalse') value: false.
+	booleanFalseResult := stick endpoint jsonGet: key path: (SjJsonPath root / 'boolFalse').
+	self assert: booleanFalseResult first equals: false.
+	
+	"Test setting a nil value"
+	stick endpoint jsonSet: key path: (SjJsonPath root / 'nullValue') value: nil.
+	nilResult := stick endpoint jsonGet: key path: (SjJsonPath root / 'nullValue').
+	self assert: nilResult isEmpty
+]
+
