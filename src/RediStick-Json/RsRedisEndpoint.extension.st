@@ -46,6 +46,13 @@ RsRedisEndpoint >> jsonSet: key path: path value: value [
 
 { #category : '*RediStick-Json' }
 RsRedisEndpoint >> jsonSet: key path: path value: value options: options [
+	| jsonString args |
+	jsonString := self toJsonString: value.
+	^ self jsonSet: key path: path rawValue: jsonString options: options
+]
+
+{ #category : '*RediStick-Json' }
+RsRedisEndpoint >> jsonSet: key path: path rawValue: value options: options [
 	| args |
 	args := {
 		        'JSON.SET'.
@@ -83,4 +90,9 @@ RsRedisEndpoint >> jsonObjKeys: key path: path [
 RsRedisEndpoint >> safeParseJson: result [
 	result ifNil: [ ^ result ].
 	^ STONJSON fromString: result
+]
+
+{ #category : '*RediStick-Json' }
+RsRedisEndpoint >> toJsonString: value [
+	^ STONJSON toString: value
 ]

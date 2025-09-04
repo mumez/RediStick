@@ -9,19 +9,19 @@ Class {
 RsJsonTest >> testJsonGetSetBasic [
 	| key value result |
 	key := 'test:json:basic'.
-	value := '{"name": "John", "age": 30, "city": "Tokyo"}'.
+	value := {'name'->'John'. 'age'->30. 'city'->'Tokyo'} asDictionary.
 	
 	stick endpoint jsonSet: key path: SjJsonPath root value: value.
 	result := stick endpoint jsonGet: key path: SjJsonPath root.
 	
-	self assert: result first equals: (STONJSON fromString: value)
+	self assert: result first equals: value
 ]
 
 { #category : 'tests' }
 RsJsonTest >> testJsonGetSetNestedPath [
 	| key value result |
 	key := 'test:json:nested'.
-	value := '{"user": {"name": "Alice", "profile": {"age": 25}}}'.
+	value := {'user'->({'name'->'Alice'. 'profile'->({'age'->25} asDictionary)} asDictionary)} asDictionary.
 	
 	stick endpoint jsonSet: key path: SjJsonPath root value: value.
 	
@@ -36,42 +36,42 @@ RsJsonTest >> testJsonGetSetNestedPath [
 RsJsonTest >> testJsonSetUpdateValue [
 	| key initialValue newAge result |
 	key := 'test:json:update'.
-	initialValue := '{"name": "Bob", "age": 20}'.
+	initialValue := {'name'->'Bob'. 'age'->20} asDictionary.
 	
 	stick endpoint jsonSet: key path: SjJsonPath root value: initialValue.
 	
-	newAge := '25'.
+	newAge := 25.
 	stick endpoint jsonSet: key path: (SjJsonPath root / 'age') value: newAge.
 	
 	result := stick endpoint jsonGet: key path: (SjJsonPath root / 'age').
-	self assert: result first equals: newAge asInteger
+	self assert: result first equals: newAge
 ]
 
 { #category : 'tests' }
 RsJsonTest >> testJsonSetWithIfNotExistsOption [
 	| key value1 value2 result |
 	key := 'test:json:ifnotexists'.
-	value1 := '{"name": "Alice", "status": "active"}'.
-	value2 := '{"name": "Bob", "status": "inactive"}'.
+	value1 := {'name'->'Alice'. 'status'->'active'} asDictionary.
+	value2 := {'name'->'Bob'. 'status'->'inactive'} asDictionary.
 	
 	"First set should succeed"
 	stick endpoint jsonSet: key path: SjJsonPath root value: value1 using: [:opts | opts ifNotExists].
 	result := stick endpoint jsonGet: key path: SjJsonPath root.
-	self assert: result first equals: (STONJSON fromString: value1).
+	self assert: result first equals: value1.
 	
 	"Second set with ifNotExists should be ignored since key already exists"
 	stick endpoint jsonSet: key path: SjJsonPath root value: value2 using: [:opts | opts ifNotExists].
 	result := stick endpoint jsonGet: key path: SjJsonPath root.
-	self assert: result first equals: (STONJSON fromString: value1).
-	self deny: result first equals: (STONJSON fromString: value2)
+	self assert: result first equals: value1.
+	self deny: result first equals: value2
 ]
 
 { #category : 'tests' }
 RsJsonTest >> testJsonSetWithIfAlreadyExistsOption [
 	| key value1 value2 result |
 	key := 'test:json:ifalreadyexists'.
-	value1 := '{"name": "Charlie", "status": "pending"}'.
-	value2 := '{"name": "David", "status": "approved"}'.
+	value1 := {'name'->'Charlie'. 'status'->'pending'} asDictionary.
+	value2 := {'name'->'David'. 'status'->'approved'} asDictionary.
 	
 	"First set with ifAlreadyExists should be ignored since key doesn't exist"
 	stick endpoint jsonSet: key path: SjJsonPath root value: value1 using: [:opts | opts ifAlreadyExists].
@@ -86,14 +86,14 @@ RsJsonTest >> testJsonSetWithIfAlreadyExistsOption [
 	"Second set with ifAlreadyExists should succeed since key exists"
 	stick endpoint jsonSet: key path: SjJsonPath root value: value2 using: [:opts | opts ifAlreadyExists].
 	result := stick endpoint jsonGet: key path: SjJsonPath root.
-	self assert: result first equals: (STONJSON fromString: value2)
+	self assert: result first equals: value2
 ]
 
 { #category : 'tests' }
 RsJsonTest >> testJsonGetWithPrettyFormatting [
 	| key value result normalResult |
 	key := 'test:json:prettyformat'.
-	value := '{"user":{"name":"Alice","profile":{"age":25,"active":true}}}'.
+	value := {'user'->({'name'->'Alice'. 'profile'->({'age'->25. 'active'->true} asDictionary)} asDictionary)} asDictionary.
 	
 	"Set JSON data"
 	stick endpoint jsonSet: key path: SjJsonPath root value: value.
@@ -122,7 +122,7 @@ RsJsonTest >> testJsonGetWithPrettyFormatting [
 RsJsonTest >> testJsonGetMultiplePaths [
 	| key value result userNamePath statusPath scorePath |
 	key := 'test:json:multiplepaths'.
-	value := '{"user": {"name": "Alice", "age": 25}, "status": "active", "score": 100}'.
+	value := {'user'->({'name'->'Alice'. 'age'->25} asDictionary). 'status'->'active'. 'score'->100} asDictionary.
 	userNamePath := SjJsonPath root / 'user' / 'name'.
 	statusPath := SjJsonPath root / 'status'.
 	scorePath := SjJsonPath root / 'score'.
@@ -149,7 +149,7 @@ RsJsonTest >> testJsonGetMultiplePaths [
 RsJsonTest >> testJsonGetMultiplePathsWithNonExistentPath [
 	| key value result userNamePath nonExistentPath statusPath |
 	key := 'test:json:multiplepaths:nonexistent'.
-	value := '{"user": {"name": "Bob"}, "status": "inactive"}'.
+	value := {'user'->({'name'->'Bob'} asDictionary). 'status'->'inactive'} asDictionary.
 	userNamePath := SjJsonPath root / 'user' / 'name'.
 	nonExistentPath := SjJsonPath root / 'nonexistent'.
 	statusPath := SjJsonPath root / 'status'.
@@ -178,7 +178,7 @@ RsJsonTest >> testJsonGetMultiplePathsWithNonExistentPath [
 RsJsonTest >> testJsonGetMultiplePathsWithPrettyFormatting [
 	| key value result dataPath metaPath |
 	key := 'test:json:multiplepaths:pretty'.
-	value := '{"data": {"items": [1,2,3]}, "meta": {"count": 3}}'.
+	value := {'data'->({'items'->{1. 2. 3}} asDictionary). 'meta'->({'count'->3} asDictionary)} asDictionary.
 	dataPath := SjJsonPath root / 'data'.
 	metaPath := SjJsonPath root / 'meta'.
 	
@@ -210,7 +210,7 @@ RsJsonTest >> testJsonGetMultiplePathsWithPrettyFormatting [
 RsJsonTest >> testJsonObjKeysBasic [
 	| key value result |
 	key := 'test:json:objkeys:basic'.
-	value := '{"name": "Alice", "age": 30, "city": "Tokyo", "active": true}'.
+	value := {'name'->'Alice'. 'age'->30. 'city'->'Tokyo'. 'active'->true} asDictionary.
 	
 	"Set JSON data"
 	stick endpoint jsonSet: key path: SjJsonPath root value: value.
@@ -233,7 +233,7 @@ RsJsonTest >> testJsonObjKeysBasic [
 RsJsonTest >> testJsonObjKeysNestedObject [
 	| key value result |
 	key := 'test:json:objkeys:nested'.
-	value := '{"user": {"profile": {"name": "Bob", "email": "bob@example.com"}, "preferences": {"theme": "dark"}}, "meta": {"version": 1}}'.
+	value := {'user'->({'profile'->({'name'->'Bob'. 'email'->'bob@example.com'} asDictionary). 'preferences'->({'theme'->'dark'} asDictionary)} asDictionary). 'meta'->({'version'->1} asDictionary)} asDictionary.
 	
 	"Set JSON data"
 	stick endpoint jsonSet: key path: SjJsonPath root value: value.
@@ -254,7 +254,7 @@ RsJsonTest >> testJsonObjKeysNestedObject [
 RsJsonTest >> testJsonObjKeysNonObjectPath [
 	| key value result |
 	key := 'test:json:objkeys:nonobject'.
-	value := '{"data": [1, 2, 3], "count": 3}'.
+	value := {'data'->{1. 2. 3}. 'count'->3} asDictionary.
 	
 	"Set JSON data"
 	stick endpoint jsonSet: key path: SjJsonPath root value: value.
@@ -280,7 +280,7 @@ RsJsonTest >> testJsonObjKeysNonExistentKey [
 RsJsonTest >> testJsonObjKeysNonExistentPath [
 	| key value result |
 	key := 'test:json:objkeys:nonexistentpath'.
-	value := '{"user": {"name": "Charlie"}}'.
+	value := {'user'->({'name'->'Charlie'} asDictionary)} asDictionary.
 	
 	"Set JSON data"
 	stick endpoint jsonSet: key path: SjJsonPath root value: value.
@@ -299,7 +299,7 @@ RsJsonTest >> testJsonSetWithNonStringValues [
 	key := 'test:json:nonstring'.
 	
 	"Create root object first"
-	stick endpoint jsonSet: key path: SjJsonPath root value: '{}'. 
+	stick endpoint jsonSet: key path: SjJsonPath root value: Dictionary new. 
 	
 	"Test setting a number value"
 	stick endpoint jsonSet: key path: (SjJsonPath root / 'number') value: 42.
@@ -319,6 +319,6 @@ RsJsonTest >> testJsonSetWithNonStringValues [
 	"Test setting a nil value"
 	stick endpoint jsonSet: key path: (SjJsonPath root / 'nullValue') value: nil.
 	nilResult := stick endpoint jsonGet: key path: (SjJsonPath root / 'nullValue').
-	self assert: nilResult isEmpty
+	self assert: nilResult first isNil.
 ]
 
