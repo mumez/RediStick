@@ -77,18 +77,23 @@ Available Metacello groups:
 
 ### Completed Features
 - Basic JSON operations: `jsonGet:path:`, `jsonSet:path:value:`
+- **Automatic JSON conversion**: JSON SET operations automatically convert Smalltalk objects to JSON strings
 - Multiple path JSON GET: `jsonGet:paths:` for retrieving multiple JSON paths at once
 - JSON SET with options: `jsonSet:path:value:using:` supporting `ifNotExists`, `ifAlreadyExists`
 - JSON GET with pretty-formatting: `jsonGet:path:using:` supporting INDENT, NEWLINE, SPACE options
 - JSON object key retrieval: `jsonObjKeys:` and `jsonObjKeys:path:` for getting object keys
+- JSON object length: `jsonObjLen:` and `jsonObjLen:path:` for getting object field count
 - Comprehensive test coverage in `RsJsonTest` class
 
 ### Implementation Details
+- **Automatic value conversion**: `jsonSet:path:value:options:` automatically converts Smalltalk objects (dictionaries, arrays, numbers, booleans, nil) to JSON strings using `toJsonString:` helper method
+- **Idiomatic Smalltalk syntax**: Tests and usage examples use native Smalltalk dictionaries (`{'key'->'value'} asDictionary`) instead of hardcoded JSON strings
 - `RsJsonSetOptions`: Handles NX (if not exists) and XX (if already exists) modes
 - `RsJsonGetOptions`: Handles pretty-formatting with indent, newline, and space options
 - Smart result handling: Returns parsed JSON objects by default, raw strings when formatting options are used
 - Multiple path support: Returns dictionary with paths as keys, arrays as values
 - JSON.OBJKEYS support: Returns nested collections with object keys, handles edge cases (nil for non-objects, empty for non-existent paths)
+- JSON.OBJLEN support: Returns object field count, returns nil for non-objects, handles nested paths with array results
 - Safe JSON parsing with `safeParseJson:` helper method
 - Integration with SJsonPath for JSON path operations
 
@@ -107,5 +112,8 @@ stick := RsRediStick targetUrl: RsRedisTestCase urlString.
 stick connect.
 stick endpoint select: RsRedisTestCase dbIndex.
 
-[stick endpoint jsonXXX ] on: Error do: [:ex | ex description]. "returns error description if error occures"
+"JSON operations now support automatic conversion from Smalltalk objects"
+stick endpoint jsonSet: 'test:key' path: SjJsonPath root value: {'name'->'Alice'. 'age'->30} asDictionary.
+
+[stick endpoint jsonXXX ] on: Error do: [:ex | ex description]. "returns error description if error occurs"
 ```
