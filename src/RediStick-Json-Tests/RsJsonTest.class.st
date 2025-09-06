@@ -508,3 +508,124 @@ RsJsonTest >> testJsonArrLenNonArrayPath [
 	self assert: result first isNil
 ]
 
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrAppendSingleValue [
+	| key value result |
+	key := 'test:json:arrappend:single'.
+	value := {'items'->{1. 2. 3}} asDictionary.
+	
+	"Set JSON data with initial array"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Append single value to array"
+	result := stick endpoint jsonArrAppend: key path: (SjJsonPath root / 'items') values: {4}.
+	
+	"Result should be the new array length"
+	self assert: result isSequenceable.
+	self assert: result size equals: 1.
+	self assert: result first equals: 4.
+	
+	"Verify the array content"
+	result := stick endpoint jsonGet: key path: (SjJsonPath root / 'items').
+	self assert: result first equals: {1. 2. 3. 4}
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrAppendMultipleValues [
+	| key value result |
+	key := 'test:json:arrappend:multiple'.
+	value := {'numbers'->{1. 2}} asDictionary.
+	
+	"Set JSON data with initial array"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Append multiple values to array"
+	result := stick endpoint jsonArrAppend: key path: (SjJsonPath root / 'numbers') values: {3. 4. 5}.
+	
+	"Result should be the new array length"
+	self assert: result isSequenceable.
+	self assert: result size equals: 1.
+	self assert: result first equals: 5.
+	
+	"Verify the array content"
+	result := stick endpoint jsonGet: key path: (SjJsonPath root / 'numbers').
+	self assert: result first equals: {1. 2. 3. 4. 5}
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrAppendMixedTypes [
+	| key value result |
+	key := 'test:json:arrappend:mixed'.
+	value := {'data'->{1}} asDictionary.
+	
+	"Set JSON data with initial array"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Append different types of values"
+	result := stick endpoint jsonArrAppend: key path: (SjJsonPath root / 'data') values: {'hello'. true. nil. {'nested'->42} asDictionary}.
+	
+	"Result should be the new array length"
+	self assert: result isSequenceable.
+	self assert: result size equals: 1.
+	self assert: result first equals: 5.
+	
+	"Verify the array content contains mixed types"
+	result := stick endpoint jsonGet: key path: (SjJsonPath root / 'data').
+	self assert: result first size equals: 5.
+	self assert: result first first equals: 1.
+	self assert: result first second equals: 'hello'.
+	self assert: result first third equals: true.
+	self assert: result first fourth isNil
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrAppendToEmptyArray [
+	| key value result |
+	key := 'test:json:arrappend:empty'.
+	value := {'items'->{}} asDictionary.
+	
+	"Set JSON data with empty array"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Append values to empty array"
+	result := stick endpoint jsonArrAppend: key path: (SjJsonPath root / 'items') values: {'first'. 'second'}.
+	
+	"Result should be the new array length"
+	self assert: result isSequenceable.
+	self assert: result size equals: 1.
+	self assert: result first equals: 2.
+	
+	"Verify the array content"
+	result := stick endpoint jsonGet: key path: (SjJsonPath root / 'items').
+	self assert: result first equals: {'first'. 'second'}
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrAppendToNonExistentArray [
+	| key result |
+	key := 'test:json:arrappend:nonexistent'.
+	
+	"Try to append to non-existent array - Redis returns null"
+	result := stick endpoint jsonArrAppend: key path: (SjJsonPath root) values: {1. 2. 3}.
+	
+	"Should get null since the key doesn't exist"
+	self assert: result isNil
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrAppendToNonArray [
+	| key value result |
+	key := 'test:json:arrappend:nonarray'.
+	value := {'data'->'not an array'} asDictionary.
+	
+	"Set JSON data with non-array value"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Try to append to non-array - Redis returns array with null"
+	result := stick endpoint jsonArrAppend: key path: (SjJsonPath root / 'data') values: {1. 2}.
+	
+	"Should get array with null since target is not an array"
+	self assert: result isSequenceable.
+	self assert: result first isNil
+]
+
