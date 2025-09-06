@@ -414,3 +414,97 @@ RsJsonTest >> testJsonObjLenEmptyObject [
 	self assert: result equals: 0
 ]
 
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrLenBasic [
+	| key value result |
+	key := 'test:json:arrlen:basic'.
+	value := {'items'->{1. 2. 3. 4. 5}} asDictionary.
+	
+	"Set JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Get array length at nested path"
+	result := stick endpoint jsonArrLen: key path: (SjJsonPath root / 'items').
+	
+	"Result should be array length"
+	self assert: result isSequenceable.
+	self assert: result size equals: 1.
+	self assert: result first equals: 5
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrLenRootPath [
+	| key value result |
+	key := 'test:json:arrlen:root'.
+	value := {1. 2. 3}.
+	
+	"Set JSON array at root"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Get array length at root path using simple method"
+	result := stick endpoint jsonArrLen: key.
+	
+	"Result should be the array length"
+	self assert: result equals: 3
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrLenEmptyArray [
+	| key value result |
+	key := 'test:json:arrlen:empty'.
+	value := {'data'->{}. 'count'->0} asDictionary.
+	
+	"Set JSON data with empty array"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Get empty array length"
+	result := stick endpoint jsonArrLen: key path: (SjJsonPath root / 'data').
+	
+	"Result should be 0 for empty array"
+	self assert: result isSequenceable.
+	self assert: result size equals: 1.
+	self assert: result first equals: 0
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrLenNonExistentKey [
+	| key result |
+	key := 'test:json:arrlen:nonexistent'.
+	result := stick endpoint jsonArrLen: key.
+	self assert: result isNil
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrLenNonExistentPath [
+	| key value result |
+	key := 'test:json:arrlen:nonexistentpath'.
+	value := {'user'->({'name'->'Alice'} asDictionary)} asDictionary.
+	
+	"Set JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Try to get array length from non-existent path"
+	result := stick endpoint jsonArrLen: key path: (SjJsonPath root / 'nonexistent').
+	
+	"Result should be empty array for non-existent paths"
+	self assert: result isEmpty
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrLenNonArrayPath [
+	| key value result |
+	key := 'test:json:arrlen:nonarray'.
+	value := {'data'->'not an array'. 'count'->3} asDictionary.
+	
+	"Set JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Try to get array length from a non-array path (should return null)"
+	result := stick endpoint jsonArrLen: key path: (SjJsonPath root / 'data').
+	
+	"Result should contain nil for non-array paths"
+	self assert: result isSequenceable.
+	self assert: result size equals: 1.
+	self assert: result first isNil
+]
+
