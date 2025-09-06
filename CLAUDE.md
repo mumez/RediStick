@@ -117,3 +117,74 @@ stick endpoint jsonSet: 'test:key' path: SjJsonPath root value: {'name'->'Alice'
 
 [stick endpoint jsonXXX ] on: Error do: [:ex | ex description]. "returns error description if error occurs"
 ```
+
+# Development Tips and Troubleshooting
+
+## Package Import and Testing Workflow
+
+### 1. Tonel File Validation
+Always validate `.st` files after creation/modification:
+```bash
+# Use smalltalk-validator MCP tool
+mcp__smalltalk-validator__validate_tonel_smalltalk_from_file: '/path/to/file.st'
+```
+
+### 2. Package Import to Pharo
+Use absolute paths for reliable package imports:
+```smalltalk
+"Import packages using MCP smalltalk-interop"
+mcp__smalltalk-interop__import_package: 'RediStick-Json' path: '/home/ume/git/RediStick/src'
+mcp__smalltalk-interop__import_package: 'RediStick-Json-Tests' path: '/home/ume/git/RediStick/src'
+```
+
+### 3. Method Verification
+Check if new methods are loaded correctly:
+```smalltalk
+"Verify method exists"
+RsRedisEndpoint canUnderstand: #jsonArrLen:
+RsRedisEndpoint canUnderstand: #jsonArrAppend:path:values:
+```
+
+### 4. Test Execution Patterns
+Count and run specific test groups:
+```smalltalk
+"Count tests by pattern"
+| result |
+result := RsJsonTest suite tests select: [ :each | each selector beginsWith: 'testJsonArrLen' ].
+result size
+
+"Run tests and get results"
+| suite results |
+suite := TestSuite new.
+RsJsonTest suite tests select: [ :each | each selector beginsWith: 'testJsonArrAppend' ] thenDo: [ :test | suite addTest: test ].
+results := suite run.
+'Passed: ', results passedCount asString, ', Failed: ', results failureCount asString, ', Errors: ', results errorCount asString
+```
+
+### 5. Redis Behavior Testing
+Test actual Redis behavior before writing assertions:
+```smalltalk
+| stick |
+stick := RsRediStick targetUrl: RsRedisTestCase urlString.
+stick connect.
+stick endpoint select: RsRedisTestCase dbIndex.
+
+"Test edge cases to understand actual Redis responses"
+stick endpoint jsonArrAppend: 'nonexistent' path: SjJsonPath root values: {1. 2. 3}. "=> nil"
+stick endpoint jsonArrAppend: 'nonarray' path: (SjJsonPath root / 'stringfield') values: {1}. "=> [nil]"
+```
+
+### 6. Common Pitfalls
+- **Eval Syntax**: Use correct variable declaration: `| var |` not just `result := ...`
+- **Error Testing**: Redis often returns `nil` or `[nil]` instead of throwing errors
+- **Package Reimport**: Always reimport packages after file modifications
+- **Path Handling**: Use `SjJsonPath root` for root paths, not raw strings
+- **Test Database**: Always use `RsRedisTestCase dbIndex` to avoid conflicts
+
+### 7. Debugging Failed Tests
+When tests fail:
+1. Run individual test methods to isolate issues
+2. Test the actual Redis behavior in isolation
+3. Check if error expectations match Redis reality
+4. Verify test data setup is correct
+5. Ensure proper cleanup between tests
