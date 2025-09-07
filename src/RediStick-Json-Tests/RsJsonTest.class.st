@@ -629,3 +629,170 @@ RsJsonTest >> testJsonArrAppendToNonArray [
 	self assert: result first isNil
 ]
 
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrIndexBasicSearch [
+	| key value result |
+	key := 'test:json:arrindex:basic'.
+	value := {'items'->{1. 2. 3. 2. 4}} asDictionary.
+	
+	"Set JSON data with array"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Search for existing value - should return first index"
+	result := stick endpoint jsonArrIndex: key path: (SjJsonPath root / 'items') value: 2.
+	
+	"Result should be index of first occurrence"
+	self assert: result isSequenceable.
+	self assert: result size equals: 1.
+	self assert: result first equals: 1.
+	
+	"Search for value at beginning"
+	result := stick endpoint jsonArrIndex: key path: (SjJsonPath root / 'items') value: 1.
+	self assert: result first equals: 0.
+	
+	"Search for value at end"
+	result := stick endpoint jsonArrIndex: key path: (SjJsonPath root / 'items') value: 4.
+	self assert: result first equals: 4
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrIndexNotFound [
+	| key value result |
+	key := 'test:json:arrindex:notfound'.
+	value := {'numbers'->{1. 2. 3}} asDictionary.
+	
+	"Set JSON data with array"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Search for non-existent value"
+	result := stick endpoint jsonArrIndex: key path: (SjJsonPath root / 'numbers') value: 5.
+	
+	"Should return -1 for not found"
+	self assert: result isSequenceable.
+	self assert: result size equals: 1.
+	self assert: result first equals: -1
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrIndexWithStartParameter [
+	| key value result |
+	key := 'test:json:arrindex:start'.
+	value := {'items'->{1. 2. 3. 2. 4}} asDictionary.
+	
+	"Set JSON data with array"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Search for value 2 starting from index 2 (should find second occurrence)"
+	result := stick endpoint jsonArrIndex: key path: (SjJsonPath root / 'items') value: 2 start: 2.
+	
+	"Result should be index of second occurrence"
+	self assert: result isSequenceable.
+	self assert: result size equals: 1.
+	self assert: result first equals: 3.
+	
+	"Search for value 1 starting from index 1 (should not find)"
+	result := stick endpoint jsonArrIndex: key path: (SjJsonPath root / 'items') value: 1 start: 1.
+	self assert: result first equals: -1
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrIndexWithStartStopParameters [
+	| key value result |
+	key := 'test:json:arrindex:range'.
+	value := {'data'->{1. 2. 3. 2. 4. 2. 5}} asDictionary.
+	
+	"Set JSON data with array"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Search for value 2 in range [2, 4] (should find occurrence at index 3)"
+	result := stick endpoint jsonArrIndex: key path: (SjJsonPath root / 'data') value: 2 start: 2 stop: 4.
+	
+	"Result should be index 3"
+	self assert: result isSequenceable.
+	self assert: result size equals: 1.
+	self assert: result first equals: 3.
+	
+	"Search for value 2 in range [4, 6] (should find occurrence at index 5)"
+	result := stick endpoint jsonArrIndex: key path: (SjJsonPath root / 'data') value: 2 start: 4 stop: 6.
+	self assert: result first equals: 5.
+	
+	"Search for value 1 in range [2, 4] (should not find)"
+	result := stick endpoint jsonArrIndex: key path: (SjJsonPath root / 'data') value: 1 start: 2 stop: 4.
+	self assert: result first equals: -1
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrIndexWithUsingBlock [
+	| key value result |
+	key := 'test:json:arrindex:using'.
+	value := {'items'->{1. 2. 3. 2. 4}} asDictionary.
+	
+	"Set JSON data with array"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Search using options block with start parameter"
+	result := stick endpoint jsonArrIndex: key path: (SjJsonPath root / 'items') value: 2 using: [:opts | opts start: 2].
+	
+	"Result should be second occurrence at index 3"
+	self assert: result isSequenceable.
+	self assert: result size equals: 1.
+	self assert: result first equals: 3.
+	
+	"Search using options block with start and stop parameters"
+	result := stick endpoint jsonArrIndex: key path: (SjJsonPath root / 'items') value: 2 using: [:opts | opts start: 0; stop: 2].
+	
+	"Should find first occurrence at index 1"
+	self assert: result first equals: 1
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrIndexEdgeCases [
+	| key value result |
+	key := 'test:json:arrindex:edge'.
+	
+	"Test with non-existent key"
+	result := stick endpoint jsonArrIndex: key path: SjJsonPath root value: 1.
+	self assert: result isNil.
+	
+	"Test with non-array value"
+	value := {'data'->'not an array'} asDictionary.
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	result := stick endpoint jsonArrIndex: key path: (SjJsonPath root / 'data') value: 1.
+	
+	"Should get array with null for non-array paths"
+	self assert: result isSequenceable.
+	self assert: result first isNil.
+	
+	"Test with empty array"
+	value := {'empty'->{}} asDictionary.
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	result := stick endpoint jsonArrIndex: key path: (SjJsonPath root / 'empty') value: 1.
+	
+	"Should return -1 for empty array"
+	self assert: result first equals: -1
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrIndexStringValues [
+	| key value result |
+	key := 'test:json:arrindex:strings'.
+	value := {'words'->{'hello'. 'world'. 'test'. 'hello'}} asDictionary.
+	
+	"Set JSON data with string array"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Search for string value"
+	result := stick endpoint jsonArrIndex: key path: (SjJsonPath root / 'words') value: 'hello'.
+	
+	"Result should be first occurrence"
+	self assert: result isSequenceable.
+	self assert: result size equals: 1.
+	self assert: result first equals: 0.
+	
+	"Search for second occurrence using start parameter"
+	result := stick endpoint jsonArrIndex: key path: (SjJsonPath root / 'words') value: 'hello' start: 1.
+	self assert: result first equals: 3
+]
+
