@@ -161,6 +161,24 @@ RsRedisEndpoint >> jsonArrIndex: key path: path value: value start: start stop: 
 ]
 
 { #category : '*RediStick-Json' }
+RsRedisEndpoint >> jsonArrInsert: key path: path index: index value: value [
+	^ self jsonArrInsert: key path: path index: index values: {value}
+]
+
+{ #category : '*RediStick-Json' }
+RsRedisEndpoint >> jsonArrInsert: key path: path index: index values: values [
+	| args jsonValues |
+	args := {
+		        'JSON.ARRINSERT'.
+		        key.
+		        path asString.
+		        index } asOrderedCollection.
+	jsonValues := values collect: [ :value | self toJsonString: value ].
+	args addAll: jsonValues.
+	^ self unifiedCommand: args.
+]
+
+{ #category : '*RediStick-Json' }
 RsRedisEndpoint >> safeParseJson: result [
 	result ifNil: [ ^ result ].
 	^ STONJSON fromString: result
