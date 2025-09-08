@@ -179,6 +179,39 @@ RsRedisEndpoint >> jsonArrInsert: key path: path index: index values: values [
 ]
 
 { #category : '*RediStick-Json' }
+RsRedisEndpoint >> jsonArrPop: key [
+	^ self jsonArrPop: key path: SjJsonPath root
+]
+
+{ #category : '*RediStick-Json' }
+RsRedisEndpoint >> jsonArrPop: key path: path [
+	^ self jsonArrPop: key path: path using: nil
+]
+
+{ #category : '*RediStick-Json' }
+RsRedisEndpoint >> jsonArrPop: key path: path index: index [
+	^ self jsonArrPop: key path: path using: [ :opts | opts index: index ]
+]
+
+{ #category : '*RediStick-Json' }
+RsRedisEndpoint >> jsonArrPop: key path: path using: optionsBlock [
+	| args options result |
+	args := {
+		        'JSON.ARRPOP'.
+		        key } asOrderedCollection.
+	path ifNotNil: [ args add: path asString ].
+	optionsBlock ifNotNil: [
+		options := RsJsonArrOptions new.
+		optionsBlock value: options.
+		args addAll: options asArray.
+	].
+	result := self unifiedCommand: args.
+	^ result
+		ifNil: [ nil ]
+		ifNotNil: [ (result collect: [:each | self safeParseJson: each]) asArray ]
+]
+
+{ #category : '*RediStick-Json' }
 RsRedisEndpoint >> safeParseJson: result [
 	result ifNil: [ ^ result ].
 	^ STONJSON fromString: result

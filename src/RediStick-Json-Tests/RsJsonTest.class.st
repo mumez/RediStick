@@ -982,3 +982,220 @@ RsJsonTest >> testJsonArrInsertInvalidIndex [
 	self assert: result isNil
 ]
 
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrPopBasic [
+	| key value result afterPop |
+	key := 'test:json:arrpop:basic'.
+	value := {'items'->{1. 2. 3}} asDictionary.
+	
+	"Set JSON data with array"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Pop from the array (should return array with last element: 3)"
+	result := stick endpoint jsonArrPop: key path: (SjJsonPath root / 'items').
+	self assert: result first equals: 3.
+	
+	"Verify the array after pop"
+	afterPop := stick endpoint jsonGet: key path: (SjJsonPath root / 'items').
+	self assert: afterPop first size equals: 2.
+	self assert: afterPop first equals: {1. 2}
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrPopRootPath [
+	| key value result afterPop |
+	key := 'test:json:arrpop:root'.
+	value := {10. 20. 30}.
+	
+	"Set JSON data as root array"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Pop from root array using simple method"
+	result := stick endpoint jsonArrPop: key.
+	self assert: result first equals: 30.
+	
+	"Verify the array after pop"
+	afterPop := stick endpoint jsonGet: key path: SjJsonPath root.
+	self assert: afterPop first size equals: 2.
+	self assert: afterPop first equals: {10. 20}
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrPopWithIndex [
+	| key value result afterPop |
+	key := 'test:json:arrpop:index'.
+	value := {'numbers'->{10. 20. 30. 40. 50}} asDictionary.
+	
+	"Set JSON data with array"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Pop element at index 2 (third element: 30)"
+	result := stick endpoint jsonArrPop: key path: (SjJsonPath root / 'numbers') index: 2.
+	self assert: result first equals: 30.
+	
+	"Verify the array after pop"
+	afterPop := stick endpoint jsonGet: key path: (SjJsonPath root / 'numbers').
+	self assert: afterPop first size equals: 4.
+	self assert: afterPop first equals: {10. 20. 40. 50}
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrPopFirstElement [
+	| key value result afterPop |
+	key := 'test:json:arrpop:first'.
+	value := {'letters'->{'a'. 'b'. 'c'}} asDictionary.
+	
+	"Set JSON data with array"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Pop first element using index 0"
+	result := stick endpoint jsonArrPop: key path: (SjJsonPath root / 'letters') index: 0.
+	self assert: result first equals: 'a'.
+	
+	"Verify the array after pop"
+	afterPop := stick endpoint jsonGet: key path: (SjJsonPath root / 'letters').
+	self assert: afterPop first size equals: 2.
+	self assert: afterPop first equals: {'b'. 'c'}
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrPopWithUsingBlock [
+	| key value result afterPop |
+	key := 'test:json:arrpop:using'.
+	value := {'data'->{100. 200. 300. 400}} asDictionary.
+	
+	"Set JSON data with array"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Pop element using options block"
+	result := stick endpoint jsonArrPop: key path: (SjJsonPath root / 'data') using: [ :opts | opts index: 1 ].
+	self assert: result first equals: 200.
+	
+	"Verify the array after pop"
+	afterPop := stick endpoint jsonGet: key path: (SjJsonPath root / 'data').
+	self assert: afterPop first size equals: 3.
+	self assert: afterPop first equals: {100. 300. 400}
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrPopEmptyArray [
+	| key value result |
+	key := 'test:json:arrpop:empty'.
+	value := {'empty'->{}} asDictionary.
+	
+	"Set JSON data with empty array"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Pop from empty array (should return array with nil)"
+	result := stick endpoint jsonArrPop: key path: (SjJsonPath root / 'empty').
+	self assert: result equals: {nil}
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrPopSingleElement [
+	| key value result afterPop |
+	key := 'test:json:arrpop:single'.
+	value := {'single'->{42}} asDictionary.
+	
+	"Set JSON data with single element array"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Pop the single element"
+	result := stick endpoint jsonArrPop: key path: (SjJsonPath root / 'single').
+	self assert: result first equals: 42.
+	
+	"Verify the array is now empty"
+	afterPop := stick endpoint jsonGet: key path: (SjJsonPath root / 'single').
+	self assert: afterPop first isEmpty
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrPopNonExistentKey [
+	| key result |
+	key := 'test:json:arrpop:nonexistent'.
+	
+	"Pop from non-existent key (should return nil)"
+	result := stick endpoint jsonArrPop: key path: SjJsonPath root.
+	self assert: result isNil
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrPopNonExistentPath [
+	| key value result |
+	key := 'test:json:arrpop:nonexistentpath'.
+	value := {'data'->{1. 2. 3}} asDictionary.
+	
+	"Set JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Pop from non-existent path (should return empty array)"
+	result := stick endpoint jsonArrPop: key path: (SjJsonPath root / 'missing').
+	self assert: result isEmpty
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrPopNonArrayPath [
+	| key value result |
+	key := 'test:json:arrpop:nonarray'.
+	value := {'text'->'hello'. 'number'->42} asDictionary.
+	
+	"Set JSON data with non-array values"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Try to pop from non-array path (should return array with nil)"
+	result := stick endpoint jsonArrPop: key path: (SjJsonPath root / 'text').
+	self assert: result equals: {nil}
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrPopOutOfRangeIndex [
+	| key value result |
+	key := 'test:json:arrpop:outofrange'.
+	value := {'items'->{1. 2. 3}} asDictionary.
+	
+	"Set JSON data with array"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Pop at out-of-range index (Redis rounds to array end - last element)"
+	result := stick endpoint jsonArrPop: key path: (SjJsonPath root / 'items') index: 10.
+	self assert: result first equals: 3
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrPopNegativeIndex [
+	| key value result afterPop |
+	key := 'test:json:arrpop:negative'.
+	value := {'items'->{10. 20. 30. 40}} asDictionary.
+	
+	"Set JSON data with array"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Pop using negative index (-1 should be last element)"
+	result := stick endpoint jsonArrPop: key path: (SjJsonPath root / 'items') index: -1.
+	self assert: result first equals: 40.
+	
+	"Verify the array after pop"
+	afterPop := stick endpoint jsonGet: key path: (SjJsonPath root / 'items').
+	self assert: afterPop first size equals: 3.
+	self assert: afterPop first equals: {10. 20. 30}
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrPopOutOfRangeNegativeIndex [
+	| key value result afterPop |
+	key := 'test:json:arrpop:outofrangenegative'.
+	value := {'items'->{10. 20. 30. 40}} asDictionary.
+	
+	"Set JSON data with array"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Pop using out-of-range negative index (Redis rounds to first element)"
+	result := stick endpoint jsonArrPop: key path: (SjJsonPath root / 'items') index: -10.
+	self assert: result first equals: 10.
+	
+	"Verify the array after pop"
+	afterPop := stick endpoint jsonGet: key path: (SjJsonPath root / 'items').
+	self assert: afterPop first size equals: 3.
+	self assert: afterPop first equals: {20. 30. 40}
+]
+
