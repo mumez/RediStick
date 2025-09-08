@@ -212,6 +212,19 @@ RsRedisEndpoint >> jsonArrPop: key path: path using: optionsBlock [
 ]
 
 { #category : '*RediStick-Json' }
+RsRedisEndpoint >> jsonArrTrim: key path: path start: start stop: stop [
+	| args result |
+	args := {
+		        'JSON.ARRTRIM'.
+		        key.
+		        path asString.
+		        start.
+		        stop } asOrderedCollection.
+	result := self unifiedCommand: args.
+	^ result asArray
+]
+
+{ #category : '*RediStick-Json' }
 RsRedisEndpoint >> safeParseJson: result [
 	result ifNil: [ ^ result ].
 	^ STONJSON fromString: result

@@ -1199,3 +1199,137 @@ RsJsonTest >> testJsonArrPopOutOfRangeNegativeIndex [
 	self assert: afterPop first equals: {20. 30. 40}
 ]
 
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrTrimBasic [
+	| key value result afterTrim |
+	key := 'test:json:arrtrim:basic'.
+	value := {'items'->{0. 1. 2. 3. 4. 5. 6. 7. 8. 9}} asDictionary.
+	
+	"Set JSON data with array"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Trim array to keep elements from index 2 to 5"
+	result := stick endpoint jsonArrTrim: key path: (SjJsonPath root / 'items') start: 2 stop: 5.
+	self assert: result first equals: 4.
+	
+	"Verify the array after trim"
+	afterTrim := stick endpoint jsonGet: key path: (SjJsonPath root / 'items').
+	self assert: afterTrim first size equals: 4.
+	self assert: afterTrim first equals: {2. 3. 4. 5}
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrTrimNegativeIndices [
+	| key value result afterTrim |
+	key := 'test:json:arrtrim:negative'.
+	value := {'data'->{10. 20. 30. 40. 50. 60}} asDictionary.
+	
+	"Set JSON data with array"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Trim using negative indices (-4 to -2)"
+	result := stick endpoint jsonArrTrim: key path: (SjJsonPath root / 'data') start: -4 stop: -2.
+	self assert: result first equals: 3.
+	
+	"Verify the array after trim"
+	afterTrim := stick endpoint jsonGet: key path: (SjJsonPath root / 'data').
+	self assert: afterTrim first size equals: 3.
+	self assert: afterTrim first equals: {30. 40. 50}
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrTrimOutOfRange [
+	| key value result afterTrim |
+	key := 'test:json:arrtrim:outofrange'.
+	value := {'numbers'->{1. 2. 3. 4. 5}} asDictionary.
+	
+	"Set JSON data with array"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Trim with stop index beyond array length"
+	result := stick endpoint jsonArrTrim: key path: (SjJsonPath root / 'numbers') start: 2 stop: 10.
+	self assert: result first equals: 3.
+	
+	"Verify the array after trim (should keep elements from index 2 to end)"
+	afterTrim := stick endpoint jsonGet: key path: (SjJsonPath root / 'numbers').
+	self assert: afterTrim first equals: {3. 4. 5}
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrTrimInvalidRange [
+	| key value result afterTrim |
+	key := 'test:json:arrtrim:invalid'.
+	value := {'test'->{10. 20. 30}} asDictionary.
+	
+	"Set JSON data with array"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Trim with start > stop (should result in empty array)"
+	result := stick endpoint jsonArrTrim: key path: (SjJsonPath root / 'test') start: 5 stop: 2.
+	self assert: result first equals: 0.
+	
+	"Verify the array is now empty"
+	afterTrim := stick endpoint jsonGet: key path: (SjJsonPath root / 'test').
+	self assert: afterTrim first isEmpty
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrTrimEmptyArray [
+	| key value result |
+	key := 'test:json:arrtrim:empty'.
+	value := {'empty'->{}} asDictionary.
+	
+	"Set JSON data with empty array"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Trim empty array"
+	result := stick endpoint jsonArrTrim: key path: (SjJsonPath root / 'empty') start: 0 stop: 5.
+	self assert: result first equals: 0
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrTrimNonExistentPath [
+	| key value result |
+	key := 'test:json:arrtrim:nonexistent'.
+	value := {'data'->{1. 2. 3}} asDictionary.
+	
+	"Set JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Try to trim non-existent path (returns empty collection)"
+	result := stick endpoint jsonArrTrim: key path: (SjJsonPath root / 'missing') start: 0 stop: 2.
+	self assert: result isEmpty
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrTrimNonArrayPath [
+	| key value result |
+	key := 'test:json:arrtrim:nonarray'.
+	value := {'text'->'hello'. 'number'->42} asDictionary.
+	
+	"Set JSON data with non-array values"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Try to trim non-array path (returns collection with nil)"
+	result := stick endpoint jsonArrTrim: key path: (SjJsonPath root / 'text') start: 0 stop: 2.
+	self assert: result first isNil
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonArrTrimSingleElement [
+	| key value result afterTrim |
+	key := 'test:json:arrtrim:single'.
+	value := {'item'->{42}} asDictionary.
+	
+	"Set JSON data with single element array"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Trim single element array to keep just that element"
+	result := stick endpoint jsonArrTrim: key path: (SjJsonPath root / 'item') start: 0 stop: 0.
+	self assert: result first equals: 1.
+	
+	"Verify the array still contains the element"
+	afterTrim := stick endpoint jsonGet: key path: (SjJsonPath root / 'item').
+	self assert: afterTrim first equals: {42}
+]
+
