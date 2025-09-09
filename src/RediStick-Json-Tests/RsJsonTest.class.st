@@ -1333,3 +1333,84 @@ RsJsonTest >> testJsonArrTrimSingleElement [
 	self assert: afterTrim first equals: {42}
 ]
 
+{ #category : 'tests' }
+RsJsonTest >> testJsonStrLenRootPath [
+	| key result |
+	key := 'test:json:strlen:root'.
+	
+	"Set string at root path"
+	stick endpoint jsonSet: key path: SjJsonPath root value: 'Hello, World!'.
+	
+	"Get string length at root path using simple method"
+	result := stick endpoint jsonStrLen: key.
+	self assert: result equals: 13
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonStrLenBasic [
+	| key value result |
+	key := 'test:json:strlen:basic'.
+	value := {'message'->'Test String'. 'nested'->({'text'->'Smalltalk'} asDictionary)} asDictionary.
+	
+	"Set JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Get string length at nested path"
+	result := stick endpoint jsonStrLen: key path: (SjJsonPath root / 'message').
+	self assert: result first equals: 11.
+	
+	"Test nested path"
+	result := stick endpoint jsonStrLen: key path: (SjJsonPath root / 'nested' / 'text').
+	self assert: result first equals: 9
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonStrLenEmptyString [
+	| key result |
+	key := 'test:json:strlen:empty'.
+	
+	"Set empty string at root path"
+	stick endpoint jsonSet: key path: SjJsonPath root value: ''.
+	
+	"Test jsonStrLen: for empty string"
+	result := stick endpoint jsonStrLen: key.
+	self assert: result equals: 0
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonStrLenNonExistentKey [
+	| result |
+	
+	"Test with non-existent key"
+	result := stick endpoint jsonStrLen: 'nonexistent:key'.
+	self assert: result isNil
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonStrLenNonExistentPath [
+	| key value result |
+	key := 'test:json:strlen:nonexistent:path'.
+	value := {'message'->'Hello'} asDictionary.
+	
+	"Set data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Test with non-existent path"
+	result := stick endpoint jsonStrLen: key path: (SjJsonPath root / 'nonexistent' / 'path').
+	self assert: result isEmpty
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonStrLenNonStringPath [
+	| key value result |
+	key := 'test:json:strlen:nonstring'.
+	value := {'data'->42. 'count'->3} asDictionary.
+	
+	"Set JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Try to get string length from a non-string path (should return null)"
+	result := stick endpoint jsonStrLen: key path: (SjJsonPath root / 'data').
+	self assert: result first isNil
+]
+

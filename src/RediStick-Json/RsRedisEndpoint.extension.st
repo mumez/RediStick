@@ -231,6 +231,21 @@ RsRedisEndpoint >> safeParseJson: result [
 ]
 
 { #category : '*RediStick-Json' }
+RsRedisEndpoint >> jsonStrLen: key [
+	^ self jsonStrLen: key path: nil
+]
+
+{ #category : '*RediStick-Json' }
+RsRedisEndpoint >> jsonStrLen: key path: path [
+	| args |
+	args := {
+		        'JSON.STRLEN'.
+		        key } asOrderedCollection.
+	path ifNotNil: [ args add: path asString ].
+	^ self unifiedCommand: args.
+]
+
+{ #category : '*RediStick-Json' }
 RsRedisEndpoint >> toJsonString: value [
 	^ STONJSON toString: value
 ]
