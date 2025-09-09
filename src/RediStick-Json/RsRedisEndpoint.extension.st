@@ -246,6 +246,23 @@ RsRedisEndpoint >> jsonStrLen: key path: path [
 ]
 
 { #category : '*RediStick-Json' }
+RsRedisEndpoint >> jsonStrAppend: key value: value [
+	^ self jsonStrAppend: key path: nil value: value
+]
+
+{ #category : '*RediStick-Json' }
+RsRedisEndpoint >> jsonStrAppend: key path: path value: value [
+	| args jsonValue |
+	args := {
+		        'JSON.STRAPPEND'.
+		        key } asOrderedCollection.
+	path ifNotNil: [ args add: path asString ].
+	jsonValue := self toJsonString: value.
+	args add: jsonValue.
+	^ self unifiedCommand: args.
+]
+
+{ #category : '*RediStick-Json' }
 RsRedisEndpoint >> toJsonString: value [
 	^ STONJSON toString: value
 ]
