@@ -1414,3 +1414,93 @@ RsJsonTest >> testJsonStrLenNonStringPath [
 	self assert: result first isNil
 ]
 
+{ #category : 'tests' }
+RsJsonTest >> testJsonNumIncrByBasic [
+	| key value result |
+	key := 'test:json:numincrby:basic'.
+	value := {'counter'->10. 'score'->100. 'temperature'->25.5} asDictionary.
+	
+	"Set JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Increment integer value"
+	result := stick endpoint jsonNumIncrBy: key path: (SjJsonPath root / 'counter') increment: 5.
+	self assert: result first equals: 15.
+	
+	"Verify the increment worked"
+	result := stick endpoint jsonGet: key path: (SjJsonPath root / 'counter').
+	self assert: result first equals: 15.
+	
+	"Increment floating point value"
+	result := stick endpoint jsonNumIncrBy: key path: (SjJsonPath root / 'temperature') increment: 2.5.
+	self assert: result first equals: 28.0.
+	
+	"Verify the float increment worked"
+	result := stick endpoint jsonGet: key path: (SjJsonPath root / 'temperature').
+	self assert: result first equals: 28.0
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonNumIncrByNegativeIncrement [
+	| key value result |
+	key := 'test:json:numincrby:negative'.
+	value := {'balance'->100. 'points'->50} asDictionary.
+	
+	"Set JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Decrement with negative increment"
+	result := stick endpoint jsonNumIncrBy: key path: (SjJsonPath root / 'balance') increment: -25.
+	self assert: result first equals: 75.
+	
+	"Verify the decrement worked"
+	result := stick endpoint jsonGet: key path: (SjJsonPath root / 'balance').
+	self assert: result first equals: 75
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonNumIncrByNonExistentKey [
+	| key result |
+	key := 'test:json:numincrby:nonexistent'.
+	
+	"Try to increment value in non-existent key"
+	result := stick endpoint jsonNumIncrBy: key path: SjJsonPath root increment: 10.
+	self assert: result isNil
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonNumIncrByNonExistentPath [
+	| key value result |
+	key := 'test:json:numincrby:nonexistentpath'.
+	value := {'existing'->5} asDictionary.
+	
+	"Set JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Try to increment non-existent path"
+	result := stick endpoint jsonNumIncrBy: key path: (SjJsonPath root / 'nonexistent') increment: 10.
+	self assert: result isEmpty
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonNumIncrByNonNumericType [
+	| key value result |
+	key := 'test:json:numincrby:nonnumeric'.
+	value := {'name'->'Alice'. 'data'->{1. 2. 3}. 'active'->true} asDictionary.
+	
+	"Set JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Try to increment string value (should return nil)"
+	result := stick endpoint jsonNumIncrBy: key path: (SjJsonPath root / 'name') increment: 1.
+	self assert: result first isNil.
+	
+	"Try to increment array value (should return nil)"
+	result := stick endpoint jsonNumIncrBy: key path: (SjJsonPath root / 'data') increment: 1.
+	self assert: result first isNil.
+	
+	"Try to increment boolean value (should return nil)"  
+	result := stick endpoint jsonNumIncrBy: key path: (SjJsonPath root / 'active') increment: 1.
+	self assert: result first isNil
+]
+
