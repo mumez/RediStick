@@ -275,6 +275,18 @@ RsRedisEndpoint >> jsonNumIncrBy: key path: path increment: increment [
 ]
 
 { #category : '*RediStick-Json' }
+RsRedisEndpoint >> jsonNumMultBy: key path: path multiplier: multiplier [
+	| args result |
+	args := {
+		        'JSON.NUMMULTBY'.
+		        key.
+		        path asString.
+		        multiplier } asOrderedCollection.
+	result := self unifiedCommand: args.
+	^ result ifNotNil: [ self safeParseJson: result ] ifNil: [ nil ]
+]
+
+{ #category : '*RediStick-Json' }
 RsRedisEndpoint >> toJsonString: value [
 	^ STONJSON toString: value
 ]

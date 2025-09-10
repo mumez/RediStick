@@ -1504,3 +1504,111 @@ RsJsonTest >> testJsonNumIncrByNonNumericType [
 	self assert: result first isNil
 ]
 
+{ #category : 'tests' }
+RsJsonTest >> testJsonNumMultByBasic [
+	| key value result |
+	key := 'test:json:nummultby:basic'.
+	value := {'price'->10. 'rate'->2.5. 'quantity'->4} asDictionary.
+	
+	"Set JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Multiply integer value"
+	result := stick endpoint jsonNumMultBy: key path: (SjJsonPath root / 'price') multiplier: 3.
+	self assert: result first equals: 30.
+	
+	"Verify the multiplication worked"
+	result := stick endpoint jsonGet: key path: (SjJsonPath root / 'price').
+	self assert: result first equals: 30.
+	
+	"Multiply floating point value"
+	result := stick endpoint jsonNumMultBy: key path: (SjJsonPath root / 'rate') multiplier: 1.5.
+	self assert: result first equals: 3.75.
+	
+	"Verify the float multiplication worked"
+	result := stick endpoint jsonGet: key path: (SjJsonPath root / 'rate').
+	self assert: result first equals: 3.75
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonNumMultByNegativeMultiplier [
+	| key value result |
+	key := 'test:json:nummultby:negative'.
+	value := {'balance'->100. 'factor'-> -2} asDictionary.
+	
+	"Set JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Multiply with negative multiplier"
+	result := stick endpoint jsonNumMultBy: key path: (SjJsonPath root / 'balance') multiplier: -0.5.
+	self assert: result first equals: -50.0.
+	
+	"Verify the negative multiplication worked"
+	result := stick endpoint jsonGet: key path: (SjJsonPath root / 'balance').
+	self assert: result first equals: -50.0
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonNumMultByZeroMultiplier [
+	| key value result |
+	key := 'test:json:nummultby:zero'.
+	value := {'value'->42} asDictionary.
+	
+	"Set JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Multiply by zero"
+	result := stick endpoint jsonNumMultBy: key path: (SjJsonPath root / 'value') multiplier: 0.
+	self assert: result first equals: 0.
+	
+	"Verify the result is zero"
+	result := stick endpoint jsonGet: key path: (SjJsonPath root / 'value').
+	self assert: result first equals: 0
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonNumMultByNonExistentKey [
+	| key result |
+	key := 'test:json:nummultby:nonexistent'.
+	
+	"Try to multiply value in non-existent key"
+	result := stick endpoint jsonNumMultBy: key path: SjJsonPath root multiplier: 2.
+	self assert: result isNil
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonNumMultByNonExistentPath [
+	| key value result |
+	key := 'test:json:nummultby:nonexistentpath'.
+	value := {'existing'->5} asDictionary.
+	
+	"Set JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Try to multiply non-existent path"
+	result := stick endpoint jsonNumMultBy: key path: (SjJsonPath root / 'nonexistent') multiplier: 2.
+	self assert: result isEmpty
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonNumMultByNonNumericType [
+	| key value result |
+	key := 'test:json:nummultby:nonnumeric'.
+	value := {'name'->'Alice'. 'data'->{1. 2. 3}. 'active'->true} asDictionary.
+	
+	"Set JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Try to multiply string value (should return nil)"
+	result := stick endpoint jsonNumMultBy: key path: (SjJsonPath root / 'name') multiplier: 2.
+	self assert: result first isNil.
+	
+	"Try to multiply array value (should return nil)"
+	result := stick endpoint jsonNumMultBy: key path: (SjJsonPath root / 'data') multiplier: 2.
+	self assert: result first isNil.
+	
+	"Try to multiply boolean value (should return nil)"  
+	result := stick endpoint jsonNumMultBy: key path: (SjJsonPath root / 'active') multiplier: 2.
+	self assert: result first isNil
+]
+
