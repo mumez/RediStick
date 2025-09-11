@@ -188,3 +188,20 @@ When tests fail:
 3. Check if error expectations match Redis reality
 4. Verify test data setup is correct
 5. Ensure proper cleanup between tests
+
+### 8. Testing Array Results
+When Redis JSON commands return arrays (like JSON.TYPE with paths):
+- Use `assertCollection:equals:` instead of `assert:equals:` for better error messages
+- Consider normalizing results in implementation with `asArray` 
+- Example:
+```smalltalk
+"Instead of:"
+self assert: result equals: #('string').
+
+"Use:"
+self assertCollection: result equals: #('string').
+
+"Or normalize in implementation:"
+result := self unifiedCommand: args.
+^ path ifNil: [ result ] ifNotNil: [ result asArray ]
+```

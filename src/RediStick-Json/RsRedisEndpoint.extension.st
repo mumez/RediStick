@@ -287,6 +287,37 @@ RsRedisEndpoint >> jsonNumMultBy: key path: path multiplier: multiplier [
 ]
 
 { #category : '*RediStick-Json' }
+RsRedisEndpoint >> jsonDel: key [
+	^ self jsonDel: key path: nil
+]
+
+{ #category : '*RediStick-Json' }
+RsRedisEndpoint >> jsonDel: key path: path [
+	| args |
+	args := {
+		        'JSON.DEL'.
+		        key } asOrderedCollection.
+	path ifNotNil: [ args add: path asString ].
+	^ self unifiedCommand: args.
+]
+
+{ #category : '*RediStick-Json' }
+RsRedisEndpoint >> jsonType: key [
+	^ self jsonType: key path: nil
+]
+
+{ #category : '*RediStick-Json' }
+RsRedisEndpoint >> jsonType: key path: path [
+	| args result |
+	args := {
+		        'JSON.TYPE'.
+		        key } asOrderedCollection.
+	path ifNotNil: [ args add: path asString ].
+	result := self unifiedCommand: args.
+	^ path ifNil: [ result ] ifNotNil: [ result asArray ]
+]
+
+{ #category : '*RediStick-Json' }
 RsRedisEndpoint >> toJsonString: value [
 	^ STONJSON toString: value
 ]

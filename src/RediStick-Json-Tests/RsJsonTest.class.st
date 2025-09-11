@@ -1612,3 +1612,151 @@ RsJsonTest >> testJsonNumMultByNonNumericType [
 	self assert: result first isNil
 ]
 
+{ #category : 'tests' }
+RsJsonTest >> testJsonDelBasic [
+	| key value result |
+	key := 'test:json:del:basic'.
+	value := {'name'->'John'. 'age'->30. 'city'->'Tokyo'} asDictionary.
+	
+	"Set JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Delete a specific path"
+	result := stick endpoint jsonDel: key path: (SjJsonPath root / 'age').
+	self assert: result equals: 1.
+	
+	"Verify the path was deleted"
+	result := stick endpoint jsonGet: key path: SjJsonPath root.
+	self assert: result first equals: {'name'->'John'. 'city'->'Tokyo'} asDictionary
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonDelEntireKey [
+	| key value result |
+	key := 'test:json:del:entire'.
+	value := {'data'->'test'} asDictionary.
+	
+	"Set JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Delete the entire key (root path)"
+	result := stick endpoint jsonDel: key path: SjJsonPath root.
+	self assert: result equals: 1.
+	
+	"Verify the key was deleted"
+	result := stick endpoint jsonGet: key path: SjJsonPath root.
+	self assert: result isNil
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonDelNonExistentPath [
+	| key value result |
+	key := 'test:json:del:nonexistent'.
+	value := {'name'->'Alice'} asDictionary.
+	
+	"Set JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Try to delete non-existent path"
+	result := stick endpoint jsonDel: key path: (SjJsonPath root / 'missing').
+	self assert: result equals: 0
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonDelNonExistentKey [
+	| key result |
+	key := 'test:json:del:nokey'.
+	
+	"Try to delete from non-existent key"
+	result := stick endpoint jsonDel: key path: SjJsonPath root.
+	self assert: result equals: 0
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonTypeBasic [
+	| key value result |
+	key := 'test:json:type:basic'.
+	value := {
+		'name'->'Alice'.
+		'age'->25.
+		'active'->true.
+		'scores'->{85. 92. 78}.
+		'profile'->({'city'->'Paris'} asDictionary).
+		'empty'->nil
+	} asDictionary.
+	
+	"Set JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Test root type"
+	result := stick endpoint jsonType: key.
+	self assert: result equals: 'object'.
+	
+	"Test string type - returns array with enhanced path syntax"
+	result := stick endpoint jsonType: key path: (SjJsonPath root / 'name').
+	self assert: result equals: #('string').
+	
+	"Test number type - Redis returns 'integer' for whole numbers"
+	result := stick endpoint jsonType: key path: (SjJsonPath root / 'age').
+	self assert: result equals: #('integer').
+	
+	"Test boolean type"
+	result := stick endpoint jsonType: key path: (SjJsonPath root / 'active').
+	self assert: result equals: #('boolean').
+	
+	"Test array type"
+	result := stick endpoint jsonType: key path: (SjJsonPath root / 'scores').
+	self assert: result equals: #('array').
+	
+	"Test object type"
+	result := stick endpoint jsonType: key path: (SjJsonPath root / 'profile').
+	self assert: result equals: #('object').
+	
+	"Test null type"
+	result := stick endpoint jsonType: key path: (SjJsonPath root / 'empty').
+	self assert: result equals: #('null')
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonTypeNonExistentKey [
+	| key result |
+	key := 'test:json:type:nokey'.
+	
+	"Try to get type from non-existent key"
+	result := stick endpoint jsonType: key.
+	self assert: result isNil
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonTypeNonExistentPath [
+	| key value result |
+	key := 'test:json:type:nopath'.
+	value := {'name'->'Bob'} asDictionary.
+	
+	"Set JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Try to get type from non-existent path"
+	result := stick endpoint jsonType: key path: (SjJsonPath root / 'missing').
+	"Redis returns empty array for non-existent paths with enhanced path syntax"
+	self assert: result equals: #()
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonDelKeyOnly [
+	| key value result |
+	key := 'test:json:del:keyonly'.
+	value := {'data'->'test'} asDictionary.
+	
+	"Set JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Delete the entire key using jsonDel: key (no path)"
+	result := stick endpoint jsonDel: key.
+	self assert: result equals: 1.
+	
+	"Verify the key was deleted"
+	result := stick endpoint jsonGet: key path: SjJsonPath root.
+	self assert: result isNil
+]
+
