@@ -318,6 +318,31 @@ RsRedisEndpoint >> jsonType: key path: path [
 ]
 
 { #category : '*RediStick-Json' }
+RsRedisEndpoint >> jsonClear: key [
+	^ self jsonClear: key path: nil
+]
+
+{ #category : '*RediStick-Json' }
+RsRedisEndpoint >> jsonClear: key path: path [
+	| args |
+	args := {
+		        'JSON.CLEAR'.
+		        key } asOrderedCollection.
+	path ifNotNil: [ args add: path asString ].
+	^ self unifiedCommand: args.
+]
+
+{ #category : '*RediStick-Json' }
+RsRedisEndpoint >> jsonForget: key [
+	^ self jsonDel: key
+]
+
+{ #category : '*RediStick-Json' }
+RsRedisEndpoint >> jsonForget: key path: path [
+	^ self jsonDel: key path: path
+]
+
+{ #category : '*RediStick-Json' }
 RsRedisEndpoint >> toJsonString: value [
 	^ STONJSON toString: value
 ]

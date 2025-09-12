@@ -43,8 +43,6 @@ smalltalkci -s Pharo64-13
 Extensions to core classes are used for modular features:
 - `RsRedisEndpoint` extensions in Json, Stream, Search packages
 - Example: `RsRedisEndpoint >> jsonGet:path:` in RediStick-Json package
-- JSON operations support options: `jsonSet:path:value:using:` with `ifNotExists`/`ifAlreadyExists`
-- JSON GET supports pretty-formatting with `jsonGet:path:using:` (INDENT, NEWLINE, SPACE options)
 
 ### Dependencies
 - **Stick**: Auto-reconnection framework (github://mumez/Stick/src)
@@ -65,143 +63,141 @@ Available Metacello groups:
 - Class extensions use `.extension.st` suffix
 - Test classes follow `*Test.class.st` naming convention
 
-## Key Classes to Understand
-- `RsRedisEndpoint`: Main Redis command interface
-- `RsRediStick`: Connection management and auto-reconnection
-- `BaselineOfRediStick`: Package structure and dependencies
-- Stream objects: `RsStream`, `RsStreamInfo`, etc. for Redis Streams
-- Connection pool: `RsRedisConnectionPool`, `RsRedisProxy`
-- JSON classes: `RsJsonSetOptions`, `RsJsonGetOptions` for JSON operation options
-
 ## Redis JSON Implementation Status
 
 ### Completed Features
-- Basic JSON operations: `jsonGet:path:`, `jsonSet:path:value:`
-- **Automatic JSON conversion**: JSON SET operations automatically convert Smalltalk objects to JSON strings
-- Multiple path JSON GET: `jsonGet:paths:` for retrieving multiple JSON paths at once
-- JSON SET with options: `jsonSet:path:value:using:` supporting `ifNotExists`, `ifAlreadyExists`
-- JSON GET with pretty-formatting: `jsonGet:path:using:` supporting INDENT, NEWLINE, SPACE options
-- JSON object key retrieval: `jsonObjKeys:` and `jsonObjKeys:path:` for getting object keys
-- JSON object length: `jsonObjLen:` and `jsonObjLen:path:` for getting object field count
-- Comprehensive test coverage in `RsJsonTest` class
+**Basic Operations:**
+- `jsonGet:path:`, `jsonSet:path:value:` - Basic JSON get/set operations
+- `jsonDel:path:`, `jsonForget:path:` - Delete operations (forget is alias for del)
+- `jsonType:path:` - Get JSON value type
+- `jsonClear:path:` - Clear containers (arrays/objects)
+
+**Advanced GET/SET:**
+- `jsonGet:paths:` - Multiple path retrieval
+- `jsonGet:path:using:` - Pretty-formatting with INDENT, NEWLINE, SPACE options
+- `jsonSet:path:value:using:` - Conditional set with `ifNotExists`, `ifAlreadyExists`
+- Automatic Smalltalk object to JSON conversion
+
+**String Operations:**
+- `jsonStrLen:path:` - String length
+- `jsonStrAppend:path:value:` - String append
+
+**Numeric Operations:**
+- `jsonNumIncrBy:path:increment:` - Increment numeric values
+- `jsonNumMultBy:path:multiplier:` - Multiply numeric values
+
+**Array Operations:**
+- `jsonArrLen:path:` - Array length
+- `jsonArrAppend:path:values:` - Append to arrays
+- `jsonArrInsert:path:index:values:` - Insert at specific index
+- `jsonArrIndex:path:value:` - Find value index (with start/stop parameters)
+- `jsonArrPop:path:index:` - Pop element at index
+- `jsonArrTrim:path:start:stop:` - Trim array to range
+
+**Object Operations:**
+- `jsonObjKeys:path:` - Get object keys
+- `jsonObjLen:path:` - Get object field count
 
 ### Implementation Details
-- **Automatic value conversion**: `jsonSet:path:value:options:` automatically converts Smalltalk objects (dictionaries, arrays, numbers, booleans, nil) to JSON strings using `toJsonString:` helper method
-- **Idiomatic Smalltalk syntax**: Tests and usage examples use native Smalltalk dictionaries (`{'key'->'value'} asDictionary`) instead of hardcoded JSON strings
-- `RsJsonSetOptions`: Handles NX (if not exists) and XX (if already exists) modes
-- `RsJsonGetOptions`: Handles pretty-formatting with indent, newline, and space options
-- Smart result handling: Returns parsed JSON objects by default, raw strings when formatting options are used
-- Multiple path support: Returns dictionary with paths as keys, arrays as values
-- JSON.OBJKEYS support: Returns nested collections with object keys, handles edge cases (nil for non-objects, empty for non-existent paths)
-- JSON.OBJLEN support: Returns object field count, returns nil for non-objects, handles nested paths with array results
-- Safe JSON parsing with `safeParseJson:` helper method
-- Integration with SJsonPath for JSON path operations
+- **Automatic conversion**: Smalltalk objects (dictionaries, arrays, numbers, booleans, nil) automatically converted to JSON
+- **Smart result handling**: Parsed JSON objects by default, raw strings with formatting options
+- **Option classes**: `RsJsonSetOptions`, `RsJsonGetOptions`, `RsJsonArrOptions` for operation parameters
+- **Safe parsing**: `safeParseJson:` helper method for robust JSON handling
+- **SJsonPath integration**: Full JSON path support for all operations
+
+### Test Coverage
+- 104 comprehensive tests in `RsJsonTest` class
+- Covers all operations, edge cases, error conditions
+- Tests for both single-path and multi-path operations
 
 ### References
-- Overview: https://redis.io/docs/latest/develop/data-types/json/
-- Commands: https://redis.io/docs/latest/operate/oss_and_stack/stack-with-enterprise/json/commands/
-- Valkey API: https://valkey.io/commands/#json
+- [Redis JSON Overview](https://redis.io/docs/latest/develop/data-types/json/)
+- [Redis JSON Commands](https://redis.io/docs/latest/operate/oss_and_stack/stack-with-enterprise/json/commands/)
+- [Valkey JSON API](https://valkey.io/commands/#json)
 
+## Development and Testing Workflow
 
-# Test tips for debug in pharo
-
+### Package Development
 ```smalltalk
-| stick |
-"You can instantiate a stick for test and send messages" 
-stick := RsRediStick targetUrl: RsRedisTestCase urlString.
-stick connect.
-stick endpoint select: RsRedisTestCase dbIndex.
-
-"JSON operations now support automatic conversion from Smalltalk objects"
-stick endpoint jsonSet: 'test:key' path: SjJsonPath root value: {'name'->'Alice'. 'age'->30} asDictionary.
-
-[stick endpoint jsonXXX ] on: Error do: [:ex | ex description]. "returns error description if error occurs"
-```
-
-# Development Tips and Troubleshooting
-
-## Package Import and Testing Workflow
-
-### 1. Tonel File Validation
-Always validate `.st` files after creation/modification:
-```bash
-# Use smalltalk-validator MCP tool
+# Validate Tonel files after modifications
 mcp__smalltalk-validator__validate_tonel_smalltalk_from_file: '/path/to/file.st'
-```
 
-### 2. Package Import to Pharo
-Use absolute paths for reliable package imports:
-```smalltalk
-"Import packages using MCP smalltalk-interop"
+# Import packages (use absolute paths, reimport after changes)
 mcp__smalltalk-interop__import_package: 'RediStick-Json' path: '/home/ume/git/RediStick/src'
 mcp__smalltalk-interop__import_package: 'RediStick-Json-Tests' path: '/home/ume/git/RediStick/src'
+
+# Run tests
+mcp__smalltalk-interop__run_class_test: 'RsJsonTest'
 ```
 
-### 3. Method Verification
-Check if new methods are loaded correctly:
-```smalltalk
-"Verify method exists"
-RsRedisEndpoint canUnderstand: #jsonArrLen:
-RsRedisEndpoint canUnderstand: #jsonArrAppend:path:values:
-```
-
-### 4. Test Execution Patterns
-Count and run specific test groups:
-```smalltalk
-"Count tests by pattern"
-| result |
-result := RsJsonTest suite tests select: [ :each | each selector beginsWith: 'testJsonArrLen' ].
-result size
-
-"Run tests and get results"
-| suite results |
-suite := TestSuite new.
-RsJsonTest suite tests select: [ :each | each selector beginsWith: 'testJsonArrAppend' ] thenDo: [ :test | suite addTest: test ].
-results := suite run.
-'Passed: ', results passedCount asString, ', Failed: ', results failureCount asString, ', Errors: ', results errorCount asString
-```
-
-### 5. Redis Behavior Testing
-Test actual Redis behavior before writing assertions:
+### Interactive Testing and Debugging
 ```smalltalk
 | stick |
+"Direct Redis testing - bypasses test runner issues"
 stick := RsRediStick targetUrl: RsRedisTestCase urlString.
 stick connect.
 stick endpoint select: RsRedisTestCase dbIndex.
 
-"Test edge cases to understand actual Redis responses"
-stick endpoint jsonArrAppend: 'nonexistent' path: SjJsonPath root values: {1. 2. 3}. "=> nil"
-stick endpoint jsonArrAppend: 'nonarray' path: (SjJsonPath root / 'stringfield') values: {1}. "=> [nil]"
+"Test JSON operations directly"
+stick endpoint jsonSet: 'test:key' path: SjJsonPath root value: {'name'->'Alice'. 'age'->30} asDictionary.
+stick endpoint jsonGet: 'test:key' path: (SjJsonPath root / 'name').
+
+"Error handling"
+[stick endpoint jsonSomeOperation: parameters] on: Error do: [:ex | ex description].
 ```
 
-### 6. Common Pitfalls
-- **Eval Syntax**: Use correct variable declaration: `| var |` not just `result := ...`
-- **Error Testing**: Redis often returns `nil` or `[nil]` instead of throwing errors
-- **Package Reimport**: Always reimport packages after file modifications
-- **Path Handling**: Use `SjJsonPath root` for root paths, not raw strings
-- **Test Database**: Always use `RsRedisTestCase dbIndex` to avoid conflicts
-
-### 7. Debugging Failed Tests
-When tests fail:
-1. Run individual test methods to isolate issues
-2. Test the actual Redis behavior in isolation
-3. Check if error expectations match Redis reality
-4. Verify test data setup is correct
-5. Ensure proper cleanup between tests
-
-### 8. Testing Array Results
-When Redis JSON commands return arrays (like JSON.TYPE with paths):
-- Use `assertCollection:equals:` instead of `assert:equals:` for better error messages
-- Consider normalizing results in implementation with `asArray` 
-- Example:
+### Test Debugging Strategy
+**When individual tests fail:**
 ```smalltalk
-"Instead of:"
-self assert: result equals: #('string').
-
-"Use:"
-self assertCollection: result equals: #('string').
-
-"Or normalize in implementation:"
-result := self unifiedCommand: args.
-^ path ifNil: [ result ] ifNotNil: [ result asArray ]
+"Debug specific test method"
+| test |
+test := RsJsonTest new.
+test setUp.
+[test testMethodName] on: Error do: [:ex | ex description]
 ```
+
+**For serialization errors (STONWriterError, NeoJSONMappingNotFound):**
+- Use proper parentheses in nested `asDictionary` expressions to avoid syntax precedence issues
+- Test components individually with direct Redis behavior testing
+- Example proper nested dictionary syntax:
+```smalltalk
+"Concise nested dictionary literals with proper parentheses:"
+value := {'user'->({'name'->'Bob'. 'settings'->({'theme'->'dark'. 'notifications'->true} asDictionary)} asDictionary). 'data'->{1. 2. 3}} asDictionary.
+```
+
+### Test Patterns
+```smalltalk
+"Count and run specific test subsets"
+| count suite results |
+count := RsJsonTest suite tests select: [ :each | each selector beginsWith: 'testJsonArr' ].
+count size.
+
+"Run specific test group"
+suite := TestSuite new.
+RsJsonTest suite tests select: [ :each | each selector beginsWith: 'testJsonClear' ] 
+  thenDo: [ :test | suite addTest: test ].
+results := suite run.
+'Passed: ', results passedCount asString, ', Failed: ', results failureCount asString
+```
+
+### Common Pitfalls
+- **Eval Syntax**: Always declare variables: `| var |`
+- **Error Expectations**: Redis often returns `nil` or `[nil]` instead of throwing errors
+- **Path Handling**: Use `SjJsonPath root` for root paths
+- **Test Database**: Always use `RsRedisTestCase dbIndex` to avoid conflicts
+- **Array Assertions**: Use `assertCollection:equals:` for better error messages
+- **Package Reimport**: Always reimport packages after file modifications
+
+### Key Classes to Understand
+- `RsRedisEndpoint`: Main Redis command interface with JSON extensions
+- `RsRediStick`: Connection management and auto-reconnection
+- `BaselineOfRediStick`: Package structure and dependencies
+- JSON option classes: `RsJsonSetOptions`, `RsJsonGetOptions`, `RsJsonArrOptions`
+- Stream objects: `RsStream`, `RsStreamInfo` for Redis Streams
+- Connection pool: `RsRedisConnectionPool`, `RsRedisProxy`
+
+# important-instruction-reminders
+Do what has been asked; nothing more, nothing less.
+NEVER create files unless they're absolutely necessary for achieving your goal.
+ALWAYS prefer editing an existing file to creating a new one.
+NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.

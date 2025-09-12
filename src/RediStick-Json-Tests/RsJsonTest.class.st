@@ -1760,3 +1760,168 @@ RsJsonTest >> testJsonDelKeyOnly [
 	self assert: result isNil
 ]
 
+{ #category : 'tests' }
+RsJsonTest >> testJsonClearArray [
+	| key value result |
+	key := 'test:json:clear:array'.
+	value := {1. 2. 3. 4}.
+	
+	"Set array data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Clear the array"
+	result := stick endpoint jsonClear: key path: SjJsonPath root.
+	self assert: result equals: 1.
+	
+	"Verify the array is now empty"
+	result := stick endpoint jsonGet: key path: SjJsonPath root.
+	self assertCollection: result first equals: #()
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonClearObject [
+	| key value result |
+	key := 'test:json:clear:object'.
+	value := {'name'->'Alice'. 'age'->30. 'city'->'Tokyo'} asDictionary.
+	
+	"Set object data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Clear the object"
+	result := stick endpoint jsonClear: key path: SjJsonPath root.
+	self assert: result equals: 1.
+	
+	"Verify the object is now empty"
+	result := stick endpoint jsonGet: key path: SjJsonPath root.
+	self assert: result first equals: Dictionary new
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonClearKeyOnly [
+	| key value result |
+	key := 'test:json:clear:keyonly'.
+	value := {'items'->{1. 2. 3}. 'count'->3} asDictionary.
+	
+	"Set JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Clear using key-only method"
+	result := stick endpoint jsonClear: key.
+	self assert: result equals: 1.
+	
+	"Verify the root is now empty object"
+	result := stick endpoint jsonGet: key path: SjJsonPath root.
+	self assert: result first equals: Dictionary new
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonClearNestedPath [
+	| key value result |
+	key := 'test:json:clear:nested'.
+	value := {'user'->({'name'->'Bob'. 'settings'->({'theme'->'dark'. 'notifications'->true} asDictionary)} asDictionary). 'data'->{1. 2. 3}} asDictionary.
+	
+	"Set nested data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Clear nested object"
+	result := stick endpoint jsonClear: key path: (SjJsonPath root / 'user' / 'settings').
+	self assert: result equals: 1.
+	
+	"Verify nested object was cleared but parent structure remains"
+	result := stick endpoint jsonGet: key path: (SjJsonPath root / 'user').
+	self assert: result first equals: {'name'->'Bob'. 'settings'->(Dictionary new)} asDictionary
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonClearNonExistentKey [
+	| key result |
+	key := 'test:json:clear:nonexistent'.
+	
+	"Try to clear non-existent key"
+	result := stick endpoint jsonClear: key path: SjJsonPath root.
+	self assert: result isNil
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonClearScalarValue [
+	| key value result |
+	key := 'test:json:clear:scalar'.
+	value := 42.
+	
+	"Set scalar data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Clear scalar (should set to 0 for numbers)"
+	result := stick endpoint jsonClear: key path: SjJsonPath root.
+	self assert: result equals: 1.
+	
+	"Verify the scalar was set to 0"
+	result := stick endpoint jsonGet: key path: SjJsonPath root.
+	self assert: result first equals: 0
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonForgetBasic [
+	| key value result |
+	key := 'test:json:forget:basic'.
+	value := {'name'->'John'. 'age'->30} asDictionary.
+	
+	"Set JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Forget (delete) a specific path"
+	result := stick endpoint jsonForget: key path: (SjJsonPath root / 'age').
+	self assert: result equals: 1.
+	
+	"Verify the path was deleted"
+	result := stick endpoint jsonGet: key path: SjJsonPath root.
+	self assert: result first equals: {'name'->'John'} asDictionary
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonForgetKeyOnly [
+	| key value result |
+	key := 'test:json:forget:keyonly'.
+	value := {'data'->'test'} asDictionary.
+	
+	"Set JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Forget (delete) the entire key using key-only method"
+	result := stick endpoint jsonForget: key.
+	self assert: result equals: 1.
+	
+	"Verify the key was deleted"
+	result := stick endpoint jsonGet: key path: SjJsonPath root.
+	self assert: result isNil
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonForgetNonExistentKey [
+	| key result |
+	key := 'test:json:forget:nonexistent'.
+	
+	"Try to forget non-existent key"
+	result := stick endpoint jsonForget: key.
+	self assert: result equals: 0
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonForgetEqualsJsonDel [
+	| key value delResult forgetResult |
+	key := 'test:json:forget:equals:del'.
+	value := {'test'->'data'} asDictionary.
+	
+	"Test that jsonForget and jsonDel return identical results"
+	"Set data and delete with jsonDel"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	delResult := stick endpoint jsonDel: key path: (SjJsonPath root / 'test').
+	
+	"Set data again and delete with jsonForget"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	forgetResult := stick endpoint jsonForget: key path: (SjJsonPath root / 'test').
+	
+	"Both should return identical results"
+	self assert: delResult equals: forgetResult
+]
+
