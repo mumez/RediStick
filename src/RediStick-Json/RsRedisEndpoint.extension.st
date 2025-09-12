@@ -343,6 +343,17 @@ RsRedisEndpoint >> jsonForget: key path: path [
 ]
 
 { #category : '*RediStick-Json' }
+RsRedisEndpoint >> jsonMerge: key path: path value: value [
+	| args |
+	args := {
+		        'JSON.MERGE'.
+		        key } asOrderedCollection.
+	path ifNotNil: [ args add: path asString ].
+	args add: (self toJsonString: value).
+	^ self unifiedCommand: args.
+]
+
+{ #category : '*RediStick-Json' }
 RsRedisEndpoint >> toJsonString: value [
 	^ STONJSON toString: value
 ]

@@ -98,17 +98,29 @@ Available Metacello groups:
 - `jsonObjKeys:path:` - Get object keys
 - `jsonObjLen:path:` - Get object field count
 
+**Document Management:**
+- `jsonMerge:path:value:` - RFC7396 compliant JSON merge operations
+- Support for partial document updates, null deletion, type conflict resolution
+
 ### Implementation Details
 - **Automatic conversion**: Smalltalk objects (dictionaries, arrays, numbers, booleans, nil) automatically converted to JSON
 - **Smart result handling**: Parsed JSON objects by default, raw strings with formatting options
 - **Option classes**: `RsJsonSetOptions`, `RsJsonGetOptions`, `RsJsonArrOptions` for operation parameters
 - **Safe parsing**: `safeParseJson:` helper method for robust JSON handling
 - **SJsonPath integration**: Full JSON path support for all operations
+- **RFC7396 compliance**: JSON Merge Patch standard for efficient document updates
 
 ### Test Coverage
-- 104 comprehensive tests in `RsJsonTest` class
+- 111 comprehensive tests in `RsJsonTest` class (as of latest implementation)
 - Covers all operations, edge cases, error conditions
 - Tests for both single-path and multi-path operations
+- RFC7396 compliance testing for merge operations
+
+### Implementation Progress
+- **Overall Completion**: 79.4% (27/34 tasks completed)
+- **Implemented Commands**: 65+ JSON methods across all major operation categories
+- **Current Phase**: Implementation (ongoing - batch operations, boolean toggle remaining)
+- **Next Features**: JSON batch operations (MGET, MSET), boolean toggle commands
 
 ### References
 - [Redis JSON Overview](https://redis.io/docs/latest/develop/data-types/json/)

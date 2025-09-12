@@ -1925,3 +1925,132 @@ RsJsonTest >> testJsonForgetEqualsJsonDel [
 	self assert: delResult equals: forgetResult
 ]
 
+{ #category : 'tests' }
+RsJsonTest >> testJsonMergeBasic [
+	| key originalValue mergeValue mergeResult finalResult |
+	key := 'test:json:merge:basic'.
+	originalValue := {'name'->'Alice'. 'age'->25. 'city'->'Paris'} asDictionary.
+	mergeValue := {'age'->30. 'country'->'France'} asDictionary.
+	
+	"Set initial JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: originalValue.
+	
+	"Merge with new data - should return 'OK'"
+	mergeResult := stick endpoint jsonMerge: key path: SjJsonPath root value: mergeValue.
+	self assert: mergeResult equals: 'OK'.
+	
+	"Verify merged result"
+	finalResult := stick endpoint jsonGet: key path: SjJsonPath root.
+	self assert: finalResult first equals: {'name'->'Alice'. 'age'->30. 'city'->'Paris'. 'country'->'France'} asDictionary
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonMergeNullDeletion [
+	| key originalValue mergeValue mergeResult finalResult |
+	key := 'test:json:merge:null'.
+	originalValue := {'name'->'Bob'. 'age'->35. 'city'->'London'. 'active'->true} asDictionary.
+	mergeValue := {'age'->nil. 'status'->'inactive'} asDictionary.
+	
+	"Set initial JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: originalValue.
+	
+	"Merge with null value to delete 'age' field - should return 'OK'"
+	mergeResult := stick endpoint jsonMerge: key path: SjJsonPath root value: mergeValue.
+	self assert: mergeResult equals: 'OK'.
+	
+	"Verify 'age' was deleted and 'status' was added"
+	finalResult := stick endpoint jsonGet: key path: SjJsonPath root.
+	self assert: finalResult first equals: {'name'->'Bob'. 'city'->'London'. 'active'->true. 'status'->'inactive'} asDictionary
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonMergeNestedPath [
+	| key originalValue mergeValue mergeResult finalResult |
+	key := 'test:json:merge:nested'.
+	originalValue := {'user'->({'name'->'Charlie'. 'preferences'->({'theme'->'dark'. 'lang'->'en'} asDictionary)} asDictionary)} asDictionary.
+	mergeValue := {'lang'->'fr'. 'notifications'->true} asDictionary.
+	
+	"Set initial nested JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: originalValue.
+	
+	"Merge at nested path - should return 'OK'"
+	mergeResult := stick endpoint jsonMerge: key path: (SjJsonPath root / 'user' / 'preferences') value: mergeValue.
+	self assert: mergeResult equals: 'OK'.
+	
+	"Verify nested merge result"
+	finalResult := stick endpoint jsonGet: key path: (SjJsonPath root / 'user' / 'preferences').
+	self assert: finalResult first equals: {'theme'->'dark'. 'lang'->'fr'. 'notifications'->true} asDictionary
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonMergeArrayReplacement [
+	| key originalValue mergeValue mergeResult finalResult |
+	key := 'test:json:merge:array'.
+	originalValue := {'items'->{1. 2. 3}. 'metadata'->({'count'->3} asDictionary)} asDictionary.
+	mergeValue := {'items'->{4. 5. 6. 7}} asDictionary.
+	
+	"Set initial JSON data with array"
+	stick endpoint jsonSet: key path: SjJsonPath root value: originalValue.
+	
+	"Merge with new array (should replace entire array) - should return 'OK'"
+	mergeResult := stick endpoint jsonMerge: key path: SjJsonPath root value: mergeValue.
+	self assert: mergeResult equals: 'OK'.
+	
+	"Verify array was completely replaced"
+	finalResult := stick endpoint jsonGet: key path: SjJsonPath root.
+	self assert: finalResult first equals: {'items'->{4. 5. 6. 7}. 'metadata'->({'count'->3} asDictionary)} asDictionary
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonMergeTypeConflict [
+	| key originalValue mergeValue mergeResult finalResult |
+	key := 'test:json:merge:conflict'.
+	originalValue := {'data'->{1. 2. 3}. 'count'->3} asDictionary.
+	mergeValue := {'data'->({'converted'->true} asDictionary)} asDictionary.
+	
+	"Set initial JSON data with array"
+	stick endpoint jsonSet: key path: SjJsonPath root value: originalValue.
+	
+	"Merge with different type (array -> object) - should return 'OK'"
+	mergeResult := stick endpoint jsonMerge: key path: SjJsonPath root value: mergeValue.
+	self assert: mergeResult equals: 'OK'.
+	
+	"Verify type conflict resolved by replacement"
+	finalResult := stick endpoint jsonGet: key path: SjJsonPath root.
+	self assert: finalResult first equals: {'data'->({'converted'->true} asDictionary). 'count'->3} asDictionary
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonMergeNonExistentKey [
+	| key mergeValue mergeResult finalResult |
+	key := 'test:json:merge:nonexistent'.
+	mergeValue := {'created'->true. 'name'->'New'} asDictionary.
+	
+	"Merge to non-existent key (should create new key) - should return 'OK'"
+	mergeResult := stick endpoint jsonMerge: key path: SjJsonPath root value: mergeValue.
+	self assert: mergeResult equals: 'OK'.
+	
+	"Verify key was created with merge value"
+	finalResult := stick endpoint jsonGet: key path: SjJsonPath root.
+	self assert: finalResult first equals: mergeValue
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonMergeNonExistentPath [
+	| key originalValue mergeValue mergeResult finalResult |
+	key := 'test:json:merge:nonexistentpath'.
+	originalValue := {'existing'->'data'} asDictionary.
+	mergeValue := {'created'->true} asDictionary.
+	
+	"Set initial JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: originalValue.
+	
+	"Merge to non-existent nested path - should return 'OK'"
+	mergeResult := stick endpoint jsonMerge: key path: (SjJsonPath root / 'newpath') value: mergeValue.
+	self assert: mergeResult equals: 'OK'.
+	
+	"Verify nested path was created"
+	finalResult := stick endpoint jsonGet: key path: SjJsonPath root.
+	self assert: finalResult first equals: {'existing'->'data'. 'newpath'->mergeValue} asDictionary
+]
+
