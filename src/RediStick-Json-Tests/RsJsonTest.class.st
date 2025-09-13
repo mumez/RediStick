@@ -2170,3 +2170,137 @@ RsJsonTest >> testJsonToggleNonExistentPath [
 	self assert: result equals: {}
 ]
 
+{ #category : 'tests' }
+RsJsonTest >> testJsonMSetBasic [
+	| multiSet result |
+	
+	"Test basic batch SET operation"
+	multiSet := RsJsonMultiSetValues new
+		key: 'test:mset:basic1' path: SjJsonPath root value: {'name'->'Alice'. 'age'->30} asDictionary;
+		key: 'test:mset:basic2' path: SjJsonPath root value: 'simple string'.
+	
+	stick endpoint jsonMSet: multiSet.
+	
+	"Verify first key was set correctly"
+	result := stick endpoint jsonGet: 'test:mset:basic1' path: SjJsonPath root.
+	self assert: result first equals: {'name'->'Alice'. 'age'->30} asDictionary.
+	
+	"Verify second key was set correctly"
+	result := stick endpoint jsonGet: 'test:mset:basic2' path: SjJsonPath root.
+	self assert: result first equals: 'simple string'
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonMSetUsingBlock [
+	| result |
+	
+	"Test jsonMSetUsing: with block syntax"
+	stick endpoint jsonMSetUsing: [ :mset |
+		mset key: 'test:mset:block1' path: SjJsonPath root value: {'status'->'active'} asDictionary;
+		     key: 'test:mset:block2' path: SjJsonPath root value: {'counter'->42} asDictionary ].
+	
+	"Verify first key was set correctly"
+	result := stick endpoint jsonGet: 'test:mset:block1' path: SjJsonPath root.
+	self assert: result first equals: {'status'->'active'} asDictionary.
+	
+	"Verify second key was set correctly"
+	result := stick endpoint jsonGet: 'test:mset:block2' path: (SjJsonPath root / 'counter').
+	self assert: result first equals: 42
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonMSetWithPaths [
+	| multiSet result |
+	
+	"Test batch SET with different paths on same key"
+	stick endpoint jsonSet: 'test:mset:paths' path: SjJsonPath root value: {'user'->{} asDictionary. 'metadata'->{} asDictionary} asDictionary.
+	
+	multiSet := RsJsonMultiSetValues new
+		key: 'test:mset:paths' path: (SjJsonPath root / 'user' / 'name') value: 'Bob';
+		key: 'test:mset:paths' path: (SjJsonPath root / 'user' / 'age') value: 25;
+		key: 'test:mset:paths' path: (SjJsonPath root / 'metadata' / 'created') value: '2024-01-01'.
+	
+	stick endpoint jsonMSet: multiSet.
+	
+	"Verify all paths were set correctly"
+	result := stick endpoint jsonGet: 'test:mset:paths' path: (SjJsonPath root / 'user' / 'name').
+	self assert: result first equals: 'Bob'.
+	
+	result := stick endpoint jsonGet: 'test:mset:paths' path: (SjJsonPath root / 'user' / 'age').
+	self assert: result first equals: 25.
+	
+	result := stick endpoint jsonGet: 'test:mset:paths' path: (SjJsonPath root / 'metadata' / 'created').
+	self assert: result first equals: '2024-01-01'
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonMSetWithArrays [
+	| multiSet result |
+	
+	"Test batch SET with array values"
+	multiSet := RsJsonMultiSetValues new
+		key: 'test:mset:arrays1' path: SjJsonPath root value: {1. 2. 3};
+		key: 'test:mset:arrays2' path: SjJsonPath root value: {'red'. 'green'. 'blue'}.
+	
+	stick endpoint jsonMSet: multiSet.
+	
+	"Verify arrays were set correctly"
+	result := stick endpoint jsonGet: 'test:mset:arrays1' path: SjJsonPath root.
+	self assert: result first equals: {1. 2. 3}.
+	
+	result := stick endpoint jsonGet: 'test:mset:arrays2' path: SjJsonPath root.
+	self assert: result first equals: {'red'. 'green'. 'blue'}
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonMSetWithBooleans [
+	| multiSet result |
+	
+	"Test batch SET with boolean values"
+	multiSet := RsJsonMultiSetValues new
+		key: 'test:mset:bool1' path: SjJsonPath root value: true;
+		key: 'test:mset:bool2' path: SjJsonPath root value: false;
+		key: 'test:mset:bool3' path: SjJsonPath root value: nil.
+	
+	stick endpoint jsonMSet: multiSet.
+	
+	"Verify boolean values were set correctly"
+	result := stick endpoint jsonGet: 'test:mset:bool1' path: SjJsonPath root.
+	self assert: result first equals: true.
+	
+	result := stick endpoint jsonGet: 'test:mset:bool2' path: SjJsonPath root.
+	self assert: result first equals: false.
+	
+	result := stick endpoint jsonGet: 'test:mset:bool3' path: SjJsonPath root.
+	self assert: result first equals: nil
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testRsJsonMultiSetValuesFluentInterface [
+	| multiSet params |
+	
+	"Test RsJsonMultiSetValues fluent interface"
+	multiSet := RsJsonMultiSetValues new
+		key: 'key1' path: (SjJsonPath root / 'field1') value: 'value1';
+		key: 'key2' path: SjJsonPath root value: {'nested'->'data'} asDictionary;
+		key: 'key3' path: (SjJsonPath root / 'number') value: 123.
+	
+	params := multiSet params.
+	self assert: params size equals: 3.
+	
+	"Verify first triplet"
+	self assert: params first first equals: 'key1'.
+	self assert: params first second asString equals: (SjJsonPath root / 'field1') asString.
+	self assert: params first third equals: 'value1'.
+	
+	"Verify second triplet"
+	self assert: params second first equals: 'key2'.
+	self assert: params second second asString equals: SjJsonPath root asString.
+	self assert: params second third equals: {'nested'->'data'} asDictionary.
+	
+	"Verify third triplet"
+	self assert: params third first equals: 'key3'.
+	self assert: params third second asString equals: (SjJsonPath root / 'number') asString.
+	self assert: params third third equals: 123
+]
+

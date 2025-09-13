@@ -380,6 +380,25 @@ RsRedisEndpoint >> jsonToggleRaw: key path: path [
 ]
 
 { #category : '*RediStick-Json' }
+RsRedisEndpoint >> jsonMSet: multiSetValues [
+	| args |
+	args := { 'JSON.MSET' } asOrderedCollection.
+	multiSetValues params do: [ :triplet |
+		args add: triplet first.                          "key"
+		args add: triplet second asString.                "path"
+		args add: (self toJsonString: triplet third) ].   "value"
+	^ self unifiedCommand: args
+]
+
+{ #category : '*RediStick-Json' }
+RsRedisEndpoint >> jsonMSetUsing: settingBlock [
+	| multiSet |
+	multiSet := RsJsonMultiSetValues new.
+	settingBlock value: multiSet.
+	^ self jsonMSet: multiSet
+]
+
+{ #category : '*RediStick-Json' }
 RsRedisEndpoint >> toJsonString: value [
 	^ STONJSON toString: value
 ]

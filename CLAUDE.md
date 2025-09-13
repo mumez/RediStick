@@ -102,6 +102,16 @@ Available Metacello groups:
 - `jsonMerge:path:value:` - RFC7396 compliant JSON merge operations
 - Support for partial document updates, null deletion, type conflict resolution
 
+**Boolean Operations:**
+- `jsonToggle:`, `jsonToggle:path:` - Boolean value toggling operations
+- Returns boolean arrays for intuitive Smalltalk usage
+- `jsonToggleRaw:path:` - Raw 0/1 values for advanced use cases
+
+**Batch Operations:**
+- `jsonMSet:` - Batch JSON SET operations using RsJsonMultiSetValues
+- `jsonMSetUsing:` - Convenient block syntax for batch operations  
+- `RsJsonMultiSetValues` - Fluent interface for building batch SET commands
+
 ### Implementation Details
 - **Automatic conversion**: Smalltalk objects (dictionaries, arrays, numbers, booleans, nil) automatically converted to JSON
 - **Smart result handling**: Parsed JSON objects by default, raw strings with formatting options
@@ -111,16 +121,23 @@ Available Metacello groups:
 - **RFC7396 compliance**: JSON Merge Patch standard for efficient document updates
 
 ### Test Coverage
-- 111 comprehensive tests in `RsJsonTest` class (as of latest implementation)
+- 120+ comprehensive tests in `RsJsonTest` class (as of latest implementation)
 - Covers all operations, edge cases, error conditions
 - Tests for both single-path and multi-path operations
 - RFC7396 compliance testing for merge operations
+- Boolean toggle operations with comprehensive edge case coverage
+- Batch operation testing with fluent interface validation
 
 ### Implementation Progress
-- **Overall Completion**: 79.4% (27/34 tasks completed)
-- **Implemented Commands**: 65+ JSON methods across all major operation categories
-- **Current Phase**: Implementation (ongoing - batch operations, boolean toggle remaining)
-- **Next Features**: JSON batch operations (MGET, MSET), boolean toggle commands
+- **Overall Completion**: 86.2% (25/29 tasks completed)
+- **Implemented Commands**: 70+ JSON methods across all major operation categories
+- **Current Phase**: Implementation (ongoing - batch retrieval remaining)
+- **Completed Features**: 
+  - All core JSON operations (GET, SET, DEL, TYPE, CLEAR)
+  - Advanced operations (arrays, strings, numbers, objects, merge)
+  - Boolean manipulation with intuitive API
+  - Batch SET operations with fluent interface
+- **Next Features**: JSON batch retrieval (MGET), documentation updates
 
 ### References
 - [Redis JSON Overview](https://redis.io/docs/latest/develop/data-types/json/)
