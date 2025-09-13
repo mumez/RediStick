@@ -354,6 +354,32 @@ RsRedisEndpoint >> jsonMerge: key path: path value: value [
 ]
 
 { #category : '*RediStick-Json' }
+RsRedisEndpoint >> jsonToggle: key [
+	^ self jsonToggle: key path: SjJsonPath root
+]
+
+{ #category : '*RediStick-Json' }
+RsRedisEndpoint >> jsonToggle: key path: path [
+	| rawResult |
+	rawResult := self jsonToggleRaw: key path: path.
+	^ rawResult ifNil: [ nil ] ifNotNil: [ 
+		rawResult collect: [ :each | 
+			each ifNil: [ nil ] 
+			ifNotNil: [ each = 1 ] ] ]
+]
+
+{ #category : '*RediStick-Json' }
+RsRedisEndpoint >> jsonToggleRaw: key path: path [
+	| args result |
+	args := {
+		        'JSON.TOGGLE'.
+		        key.
+		        path asString } asOrderedCollection.
+	result := self unifiedCommand: args.
+	^ result ifNil: [ nil ] ifNotNil: [ result asArray ]
+]
+
+{ #category : '*RediStick-Json' }
 RsRedisEndpoint >> toJsonString: value [
 	^ STONJSON toString: value
 ]

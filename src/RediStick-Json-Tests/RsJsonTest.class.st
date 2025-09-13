@@ -2054,3 +2054,119 @@ RsJsonTest >> testJsonMergeNonExistentPath [
 	self assert: finalResult first equals: {'existing'->'data'. 'newpath'->mergeValue} asDictionary
 ]
 
+{ #category : 'tests' }
+RsJsonTest >> testJsonToggleBasic [
+	| key result |
+	key := 'test:json:toggle:basic'.
+	
+	"Set initial boolean value"
+	stick endpoint jsonSet: key path: SjJsonPath root value: true.
+	
+	"Toggle the boolean value - returns boolean result"
+	result := stick endpoint jsonToggle: key.
+	self assert: result equals: {false}.
+	
+	"Verify value is now false"
+	result := stick endpoint jsonGet: key path: SjJsonPath root.
+	self assert: result first equals: false.
+	
+	"Toggle again"
+	result := stick endpoint jsonToggle: key.
+	self assert: result equals: {true}.
+	
+	"Verify value is now true"
+	result := stick endpoint jsonGet: key path: SjJsonPath root.
+	self assert: result first equals: true
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonToggleWithPath [
+	| key value result |
+	key := 'test:json:toggle:path'.
+	value := {'user'->({'active'->true. 'verified'->false} asDictionary)} asDictionary.
+	
+	"Set initial JSON data with boolean fields"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Toggle active field"
+	result := stick endpoint jsonToggle: key path: (SjJsonPath root / 'user' / 'active').
+	self assert: result equals: {false}.
+	
+	"Verify active is now false"
+	result := stick endpoint jsonGet: key path: (SjJsonPath root / 'user' / 'active').
+	self assert: result first equals: false.
+	
+	"Toggle verified field"
+	result := stick endpoint jsonToggle: key path: (SjJsonPath root / 'user' / 'verified').
+	self assert: result equals: {true}.
+	
+	"Verify verified is now true"
+	result := stick endpoint jsonGet: key path: (SjJsonPath root / 'user' / 'verified').
+	self assert: result first equals: true
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonToggleMultipleBooleans [
+	| key value result |
+	key := 'test:json:toggle:multiple'.
+	value := {'flags'->{true. false. true}} asDictionary.
+	
+	"Set initial array of boolean values"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Toggle all boolean values in array"
+	result := stick endpoint jsonToggle: key path: (SjJsonPath root / 'flags' / '*').
+	self assert: result equals: {false. true. false}.
+	
+	"Verify all values are toggled"
+	result := stick endpoint jsonGet: key path: (SjJsonPath root / 'flags').
+	self assert: result first equals: {false. true. false}
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonToggleNonBooleanValue [
+	| key result |
+	key := 'test:json:toggle:nonbool'.
+	
+	"Set non-boolean value"
+	stick endpoint jsonSet: key path: SjJsonPath root value: 'not a boolean'.
+	
+	"Try to toggle non-boolean value - should handle gracefully"
+	[result := stick endpoint jsonToggle: key] 
+		on: Error 
+		do: [:ex | result := nil].
+	
+	"Redis returns null for non-boolean values"
+	self assert: result equals: {nil}
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonToggleNonExistentKey [
+	| key result |
+	key := 'test:json:toggle:nonexistent'.
+	
+	"Try to toggle non-existent key"
+	[result := stick endpoint jsonToggle: key] 
+		on: Error 
+		do: [:ex | result := nil].
+	
+	"Should handle non-existent key gracefully"
+	self assert: result isNil
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonToggleNonExistentPath [
+	| key value result |
+	key := 'test:json:toggle:nonexistentpath'.
+	value := {'existing'->'data'} asDictionary.
+	
+	"Set initial JSON data"
+	stick endpoint jsonSet: key path: SjJsonPath root value: value.
+	
+	"Try to toggle non-existent path"
+	result := stick endpoint jsonToggle: key path: (SjJsonPath root / 'nonexistent').
+	
+	"Should return empty array for non-existent path"
+	self assert: result equals: {}
+]
+
