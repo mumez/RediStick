@@ -2304,3 +2304,104 @@ RsJsonTest >> testRsJsonMultiSetValuesFluentInterface [
 	self assert: params third third equals: 123
 ]
 
+{ #category : 'tests' }
+RsJsonTest >> testJsonMGetBasic [
+	| key1 key2 key3 result |
+	key1 := 'test:mget:basic1'.
+	key2 := 'test:mget:basic2'.
+	key3 := 'test:mget:basic3'.
+
+	"Set up test data"
+	stick endpoint jsonSet: key1 path: SjJsonPath root value: {'name'->'Alice'. 'age'->25} asDictionary.
+	stick endpoint jsonSet: key2 path: SjJsonPath root value: {'name'->'Bob'. 'age'->30} asDictionary.
+	"key3 deliberately not set to test nil handling"
+
+	"Test MGET with multiple keys"
+	result := stick endpoint jsonMGet: {key1. key2. key3}.
+
+	self assert: result size equals: 3.
+	self assert: (result at: 1) first equals: {'name'->'Alice'. 'age'->25} asDictionary.
+	self assert: (result at: 2) first equals: {'name'->'Bob'. 'age'->30} asDictionary.
+	self assert: (result at: 3) equals: nil
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonMGetWithPath [
+	| key1 key2 key3 result |
+	key1 := 'test:mget:path1'.
+	key2 := 'test:mget:path2'.
+	key3 := 'test:mget:path3'.
+
+	"Set up test data with nested structures"
+	stick endpoint jsonSet: key1 path: SjJsonPath root value: {'user'->({'name'->'Alice'. 'settings'->({'theme'->'dark'} asDictionary)} asDictionary)} asDictionary.
+	stick endpoint jsonSet: key2 path: SjJsonPath root value: {'user'->({'name'->'Bob'. 'settings'->({'theme'->'light'} asDictionary)} asDictionary)} asDictionary.
+	stick endpoint jsonSet: key3 path: SjJsonPath root value: {'other'->'data'} asDictionary.
+
+	"Test MGET with specific path"
+	result := stick endpoint jsonMGet: {key1. key2. key3} path: (SjJsonPath root / 'user' / 'name').
+
+	self assert: result size equals: 3.
+	self assert: (result at: 1) first equals: 'Alice'.
+	self assert: (result at: 2) first equals: 'Bob'.
+	self assert: (result at: 3) isEmpty "path doesn't exist in key3"
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonMGetWithNonExistentKeys [
+	| key1 key3 result |
+	key1 := 'test:mget:exists1'.
+	key3 := 'test:mget:exists3'.
+
+	"Set up some existing keys"
+	stick endpoint jsonSet: key1 path: SjJsonPath root value: {'name'->'Alice'. 'status'->'active'} asDictionary.
+	stick endpoint jsonSet: key3 path: SjJsonPath root value: {'name'->'Charlie'. 'status'->'inactive'} asDictionary.
+
+	"Test MGET with mix of existing and non-existent keys"
+	result := stick endpoint jsonMGet: {key1. 'nonexistent2'. key3. 'nonexistent4'}.
+
+	self assert: result size equals: 4.
+	self assert: (result at: 1) first equals: {'name'->'Alice'. 'status'->'active'} asDictionary.
+	self assert: (result at: 2) equals: nil.
+	self assert: (result at: 3) first equals: {'name'->'Charlie'. 'status'->'inactive'} asDictionary.
+	self assert: (result at: 4) equals: nil
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonMGetMixedTypes [
+	| key1 key2 key3 result |
+	key1 := 'test:mget:mixed1'.
+	key2 := 'test:mget:mixed2'.
+	key3 := 'test:mget:mixed3'.
+
+	"Set up test data with different JSON types"
+	stick endpoint jsonSet: key1 path: SjJsonPath root value: 'string value'.
+	stick endpoint jsonSet: key2 path: SjJsonPath root value: 42.
+	stick endpoint jsonSet: key3 path: SjJsonPath root value: {1. 2. 3}.
+
+	"Test MGET with mixed data types"
+	result := stick endpoint jsonMGet: {key1. key2. key3}.
+
+	self assert: result size equals: 3.
+	self assert: (result at: 1) first equals: 'string value'.
+	self assert: (result at: 2) first equals: 42.
+	self assertCollection: (result at: 3) first equals: {1. 2. 3}
+]
+
+{ #category : 'tests' }
+RsJsonTest >> testJsonMGetArrayPaths [
+	| key1 key2 result |
+	key1 := 'test:mget:array1'.
+	key2 := 'test:mget:array2'.
+
+	"Set up test data with arrays (3 elements each)"
+	stick endpoint jsonSet: key1 path: SjJsonPath root value: {'items'->({{'name'->'first'} asDictionary. {'name'->'second'} asDictionary. {'name'->'third'} asDictionary})} asDictionary.
+	stick endpoint jsonSet: key2 path: SjJsonPath root value: {'items'->({{'name'->'alpha'} asDictionary. {'name'->'beta'} asDictionary. {'name'->'gamma'} asDictionary})} asDictionary.
+
+	"Test MGET with array element path using @ for indexing (get 2nd element, index 1)"
+	result := stick endpoint jsonMGet: {key1. key2} path: (SjJsonPath root / 'items' @ 1 / 'name').
+
+	self assert: result size equals: 2.
+	self assert: (result at: 1) first equals: 'second'.
+	self assert: (result at: 2) first equals: 'beta'
+]
+

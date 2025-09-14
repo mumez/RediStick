@@ -399,6 +399,25 @@ RsRedisEndpoint >> jsonMSetUsing: settingBlock [
 ]
 
 { #category : '*RediStick-Json' }
+RsRedisEndpoint >> jsonMGet: keys [
+	"Get JSON values from multiple keys at root path"
+	^ self jsonMGet: keys path: SjJsonPath root
+]
+
+{ #category : '*RediStick-Json' }
+RsRedisEndpoint >> jsonMGet: keys path: path [
+	"Get JSON values from specific path across multiple keys"
+	| args pathStr |
+	args := OrderedCollection new.
+	pathStr := path asString.
+	args add: 'JSON.MGET'.
+	keys do: [:key | args add: key].
+	args add: pathStr.
+	^ (self unifiedCommand: args asArray) collect: [:result |
+		self safeParseJson: result]
+]
+
+{ #category : '*RediStick-Json' }
 RsRedisEndpoint >> toJsonString: value [
 	^ STONJSON toString: value
 ]

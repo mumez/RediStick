@@ -109,7 +109,9 @@ Available Metacello groups:
 
 **Batch Operations:**
 - `jsonMSet:` - Batch JSON SET operations using RsJsonMultiSetValues
-- `jsonMSetUsing:` - Convenient block syntax for batch operations  
+- `jsonMSetUsing:` - Convenient block syntax for batch operations
+- `jsonMGet:keys:` - Batch JSON GET operations from multiple keys
+- `jsonMGet:keys:path:` - Batch JSON GET from specific paths across multiple keys
 - `RsJsonMultiSetValues` - Fluent interface for building batch SET commands
 
 ### Implementation Details
@@ -121,23 +123,26 @@ Available Metacello groups:
 - **RFC7396 compliance**: JSON Merge Patch standard for efficient document updates
 
 ### Test Coverage
-- 120+ comprehensive tests in `RsJsonTest` class (as of latest implementation)
+- 128 comprehensive tests in `RsJsonTest` class (final implementation)
 - Covers all operations, edge cases, error conditions
 - Tests for both single-path and multi-path operations
 - RFC7396 compliance testing for merge operations
 - Boolean toggle operations with comprehensive edge case coverage
 - Batch operation testing with fluent interface validation
+- Batch retrieval testing with MGET operations
+- Array path testing with SJsonPath `@` indexing syntax
+- Mixed existing/non-existing key handling in batch operations
 
 ### Implementation Progress
-- **Overall Completion**: 86.2% (25/29 tasks completed)
-- **Implemented Commands**: 70+ JSON methods across all major operation categories
-- **Current Phase**: Implementation (ongoing - batch retrieval remaining)
-- **Completed Features**: 
+- **Overall Completion**: 100% (29/29 tasks completed)
+- **Implemented Commands**: 75+ JSON methods across all major operation categories
+- **Current Phase**: Complete - all Redis JSON API commands implemented
+- **Completed Features**:
   - All core JSON operations (GET, SET, DEL, TYPE, CLEAR)
   - Advanced operations (arrays, strings, numbers, objects, merge)
   - Boolean manipulation with intuitive API
-  - Batch SET operations with fluent interface
-- **Next Features**: JSON batch retrieval (MGET), documentation updates
+  - Batch operations (SET and GET) with fluent interface
+  - Complete MGET batch retrieval functionality
 
 ### References
 - [Redis JSON Overview](https://redis.io/docs/latest/develop/data-types/json/)
