@@ -63,7 +63,7 @@ RsRedisEndpoint >> jsonSet: key path: path value: value [
 
 { #category : '*RediStick-Json' }
 RsRedisEndpoint >> jsonSet: key path: path value: value options: options [
-	| jsonString args |
+	| jsonString |
 	jsonString := self toJsonString: value.
 	^ self jsonSet: key path: path rawValue: jsonString options: options
 ]
@@ -95,7 +95,7 @@ RsRedisEndpoint >> jsonObjKeys: key [
 
 { #category : '*RediStick-Json' }
 RsRedisEndpoint >> jsonObjKeys: key path: path [
-	| args result pathString |
+	| args |
 	args := {
 		        'JSON.OBJKEYS'.
 		        key } asOrderedCollection.
@@ -223,9 +223,7 @@ RsRedisEndpoint >> jsonArrPop: key path: path using: optionsBlock [
 		args addAll: options asArray.
 	].
 	result := self unifiedCommand: args.
-	^ result
-		ifNil: [ nil ]
-		ifNotNil: [ (result collect: [:each | self safeParseJson: each]) asArray ]
+	^ result ifNotNil: [ (result collect: [:each | self safeParseJson: each]) asArray ]
 ]
 
 { #category : '*RediStick-Json' }
@@ -288,7 +286,7 @@ RsRedisEndpoint >> jsonNumIncrBy: key path: path increment: increment [
 		        path asString.
 		        increment } asOrderedCollection.
 	result := self unifiedCommand: args.
-	^ result ifNotNil: [ self safeParseJson: result ] ifNil: [ nil ]
+	^ result ifNotNil: [ self safeParseJson: result ]
 ]
 
 { #category : '*RediStick-Json' }
@@ -300,7 +298,7 @@ RsRedisEndpoint >> jsonNumMultBy: key path: path multiplier: multiplier [
 		        path asString.
 		        multiplier } asOrderedCollection.
 	result := self unifiedCommand: args.
-	^ result ifNotNil: [ self safeParseJson: result ] ifNil: [ nil ]
+	^ result ifNotNil: [ self safeParseJson: result ]
 ]
 
 { #category : '*RediStick-Json' }
