@@ -428,12 +428,11 @@ RsRedisEndpoint >> jsonMGet: keys path: path [
 	args := OrderedCollection new.
 	pathStr := path asString.
 	args add: 'JSON.MGET'.
-	keys do: [:key | args add: key].
+	args addAll: keys.
 	args add: pathStr.
 	results := self unifiedCommand: args asArray.
-	^ keys withIndexCollect: [:key :index |
-		| result parsedResult |
-		result := results at: index.
+	^ keys with: results collect: [:key :result |
+		| parsedResult |
 		parsedResult := self safeParseJson: result.
 		RsJsonGetResult key: key path: path values: parsedResult
 	]
