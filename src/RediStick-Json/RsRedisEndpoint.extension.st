@@ -377,10 +377,9 @@ RsRedisEndpoint >> jsonToggle: key [
 RsRedisEndpoint >> jsonToggle: key path: path [
 	| rawResult |
 	rawResult := self jsonToggleRaw: key path: path.
-	^ rawResult ifNil: [ nil ] ifNotNil: [ 
+	^ rawResult ifNotNil: [ 
 		rawResult collect: [ :each | 
-			each ifNil: [ nil ] 
-			ifNotNil: [ each = 1 ] ] ]
+			each ifNotNil: [ each = 1 ] ] ]
 ]
 
 { #category : '*RediStick-Json' }
