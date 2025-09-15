@@ -9,9 +9,26 @@ RsRedisEndpoint >> jsonGet: key options: options paths: paths [
 	options ifNotNil: [ args addAll: options asArray ].
 	paths ifNotNil: [ args addAll: paths asArray ].
 	result := self unifiedCommand: args.
-	^ (options notNil and: [ options hasPrettyFormattingOptions ]) 
-		ifTrue: [ result ]
-		ifFalse: [ self safeParseJson: result ]
+	(options notNil and: [ options hasPrettyFormattingOptions ]) 
+		ifTrue: [ ^ result ].
+	^ self buildGetResultFrom: (self safeParseJson: result) key: key paths: paths
+]
+
+
+{ #category : '*RediStick-Json' }
+RsRedisEndpoint >> buildGetResultFrom: jsonArrayOrDict key: key paths: paths [
+	"If result is nil (key doesn't exist), return invalid result"
+	jsonArrayOrDict isNil ifTrue: [
+		paths size = 1
+			ifTrue: [^ RsJsonGetResult key: key path: paths first values: nil]
+			ifFalse: [^ paths collect: [:eachPath | RsJsonGetResult key: key path: eachPath values: nil]]
+	].
+
+	"If one path, array will be returned"
+	jsonArrayOrDict isArray ifTrue: [^ RsJsonGetResult key: key path: paths first values: jsonArrayOrDict].
+
+	"If many paths, dict with path key will be returned"
+	^ paths collect: [:eachPath | RsJsonGetResult key: key path: eachPath values: (jsonArrayOrDict at: eachPath asString)].
 ]
 
 { #category : '*RediStick-Json' }
@@ -407,14 +424,19 @@ RsRedisEndpoint >> jsonMGet: keys [
 { #category : '*RediStick-Json' }
 RsRedisEndpoint >> jsonMGet: keys path: path [
 	"Get JSON values from specific path across multiple keys"
-	| args pathStr |
+	| args pathStr results |
 	args := OrderedCollection new.
 	pathStr := path asString.
 	args add: 'JSON.MGET'.
 	keys do: [:key | args add: key].
 	args add: pathStr.
-	^ (self unifiedCommand: args asArray) collect: [:result |
-		self safeParseJson: result]
+	results := self unifiedCommand: args asArray.
+	^ keys withIndexCollect: [:key :index |
+		| result parsedResult |
+		result := results at: index.
+		parsedResult := self safeParseJson: result.
+		RsJsonGetResult key: key path: path values: parsedResult
+	]
 ]
 
 { #category : '*RediStick-Json' }

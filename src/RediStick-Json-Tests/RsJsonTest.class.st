@@ -13,8 +13,8 @@ RsJsonTest >> testJsonGetSetBasic [
 	
 	stick endpoint jsonSet: key path: SjJsonPath root value: value.
 	result := stick endpoint jsonGet: key path: SjJsonPath root.
-	
-	self assert: result first equals: value
+
+	self assert: result value equals: value
 ]
 
 { #category : 'tests' }
@@ -75,10 +75,8 @@ RsJsonTest >> testJsonSetWithIfAlreadyExistsOption [
 	
 	"First set with ifAlreadyExists should be ignored since key doesn't exist"
 	stick endpoint jsonSet: key path: SjJsonPath root value: value1 using: [:opts | opts ifAlreadyExists].
-	[result := stick endpoint jsonGet: key path: SjJsonPath root]
-		on: Error 
-		do: [:ex | result := nil].
-	self assert: result isNil.
+	result := stick endpoint jsonGet: key path: SjJsonPath root.
+	self assert: result isInvalidKey.
 	
 	"Set without options to create the key"
 	stick endpoint jsonSet: key path: SjJsonPath root value: value1.
@@ -115,7 +113,7 @@ RsJsonTest >> testJsonGetWithPrettyFormatting [
 	
 	"Get without options for comparison - should return parsed object"
 	normalResult := stick endpoint jsonGet: key path: SjJsonPath root.
-	self assert: normalResult first isDictionary
+	self assert: normalResult value isDictionary
 ]
 
 { #category : 'tests' }
@@ -137,17 +135,17 @@ RsJsonTest >> testJsonGetMultiplePaths [
 		scorePath
 	}.
 	
-	"Result should be a dictionary with paths as keys and arrays as values"
-	self assert: result isDictionary.
+	"Result should be an array of RsJsonGetResult objects"
+	self assert: result isArray.
 	self assert: result size equals: 3.
-	self assert: (result at: userNamePath asString) first equals: 'Alice'.
-	self assert: (result at: statusPath asString) first equals: 'active'.
-	self assert: (result at: scorePath asString) first equals: 100
+	self assert: (result at: 1) value equals: 'Alice'.
+	self assert: (result at: 2) value equals: 'active'.
+	self assert: (result at: 3) value equals: 100
 ]
 
 { #category : 'tests' }
 RsJsonTest >> testJsonGetMultiplePathsWithNonExistentPath [
-	| key value result userNamePath nonExistentPath statusPath |
+	| key value result results userNamePath nonExistentPath statusPath |
 	key := 'test:json:multiplepaths:nonexistent'.
 	value := {'user'->({'name'->'Bob'} asDictionary). 'status'->'inactive'} asDictionary.
 	userNamePath := SjJsonPath root / 'user' / 'name'.
@@ -158,20 +156,20 @@ RsJsonTest >> testJsonGetMultiplePathsWithNonExistentPath [
 	stick endpoint jsonSet: key path: SjJsonPath root value: value.
 	
 	"Get multiple paths including a non-existent path"
-	result := stick endpoint jsonGet: key paths: {
+	results := stick endpoint jsonGet: key paths: {
 		userNamePath.
 		nonExistentPath.
 		statusPath
 	}.
 	
-	"Result should be a dictionary with paths as keys"
-	self assert: result isDictionary.
-	self assert: result size equals: 3.
-	self assert: (result at: userNamePath asString) first equals: 'Bob'.
-	"Non-existent path should be included in result with empty array"
-	self assert: (result includesKey: nonExistentPath asString).
-	self assert: (result at: nonExistentPath asString) isEmpty.
-	self assert: (result at: statusPath asString) first equals: 'inactive'
+	"Results should be an array of RsJsonGetResult objects"
+	self assert: results isArray.
+	self assert: results size equals: 3.
+	self assert: (results at: 1) value equals: 'Bob'.
+	self assert: (results at: 2) value isNil.
+	self assert: (results at: 2) isInvalidKey not. "Non-existent path, not invalid key"
+	self assert: (results at: 3) value equals: 'inactive'
+
 ]
 
 { #category : 'tests' }
@@ -304,17 +302,17 @@ RsJsonTest >> testJsonSetWithNonStringValues [
 	"Test setting a number value"
 	stick endpoint jsonSet: key path: (SjJsonPath root / 'number') value: 42.
 	numberResult := stick endpoint jsonGet: key path: (SjJsonPath root / 'number').
-	self assert: numberResult first equals: 42.
+	self assert: numberResult value equals: 42.
 	
 	"Test setting a boolean true value"
 	stick endpoint jsonSet: key path: (SjJsonPath root / 'boolTrue') value: true.
 	booleanTrueResult := stick endpoint jsonGet: key path: (SjJsonPath root / 'boolTrue').
-	self assert: booleanTrueResult first equals: true.
+	self assert: booleanTrueResult value equals: true.
 	
 	"Test setting a boolean false value"
 	stick endpoint jsonSet: key path: (SjJsonPath root / 'boolFalse') value: false.
 	booleanFalseResult := stick endpoint jsonGet: key path: (SjJsonPath root / 'boolFalse').
-	self assert: booleanFalseResult first equals: false.
+	self assert: booleanFalseResult value equals: false.
 	
 	"Test setting a nil value"
 	stick endpoint jsonSet: key path: (SjJsonPath root / 'nullValue') value: nil.
@@ -1642,10 +1640,10 @@ RsJsonTest >> testJsonDelEntireKey [
 	"Delete the entire key (root path)"
 	result := stick endpoint jsonDel: key path: SjJsonPath root.
 	self assert: result equals: 1.
-	
+
 	"Verify the key was deleted"
 	result := stick endpoint jsonGet: key path: SjJsonPath root.
-	self assert: result isNil
+	self assert: result isInvalidKey
 ]
 
 { #category : 'tests' }
@@ -1754,10 +1752,10 @@ RsJsonTest >> testJsonDelKeyOnly [
 	"Delete the entire key using jsonDel: key (no path)"
 	result := stick endpoint jsonDel: key.
 	self assert: result equals: 1.
-	
+
 	"Verify the key was deleted"
 	result := stick endpoint jsonGet: key path: SjJsonPath root.
-	self assert: result isNil
+	self assert: result isInvalidKey
 ]
 
 { #category : 'tests' }
@@ -1890,10 +1888,10 @@ RsJsonTest >> testJsonForgetKeyOnly [
 	"Forget (delete) the entire key using key-only method"
 	result := stick endpoint jsonForget: key.
 	self assert: result equals: 1.
-	
+
 	"Verify the key was deleted"
 	result := stick endpoint jsonGet: key path: SjJsonPath root.
-	self assert: result isNil
+	self assert: result isInvalidKey
 ]
 
 { #category : 'tests' }
@@ -1941,7 +1939,7 @@ RsJsonTest >> testJsonMergeBasic [
 	
 	"Verify merged result"
 	finalResult := stick endpoint jsonGet: key path: SjJsonPath root.
-	self assert: finalResult first equals: {'name'->'Alice'. 'age'->30. 'city'->'Paris'. 'country'->'France'} asDictionary
+	self assert: finalResult value equals: {'name'->'Alice'. 'age'->30. 'city'->'Paris'. 'country'->'France'} asDictionary
 ]
 
 { #category : 'tests' }
@@ -1960,7 +1958,7 @@ RsJsonTest >> testJsonMergeNullDeletion [
 	
 	"Verify 'age' was deleted and 'status' was added"
 	finalResult := stick endpoint jsonGet: key path: SjJsonPath root.
-	self assert: finalResult first equals: {'name'->'Bob'. 'city'->'London'. 'active'->true. 'status'->'inactive'} asDictionary
+	self assert: finalResult value equals: {'name'->'Bob'. 'city'->'London'. 'active'->true. 'status'->'inactive'} asDictionary
 ]
 
 { #category : 'tests' }
@@ -1979,7 +1977,7 @@ RsJsonTest >> testJsonMergeNestedPath [
 	
 	"Verify nested merge result"
 	finalResult := stick endpoint jsonGet: key path: (SjJsonPath root / 'user' / 'preferences').
-	self assert: finalResult first equals: {'theme'->'dark'. 'lang'->'fr'. 'notifications'->true} asDictionary
+	self assert: finalResult value equals: {'theme'->'dark'. 'lang'->'fr'. 'notifications'->true} asDictionary
 ]
 
 { #category : 'tests' }
@@ -1998,7 +1996,7 @@ RsJsonTest >> testJsonMergeArrayReplacement [
 	
 	"Verify array was completely replaced"
 	finalResult := stick endpoint jsonGet: key path: SjJsonPath root.
-	self assert: finalResult first equals: {'items'->{4. 5. 6. 7}. 'metadata'->({'count'->3} asDictionary)} asDictionary
+	self assert: finalResult value equals: {'items'->{4. 5. 6. 7}. 'metadata'->({'count'->3} asDictionary)} asDictionary
 ]
 
 { #category : 'tests' }
@@ -2017,7 +2015,7 @@ RsJsonTest >> testJsonMergeTypeConflict [
 	
 	"Verify type conflict resolved by replacement"
 	finalResult := stick endpoint jsonGet: key path: SjJsonPath root.
-	self assert: finalResult first equals: {'data'->({'converted'->true} asDictionary). 'count'->3} asDictionary
+	self assert: finalResult value equals: {'data'->({'converted'->true} asDictionary). 'count'->3} asDictionary
 ]
 
 { #category : 'tests' }
@@ -2032,7 +2030,7 @@ RsJsonTest >> testJsonMergeNonExistentKey [
 	
 	"Verify key was created with merge value"
 	finalResult := stick endpoint jsonGet: key path: SjJsonPath root.
-	self assert: finalResult first equals: mergeValue
+	self assert: finalResult value equals: mergeValue
 ]
 
 { #category : 'tests' }
@@ -2051,7 +2049,7 @@ RsJsonTest >> testJsonMergeNonExistentPath [
 	
 	"Verify nested path was created"
 	finalResult := stick endpoint jsonGet: key path: SjJsonPath root.
-	self assert: finalResult first equals: {'existing'->'data'. 'newpath'->mergeValue} asDictionary
+	self assert: finalResult value equals: {'existing'->'data'. 'newpath'->mergeValue} asDictionary
 ]
 
 { #category : 'tests' }
@@ -2320,9 +2318,9 @@ RsJsonTest >> testJsonMGetBasic [
 	result := stick endpoint jsonMGet: {key1. key2. key3}.
 
 	self assert: result size equals: 3.
-	self assert: (result at: 1) first equals: {'name'->'Alice'. 'age'->25} asDictionary.
-	self assert: (result at: 2) first equals: {'name'->'Bob'. 'age'->30} asDictionary.
-	self assert: (result at: 3) equals: nil
+	self assert: (result at: 1) value equals: {'name'->'Alice'. 'age'->25} asDictionary.
+	self assert: (result at: 2) value equals: {'name'->'Bob'. 'age'->30} asDictionary.
+	self assert: (result at: 3) isInvalidKey.
 ]
 
 { #category : 'tests' }
@@ -2341,9 +2339,9 @@ RsJsonTest >> testJsonMGetWithPath [
 	result := stick endpoint jsonMGet: {key1. key2. key3} path: (SjJsonPath root / 'user' / 'name').
 
 	self assert: result size equals: 3.
-	self assert: (result at: 1) first equals: 'Alice'.
-	self assert: (result at: 2) first equals: 'Bob'.
-	self assert: (result at: 3) isEmpty "path doesn't exist in key3"
+	self assert: (result at: 1) value equals: 'Alice'.
+	self assert: (result at: 2) value equals: 'Bob'.
+	self assert: (result at: 3) isEmpty "key3 exists but path doesn't exist"
 ]
 
 { #category : 'tests' }
@@ -2360,10 +2358,10 @@ RsJsonTest >> testJsonMGetWithNonExistentKeys [
 	result := stick endpoint jsonMGet: {key1. 'nonexistent2'. key3. 'nonexistent4'}.
 
 	self assert: result size equals: 4.
-	self assert: (result at: 1) first equals: {'name'->'Alice'. 'status'->'active'} asDictionary.
-	self assert: (result at: 2) equals: nil.
-	self assert: (result at: 3) first equals: {'name'->'Charlie'. 'status'->'inactive'} asDictionary.
-	self assert: (result at: 4) equals: nil
+	self assert: (result at: 1) value equals: {'name'->'Alice'. 'status'->'active'} asDictionary.
+	self assert: (result at: 2) isInvalidKey.
+	self assert: (result at: 3) value equals: {'name'->'Charlie'. 'status'->'inactive'} asDictionary.
+	self assert: (result at: 4) isInvalidKey
 ]
 
 { #category : 'tests' }
@@ -2382,9 +2380,9 @@ RsJsonTest >> testJsonMGetMixedTypes [
 	result := stick endpoint jsonMGet: {key1. key2. key3}.
 
 	self assert: result size equals: 3.
-	self assert: (result at: 1) first equals: 'string value'.
-	self assert: (result at: 2) first equals: 42.
-	self assertCollection: (result at: 3) first equals: {1. 2. 3}
+	self assert: (result at: 1) value equals: 'string value'.
+	self assert: (result at: 2) value equals: 42.
+	self assertCollection: (result at: 3) value equals: {1. 2. 3}
 ]
 
 { #category : 'tests' }
@@ -2401,7 +2399,7 @@ RsJsonTest >> testJsonMGetArrayPaths [
 	result := stick endpoint jsonMGet: {key1. key2} path: (SjJsonPath root / 'items' @ 1 / 'name').
 
 	self assert: result size equals: 2.
-	self assert: (result at: 1) first equals: 'second'.
-	self assert: (result at: 2) first equals: 'beta'
+	self assert: (result at: 1) value equals: 'second'.
+	self assert: (result at: 2) value equals: 'beta'
 ]
 

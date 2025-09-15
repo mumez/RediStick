@@ -116,11 +116,18 @@ Available Metacello groups:
 
 ### Implementation Details
 - **Automatic conversion**: Smalltalk objects (dictionaries, arrays, numbers, booleans, nil) automatically converted to JSON
+- **Result wrapping**: JSON.GET/MGET operations return `RsJsonGetResult` wrapper objects with metadata and state checking
 - **Smart result handling**: Parsed JSON objects by default, raw strings with formatting options
 - **Option classes**: `RsJsonSetOptions`, `RsJsonGetOptions`, `RsJsonArrOptions` for operation parameters
 - **Safe parsing**: `safeParseJson:` helper method for robust JSON handling
 - **SJsonPath integration**: Full JSON path support for all operations
 - **RFC7396 compliance**: JSON Merge Patch standard for efficient document updates
+
+**RsJsonGetResult Wrapper Features:**
+- **Metadata access**: `key`, `path` methods return query metadata
+- **State checking**: `isInvalidKey`, `hasValue`, `isEmpty` methods for clear result state
+- **Backward compatibility**: `value`/`first`, `values` accessors maintain existing API
+- **Consistent handling**: Unified result processing for single-key and batch operations
 
 ### Test Coverage
 - 128 comprehensive tests in `RsJsonTest` class (final implementation)
@@ -134,15 +141,21 @@ Available Metacello groups:
 - Mixed existing/non-existing key handling in batch operations
 
 ### Implementation Progress
-- **Overall Completion**: 100% (29/29 tasks completed)
+- **Overall Completion**: 100% (29/29 tasks completed + RsJsonGetResult wrapper refactoring)
 - **Implemented Commands**: 75+ JSON methods across all major operation categories
-- **Current Phase**: Complete - all Redis JSON API commands implemented
+- **Current Phase**: Complete - all Redis JSON API commands implemented with result wrapper enhancement
+- **Latest Enhancement**: JSON.GET/MGET Result Wrapper Refactoring (September 2025)
+  - Enhanced result handling with `RsJsonGetResult` wrapper objects
+  - Clear state checking: `isInvalidKey`, `hasValue`, `isEmpty` methods
+  - Maintained full backward compatibility through accessor methods
+  - 128/128 tests passing with comprehensive wrapper integration
 - **Completed Features**:
   - All core JSON operations (GET, SET, DEL, TYPE, CLEAR)
   - Advanced operations (arrays, strings, numbers, objects, merge)
   - Boolean manipulation with intuitive API
   - Batch operations (SET and GET) with fluent interface
   - Complete MGET batch retrieval functionality
+  - Result wrapper system for enhanced metadata and state checking
 
 ### References
 - [Redis JSON Overview](https://redis.io/docs/latest/develop/data-types/json/)
