@@ -69,6 +69,15 @@ Metacello new
   load: #('Core' 'Search').
 ```
 
+### With JSON package
+
+```smalltalk
+Metacello new
+  baseline: 'RediStick';
+  repository: 'github://mumez/RediStick/src';
+  load: #('Core' 'Json').
+```
+
 ## Sample Code
 
 ### Basic usage
@@ -114,3 +123,9 @@ Please read [Stream.md](./doc/Stream.md).
 RediStick supports [RediSearch](https://redis.io/docs/stack/search/) - a full-text search extension for Redis.
 
 Please read [Search.md](./doc/Search.md).
+
+### Using JSON
+
+RediStick supports [RedisJSON](https://redis.io/docs/latest/develop/data-types/json/) - a JSON data type for Redis.
+
+Please read [Json.md](./doc/Json.md).
