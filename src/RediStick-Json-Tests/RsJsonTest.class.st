@@ -145,7 +145,7 @@ RsJsonTest >> testJsonGetMultiplePaths [
 
 { #category : 'tests' }
 RsJsonTest >> testJsonGetMultiplePathsWithNonExistentPath [
-	| key value result results userNamePath nonExistentPath statusPath |
+	| key value results userNamePath nonExistentPath statusPath |
 	key := 'test:json:multiplepaths:nonexistent'.
 	value := {'user'->({'name'->'Bob'} asDictionary). 'status'->'inactive'} asDictionary.
 	userNamePath := SjJsonPath root / 'user' / 'name'.
