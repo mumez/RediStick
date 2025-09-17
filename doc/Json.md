@@ -110,9 +110,6 @@ formatted := stick endpoint jsonGet: 'profile:456' path: SjJsonPath root using: 
 "Get JSON value type"
 type := stick endpoint jsonType: 'user:123' path: (SjJsonPath root / 'age').
 type. "Returns 'integer'"
-
-"Clear JSON containers"
-stick endpoint jsonClear: 'user:123' path: SjJsonPath root.
 ```
 
 ### String Operations
@@ -209,12 +206,12 @@ stick endpoint jsonMSetUsing: [:multiSet |
     multiSet
         key: 'user:1' path: SjJsonPath root value: {'name'->'Alice'. 'age'->25} asDictionary;
         key: 'user:2' path: SjJsonPath root value: {'name'->'Bob'. 'age'->30} asDictionary;
-        key: 'user:3' path: (SjJsonPath root / 'status') value: 'active'].
+        key: 'user:3' path: SjJsonPath root value: {'name'->'Charlie'. 'status'->'active'} asDictionary].
 
 "Using RsJsonMultiSetValues directly"
 multiSet := RsJsonMultiSetValues new
     key: 'batch:1' path: SjJsonPath root value: {'count'->1} asDictionary;
-    key: 'batch:2' path: (SjJsonPath root / 'count') value: 2;
+    key: 'batch:2' path: SjJsonPath root value: {'count'->2} asDictionary;
     yourself.
 stick endpoint jsonMSet: multiSet.
 ```
@@ -292,6 +289,13 @@ userAgePath := SjJsonPath root / 'user' / 'age'.
 "Reuse in multiple operations"
 name := stick endpoint jsonGet: 'profile:123' path: userNamePath.
 age := stick endpoint jsonGet: 'profile:123' path: userAgePath.
+```
+
+## Cleanup Operations
+
+```smalltalk
+"Clear JSON containers - this will remove all data from the key"
+stick endpoint jsonClear: 'user:123' path: SjJsonPath root.
 ```
 
 ## References
