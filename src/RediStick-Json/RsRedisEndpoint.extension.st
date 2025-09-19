@@ -105,32 +105,34 @@ RsRedisEndpoint >> jsonObjKeys: key path: path [
 
 { #category : '*RediStick-Json' }
 RsRedisEndpoint >> jsonObjLen: key [
-	^ self jsonObjLen: key path: nil
+	^ self jsonObjLen: key path: SjJsonPath root
 ]
 
 { #category : '*RediStick-Json' }
 RsRedisEndpoint >> jsonObjLen: key path: path [
-	| args |
+	| args result |
 	args := {
 		        'JSON.OBJLEN'.
 		        key } asOrderedCollection.
 	path ifNotNil: [ args add: path asString ].
-	^ self unifiedCommand: args.
+	result := self unifiedCommand: args.
+	^ RsJsonGetResult key: key path: path values: result
 ]
 
 { #category : '*RediStick-Json' }
 RsRedisEndpoint >> jsonArrLen: key [
-	^ self jsonArrLen: key path: nil
+	^ self jsonArrLen: key path: SjJsonPath root
 ]
 
 { #category : '*RediStick-Json' }
 RsRedisEndpoint >> jsonArrLen: key path: path [
-	| args |
+	| args result |
 	args := {
 		        'JSON.ARRLEN'.
 		        key } asOrderedCollection.
 	path ifNotNil: [ args add: path asString ].
-	^ self unifiedCommand: args.
+	result := self unifiedCommand: args.
+	^ RsJsonGetResult key: key path: path values: result
 ]
 
 { #category : '*RediStick-Json' }
@@ -247,17 +249,18 @@ RsRedisEndpoint >> safeParseJson: result [
 
 { #category : '*RediStick-Json' }
 RsRedisEndpoint >> jsonStrLen: key [
-	^ self jsonStrLen: key path: nil
+	^ self jsonStrLen: key path: SjJsonPath root
 ]
 
 { #category : '*RediStick-Json' }
 RsRedisEndpoint >> jsonStrLen: key path: path [
-	| args |
+	| args result |
 	args := {
 		        'JSON.STRLEN'.
 		        key } asOrderedCollection.
 	path ifNotNil: [ args add: path asString ].
-	^ self unifiedCommand: args.
+	result := self unifiedCommand: args.
+	^ RsJsonGetResult key: key path: path values: result
 ]
 
 { #category : '*RediStick-Json' }

@@ -49,6 +49,28 @@ result := stick endpoint jsonGet: 'user:123' path: SjJsonPath root.
 result value. "Returns the parsed dictionary"
 ```
 
+#### Understanding RsJsonGetResult
+
+Most JSON query operations (GET, length operations) return `RsJsonGetResult` wrapper objects that provide consistent access to results and metadata:
+
+```smalltalk
+"Get JSON data"
+result := stick endpoint jsonGet: 'user:123' path: SjJsonPath root.
+
+"Access the actual value"
+user := result value.      "Returns the first/single result"
+data := result values.     "Returns all results as array"
+
+"Check result state"
+result isInvalidKey.       "true if key doesn't exist"
+result hasValue.           "true if key exists (regardless of content)"
+result isEmpty.            "true if key exists but no values returned"
+
+"Access metadata"
+result key.                "Returns the Redis key that was queried"
+result path.               "Returns the JSON path that was used"
+```
+
 #### Working with JSON Paths
 
 ```smalltalk
@@ -115,8 +137,9 @@ type. "Returns 'integer'"
 ### String Operations
 
 ```smalltalk
-"Get string length"
-length := stick endpoint jsonStrLen: 'user:123' path: (SjJsonPath root / 'name').
+"Get string length - returns RsJsonGetResult wrapper"
+result := stick endpoint jsonStrLen: 'user:123' path: (SjJsonPath root / 'name').
+length := result value.  "Get the length value"
 
 "Append to string"
 stick endpoint jsonStrAppend: 'user:123' path: (SjJsonPath root / 'name') value: ' Doe'.
@@ -139,8 +162,9 @@ doubled := stick endpoint jsonNumMultBy: 'user:123' path: (SjJsonPath root / 'ag
 data := {'items'->{1. 2. 3}. 'tags'->{'red'. 'blue'}} asDictionary.
 stick endpoint jsonSet: 'data:789' path: SjJsonPath root value: data.
 
-"Get array length"
-length := stick endpoint jsonArrLen: 'data:789' path: (SjJsonPath root / 'items').
+"Get array length - returns RsJsonGetResult wrapper"
+result := stick endpoint jsonArrLen: 'data:789' path: (SjJsonPath root / 'items').
+length := result value.  "Get the array length"
 
 "Append to array"
 stick endpoint jsonArrAppend: 'data:789' path: (SjJsonPath root / 'items') values: {4. 5}.
@@ -164,8 +188,9 @@ stick endpoint jsonArrTrim: 'data:789' path: (SjJsonPath root / 'items') start: 
 "Get object keys"
 keys := stick endpoint jsonObjKeys: 'user:123' path: SjJsonPath root.
 
-"Get number of object fields"
-fieldCount := stick endpoint jsonObjLen: 'user:123' path: SjJsonPath root.
+"Get number of object fields - returns RsJsonGetResult wrapper"
+result := stick endpoint jsonObjLen: 'user:123' path: SjJsonPath root.
+fieldCount := result value.  "Get the field count"
 ```
 
 ### Boolean Operations

@@ -333,7 +333,7 @@ RsJsonTest >> testJsonObjLenBasic [
 	result := stick endpoint jsonObjLen: key.
 	
 	"Result should be the object length"
-	self assert: result equals: 4
+	self assert: result value equals: 4
 ]
 
 { #category : 'tests' }
@@ -349,9 +349,9 @@ RsJsonTest >> testJsonObjLenNestedObject [
 	result := stick endpoint jsonObjLen: key path: (SjJsonPath root / 'user' / 'profile').
 	
 	"Result should be an array with the object length"
-	self assert: result isSequenceable.
-	self assert: result size equals: 1.
-	self assert: result first equals: 2
+	self assert: result values isSequenceable.
+	self assert: result values size equals: 1.
+	self assert: result value equals: 2
 ]
 
 { #category : 'tests' }
@@ -365,11 +365,11 @@ RsJsonTest >> testJsonObjLenNonObjectPath [
 	
 	"Try to get object length from an array path (should return null)"
 	result := stick endpoint jsonObjLen: key path: (SjJsonPath root / 'data').
-	
+
 	"Result should be an array with nil for non-object paths"
-	self assert: result isSequenceable.
-	self assert: result size equals: 1.
-	self assert: result first isNil
+	self assert: result values isSequenceable.
+	self assert: result values size equals: 1.
+	self assert: result value isNil
 ]
 
 { #category : 'tests' }
@@ -377,7 +377,7 @@ RsJsonTest >> testJsonObjLenNonExistentKey [
 	| key result |
 	key := 'test:json:objlen:nonexistent'.
 	result := stick endpoint jsonObjLen: key.
-	self assert: result isNil
+	self assert: result isInvalidKey
 ]
 
 { #category : 'tests' }
@@ -409,7 +409,7 @@ RsJsonTest >> testJsonObjLenEmptyObject [
 	result := stick endpoint jsonObjLen: key.
 	
 	"Result should be 0 for empty object"
-	self assert: result equals: 0
+	self assert: result value equals: 0
 ]
 
 { #category : 'tests' }
@@ -425,9 +425,9 @@ RsJsonTest >> testJsonArrLenBasic [
 	result := stick endpoint jsonArrLen: key path: (SjJsonPath root / 'items').
 	
 	"Result should be array length"
-	self assert: result isSequenceable.
-	self assert: result size equals: 1.
-	self assert: result first equals: 5
+	self assert: result values isSequenceable.
+	self assert: result values size equals: 1.
+	self assert: result value equals: 5
 ]
 
 { #category : 'tests' }
@@ -443,7 +443,7 @@ RsJsonTest >> testJsonArrLenRootPath [
 	result := stick endpoint jsonArrLen: key.
 	
 	"Result should be the array length"
-	self assert: result equals: 3
+	self assert: result value equals: 3
 ]
 
 { #category : 'tests' }
@@ -459,9 +459,9 @@ RsJsonTest >> testJsonArrLenEmptyArray [
 	result := stick endpoint jsonArrLen: key path: (SjJsonPath root / 'data').
 	
 	"Result should be 0 for empty array"
-	self assert: result isSequenceable.
-	self assert: result size equals: 1.
-	self assert: result first equals: 0
+	self assert: result values isSequenceable.
+	self assert: result values size equals: 1.
+	self assert: result value equals: 0
 ]
 
 { #category : 'tests' }
@@ -469,7 +469,7 @@ RsJsonTest >> testJsonArrLenNonExistentKey [
 	| key result |
 	key := 'test:json:arrlen:nonexistent'.
 	result := stick endpoint jsonArrLen: key.
-	self assert: result isNil
+	self assert: result isInvalidKey
 ]
 
 { #category : 'tests' }
@@ -501,9 +501,9 @@ RsJsonTest >> testJsonArrLenNonArrayPath [
 	result := stick endpoint jsonArrLen: key path: (SjJsonPath root / 'data').
 	
 	"Result should contain nil for non-array paths"
-	self assert: result isSequenceable.
-	self assert: result size equals: 1.
-	self assert: result first isNil
+	self assert: result values isSequenceable.
+	self assert: result values size equals: 1.
+	self assert: result value isNil
 ]
 
 { #category : 'tests' }
@@ -1341,7 +1341,7 @@ RsJsonTest >> testJsonStrLenRootPath [
 	
 	"Get string length at root path using simple method"
 	result := stick endpoint jsonStrLen: key.
-	self assert: result equals: 13
+	self assert: result value equals: 13
 ]
 
 { #category : 'tests' }
@@ -1355,11 +1355,11 @@ RsJsonTest >> testJsonStrLenBasic [
 	
 	"Get string length at nested path"
 	result := stick endpoint jsonStrLen: key path: (SjJsonPath root / 'message').
-	self assert: result first equals: 11.
-	
+	self assert: result value equals: 11.
+
 	"Test nested path"
 	result := stick endpoint jsonStrLen: key path: (SjJsonPath root / 'nested' / 'text').
-	self assert: result first equals: 9
+	self assert: result value equals: 9
 ]
 
 { #category : 'tests' }
@@ -1372,7 +1372,7 @@ RsJsonTest >> testJsonStrLenEmptyString [
 	
 	"Test jsonStrLen: for empty string"
 	result := stick endpoint jsonStrLen: key.
-	self assert: result equals: 0
+	self assert: result value equals: 0
 ]
 
 { #category : 'tests' }
@@ -1381,7 +1381,7 @@ RsJsonTest >> testJsonStrLenNonExistentKey [
 	
 	"Test with non-existent key"
 	result := stick endpoint jsonStrLen: 'nonexistent:key'.
-	self assert: result isNil
+	self assert: result isInvalidKey
 ]
 
 { #category : 'tests' }
@@ -1409,7 +1409,7 @@ RsJsonTest >> testJsonStrLenNonStringPath [
 	
 	"Try to get string length from a non-string path (should return null)"
 	result := stick endpoint jsonStrLen: key path: (SjJsonPath root / 'data').
-	self assert: result first isNil
+	self assert: result value isNil
 ]
 
 { #category : 'tests' }
