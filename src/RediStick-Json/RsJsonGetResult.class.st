@@ -70,3 +70,24 @@ RsJsonGetResult >> values [
 	self isInvalidKey ifTrue: [^ nil].
 	^ values
 ]
+
+{ #category : 'printing' }
+RsJsonGetResult >> printOn: aStream [
+	aStream nextPutAll: 'RsJsonGetResult('.
+	self values printOn: aStream.
+	aStream nextPut: $)
+]
+
+{ #category : 'comparing' }
+RsJsonGetResult >> = anObject [
+	self == anObject ifTrue: [ ^ true ].
+	self class = anObject class ifFalse: [ ^ false ].
+	^ key = anObject key
+		and: [ path = anObject path
+		and: [ values = anObject values ] ]
+]
+
+{ #category : 'comparing' }
+RsJsonGetResult >> hash [
+	^ key hash bitXor: (path hash bitXor: values hash)
+]
