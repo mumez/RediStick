@@ -32,6 +32,12 @@ RsRedisEndpoint >> buildGetResultFrom: jsonArrayOrDict key: key paths: paths [
 ]
 
 { #category : '*RediStick-Json' }
+RsRedisEndpoint >> buildGetResultFrom: jsonArrayOrDict key: key path: path [
+	"Helper method for single path results - used by length operations"
+	^ RsJsonGetResult key: key path: path values: jsonArrayOrDict
+]
+
+{ #category : '*RediStick-Json' }
 RsRedisEndpoint >> jsonGet: key path: path [
 	^ self jsonGet: key path: path using: nil
 ]
@@ -116,7 +122,7 @@ RsRedisEndpoint >> jsonObjLen: key path: path [
 		        key } asOrderedCollection.
 	path ifNotNil: [ args add: path asString ].
 	result := self unifiedCommand: args.
-	^ RsJsonGetResult key: key path: path values: result
+	^ self buildGetResultFrom: result key: key path: path
 ]
 
 { #category : '*RediStick-Json' }
@@ -132,7 +138,7 @@ RsRedisEndpoint >> jsonArrLen: key path: path [
 		        key } asOrderedCollection.
 	path ifNotNil: [ args add: path asString ].
 	result := self unifiedCommand: args.
-	^ RsJsonGetResult key: key path: path values: result
+	^ self buildGetResultFrom: result key: key path: path
 ]
 
 { #category : '*RediStick-Json' }
@@ -260,7 +266,7 @@ RsRedisEndpoint >> jsonStrLen: key path: path [
 		        key } asOrderedCollection.
 	path ifNotNil: [ args add: path asString ].
 	result := self unifiedCommand: args.
-	^ RsJsonGetResult key: key path: path values: result
+	^ self buildGetResultFrom: result key: key path: path
 ]
 
 { #category : '*RediStick-Json' }
@@ -434,7 +440,7 @@ RsRedisEndpoint >> jsonMGet: keys path: path [
 	^ keys with: results collect: [:key :result |
 		| parsedResult |
 		parsedResult := self safeParseJson: result.
-		RsJsonGetResult key: key path: path values: parsedResult
+		self buildGetResultFrom: parsedResult key: key path: path
 	]
 ]
 
