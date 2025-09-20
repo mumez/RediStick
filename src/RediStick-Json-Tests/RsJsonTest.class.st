@@ -517,11 +517,11 @@ RsJsonTest >> testJsonArrAppendSingleValue [
 	
 	"Append single value to array"
 	result := stick endpoint jsonArrAppend: key path: (SjJsonPath root / 'items') values: {4}.
-	
+
 	"Result should be the new array length"
-	self assert: result isSequenceable.
-	self assert: result size equals: 1.
-	self assert: result first equals: 4.
+	self assert: result values isSequenceable.
+	self assert: result values size equals: 1.
+	self assert: result value equals: 4.
 	
 	"Verify the array content"
 	result := stick endpoint jsonGet: key path: (SjJsonPath root / 'items').
@@ -539,11 +539,11 @@ RsJsonTest >> testJsonArrAppendMultipleValues [
 	
 	"Append multiple values to array"
 	result := stick endpoint jsonArrAppend: key path: (SjJsonPath root / 'numbers') values: {3. 4. 5}.
-	
+
 	"Result should be the new array length"
-	self assert: result isSequenceable.
-	self assert: result size equals: 1.
-	self assert: result first equals: 5.
+	self assert: result values isSequenceable.
+	self assert: result values size equals: 1.
+	self assert: result value equals: 5.
 	
 	"Verify the array content"
 	result := stick endpoint jsonGet: key path: (SjJsonPath root / 'numbers').
@@ -561,11 +561,11 @@ RsJsonTest >> testJsonArrAppendMixedTypes [
 	
 	"Append different types of values"
 	result := stick endpoint jsonArrAppend: key path: (SjJsonPath root / 'data') values: {'hello'. true. nil. {'nested'->42} asDictionary}.
-	
+
 	"Result should be the new array length"
-	self assert: result isSequenceable.
-	self assert: result size equals: 1.
-	self assert: result first equals: 5.
+	self assert: result values isSequenceable.
+	self assert: result values size equals: 1.
+	self assert: result value equals: 5.
 	
 	"Verify the array content contains mixed types"
 	result := stick endpoint jsonGet: key path: (SjJsonPath root / 'data').
@@ -587,11 +587,11 @@ RsJsonTest >> testJsonArrAppendToEmptyArray [
 	
 	"Append values to empty array"
 	result := stick endpoint jsonArrAppend: key path: (SjJsonPath root / 'items') values: {'first'. 'second'}.
-	
+
 	"Result should be the new array length"
-	self assert: result isSequenceable.
-	self assert: result size equals: 1.
-	self assert: result first equals: 2.
+	self assert: result values isSequenceable.
+	self assert: result values size equals: 1.
+	self assert: result value equals: 2.
 	
 	"Verify the array content"
 	result := stick endpoint jsonGet: key path: (SjJsonPath root / 'items').
@@ -607,7 +607,7 @@ RsJsonTest >> testJsonArrAppendToNonExistentArray [
 	result := stick endpoint jsonArrAppend: key path: (SjJsonPath root) values: {1. 2. 3}.
 	
 	"Should get null since the key doesn't exist"
-	self assert: result isNil
+	self assert: result isInvalidKey
 ]
 
 { #category : 'tests' }
@@ -623,8 +623,8 @@ RsJsonTest >> testJsonArrAppendToNonArray [
 	result := stick endpoint jsonArrAppend: key path: (SjJsonPath root / 'data') values: {1. 2}.
 	
 	"Should get array with null since target is not an array"
-	self assert: result isSequenceable.
-	self assert: result first isNil
+	self assert: result values isSequenceable.
+	self assert: result value isNil
 ]
 
 { #category : 'tests' }
@@ -640,17 +640,17 @@ RsJsonTest >> testJsonArrIndexBasicSearch [
 	result := stick endpoint jsonArrIndex: key path: (SjJsonPath root / 'items') value: 2.
 	
 	"Result should be index of first occurrence"
-	self assert: result isSequenceable.
-	self assert: result size equals: 1.
-	self assert: result first equals: 1.
-	
+	self assert: result values isSequenceable.
+	self assert: result values size equals: 1.
+	self assert: result value equals: 1.
+
 	"Search for value at beginning"
 	result := stick endpoint jsonArrIndex: key path: (SjJsonPath root / 'items') value: 1.
-	self assert: result first equals: 0.
-	
+	self assert: result value equals: 0.
+
 	"Search for value at end"
 	result := stick endpoint jsonArrIndex: key path: (SjJsonPath root / 'items') value: 4.
-	self assert: result first equals: 4
+	self assert: result value equals: 4
 ]
 
 { #category : 'tests' }
@@ -666,9 +666,9 @@ RsJsonTest >> testJsonArrIndexNotFound [
 	result := stick endpoint jsonArrIndex: key path: (SjJsonPath root / 'numbers') value: 5.
 	
 	"Should return -1 for not found"
-	self assert: result isSequenceable.
-	self assert: result size equals: 1.
-	self assert: result first equals: -1
+	self assert: result values isSequenceable.
+	self assert: result values size equals: 1.
+	self assert: result value equals: -1
 ]
 
 { #category : 'tests' }
@@ -684,13 +684,13 @@ RsJsonTest >> testJsonArrIndexWithStartParameter [
 	result := stick endpoint jsonArrIndex: key path: (SjJsonPath root / 'items') value: 2 start: 2.
 	
 	"Result should be index of second occurrence"
-	self assert: result isSequenceable.
-	self assert: result size equals: 1.
-	self assert: result first equals: 3.
+	self assert: result values isSequenceable.
+	self assert: result values size equals: 1.
+	self assert: result value equals: 3.
 	
 	"Search for value 1 starting from index 1 (should not find)"
 	result := stick endpoint jsonArrIndex: key path: (SjJsonPath root / 'items') value: 1 start: 1.
-	self assert: result first equals: -1
+	self assert: result value equals: -1
 ]
 
 { #category : 'tests' }
@@ -706,9 +706,9 @@ RsJsonTest >> testJsonArrIndexWithStartStopParameters [
 	result := stick endpoint jsonArrIndex: key path: (SjJsonPath root / 'data') value: 2 start: 2 stop: 4.
 	
 	"Result should be index 3"
-	self assert: result isSequenceable.
-	self assert: result size equals: 1.
-	self assert: result first equals: 3.
+	self assert: result values isSequenceable.
+	self assert: result values size equals: 1.
+	self assert: result value equals: 3.
 	
 	"Search for value 2 in range [4, 6] (should find occurrence at index 5)"
 	result := stick endpoint jsonArrIndex: key path: (SjJsonPath root / 'data') value: 2 start: 4 stop: 6.
@@ -716,7 +716,7 @@ RsJsonTest >> testJsonArrIndexWithStartStopParameters [
 	
 	"Search for value 1 in range [2, 4] (should not find)"
 	result := stick endpoint jsonArrIndex: key path: (SjJsonPath root / 'data') value: 1 start: 2 stop: 4.
-	self assert: result first equals: -1
+	self assert: result value equals: -1
 ]
 
 { #category : 'tests' }
@@ -732,9 +732,9 @@ RsJsonTest >> testJsonArrIndexWithUsingBlock [
 	result := stick endpoint jsonArrIndex: key path: (SjJsonPath root / 'items') value: 2 using: [:opts | opts start: 2].
 	
 	"Result should be second occurrence at index 3"
-	self assert: result isSequenceable.
-	self assert: result size equals: 1.
-	self assert: result first equals: 3.
+	self assert: result values isSequenceable.
+	self assert: result values size equals: 1.
+	self assert: result value equals: 3.
 	
 	"Search using options block with start and stop parameters"
 	result := stick endpoint jsonArrIndex: key path: (SjJsonPath root / 'items') value: 2 using: [:opts | opts start: 0; stop: 2].
@@ -750,17 +750,17 @@ RsJsonTest >> testJsonArrIndexEdgeCases [
 	
 	"Test with non-existent key"
 	result := stick endpoint jsonArrIndex: key path: SjJsonPath root value: 1.
-	self assert: result isNil.
+	self assert: result isInvalidKey.
 	
 	"Test with non-array value"
 	value := {'data'->'not an array'} asDictionary.
 	stick endpoint jsonSet: key path: SjJsonPath root value: value.
 	
 	result := stick endpoint jsonArrIndex: key path: (SjJsonPath root / 'data') value: 1.
-	
+
 	"Should get array with null for non-array paths"
-	self assert: result isSequenceable.
-	self assert: result first isNil.
+	self assert: result values isSequenceable.
+	self assert: result value isNil.
 	
 	"Test with empty array"
 	value := {'empty'->{}} asDictionary.
@@ -769,7 +769,7 @@ RsJsonTest >> testJsonArrIndexEdgeCases [
 	result := stick endpoint jsonArrIndex: key path: (SjJsonPath root / 'empty') value: 1.
 	
 	"Should return -1 for empty array"
-	self assert: result first equals: -1
+	self assert: result value equals: -1
 ]
 
 { #category : 'tests' }
@@ -785,8 +785,8 @@ RsJsonTest >> testJsonArrIndexStringValues [
 	result := stick endpoint jsonArrIndex: key path: (SjJsonPath root / 'words') value: 'hello'.
 	
 	"Result should be first occurrence"
-	self assert: result isSequenceable.
-	self assert: result size equals: 1.
+	self assert: result values isSequenceable.
+	self assert: result values size equals: 1.
 	self assert: result first equals: 0.
 	
 	"Search for second occurrence using start parameter"
@@ -805,11 +805,11 @@ RsJsonTest >> testJsonArrInsertSingleValue [
 	
 	"Insert single value at index 2"
 	result := stick endpoint jsonArrInsert: key path: (SjJsonPath root / 'items') index: 2 value: 3.
-	
+
 	"Result should be the new array length"
-	self assert: result isSequenceable.
-	self assert: result size equals: 1.
-	self assert: result first equals: 5.
+	self assert: result values isSequenceable.
+	self assert: result values size equals: 1.
+	self assert: result value equals: 5.
 	
 	"Verify the array content"
 	result := stick endpoint jsonGet: key path: (SjJsonPath root / 'items').
@@ -827,11 +827,11 @@ RsJsonTest >> testJsonArrInsertMultipleValues [
 	
 	"Insert multiple values at index 1"
 	result := stick endpoint jsonArrInsert: key path: (SjJsonPath root / 'numbers') index: 1 values: {2. 3. 4}.
-	
+
 	"Result should be the new array length"
-	self assert: result isSequenceable.
-	self assert: result size equals: 1.
-	self assert: result first equals: 5.
+	self assert: result values isSequenceable.
+	self assert: result values size equals: 1.
+	self assert: result value equals: 5.
 	
 	"Verify the array content"
 	result := stick endpoint jsonGet: key path: (SjJsonPath root / 'numbers').
@@ -851,8 +851,8 @@ RsJsonTest >> testJsonArrInsertAtBeginning [
 	result := stick endpoint jsonArrInsert: key path: (SjJsonPath root / 'data') index: 0 value: 1.
 	
 	"Result should be the new array length"
-	self assert: result isSequenceable.
-	self assert: result size equals: 1.
+	self assert: result values isSequenceable.
+	self assert: result values size equals: 1.
 	self assert: result first equals: 4.
 	
 	"Verify the array content"
@@ -873,8 +873,8 @@ RsJsonTest >> testJsonArrInsertAtEnd [
 	result := stick endpoint jsonArrInsert: key path: (SjJsonPath root / 'items') index: 3 value: 4.
 	
 	"Result should be the new array length"
-	self assert: result isSequenceable.
-	self assert: result size equals: 1.
+	self assert: result values isSequenceable.
+	self assert: result values size equals: 1.
 	self assert: result first equals: 4.
 	
 	"Verify the array content"
@@ -895,9 +895,9 @@ RsJsonTest >> testJsonArrInsertMixedTypes [
 	result := stick endpoint jsonArrInsert: key path: (SjJsonPath root / 'data') index: 1 values: {'hello'. true. nil. {'nested'->42} asDictionary}.
 	
 	"Result should be the new array length"
-	self assert: result isSequenceable.
-	self assert: result size equals: 1.
-	self assert: result first equals: 6.
+	self assert: result values isSequenceable.
+	self assert: result values size equals: 1.
+	self assert: result value equals: 6.
 	
 	"Verify the array content contains mixed types"
 	result := stick endpoint jsonGet: key path: (SjJsonPath root / 'data').
@@ -922,9 +922,9 @@ RsJsonTest >> testJsonArrInsertNegativeIndex [
 	result := stick endpoint jsonArrInsert: key path: (SjJsonPath root / 'items') index: -1 value: 99.
 	
 	"Result should be the new array length"
-	self assert: result isSequenceable.
-	self assert: result size equals: 1.
-	self assert: result first equals: 6.
+	self assert: result values isSequenceable.
+	self assert: result values size equals: 1.
+	self assert: result value equals: 6.
 	
 	"Verify the array content (99 should be inserted before last element)"
 	result := stick endpoint jsonGet: key path: (SjJsonPath root / 'items').
@@ -938,26 +938,26 @@ RsJsonTest >> testJsonArrInsertEdgeCases [
 	
 	"Test with non-existent key"
 	result := stick endpoint jsonArrInsert: key path: SjJsonPath root index: 0 value: 1.
-	self assert: result isNil.
-	
+	self assert: result isInvalidKey.
+
 	"Test with non-array value"
 	value := {'data'->'not an array'} asDictionary.
 	stick endpoint jsonSet: key path: SjJsonPath root value: value.
-	
+
 	result := stick endpoint jsonArrInsert: key path: (SjJsonPath root / 'data') index: 0 value: 1.
-	
+
 	"Should get array with null for non-array paths"
-	self assert: result isSequenceable.
-	self assert: result first isNil.
-	
+	self assert: result values isSequenceable.
+	self assert: result value isNil.
+
 	"Test with empty array"
 	value := {'empty'->{}} asDictionary.
 	stick endpoint jsonSet: key path: SjJsonPath root value: value.
-	
+
 	result := stick endpoint jsonArrInsert: key path: (SjJsonPath root / 'empty') index: 0 value: 'first'.
-	
+
 	"Should successfully insert into empty array"
-	self assert: result first equals: 1.
+	self assert: result value equals: 1.
 	
 	"Verify content"
 	result := stick endpoint jsonGet: key path: (SjJsonPath root / 'empty').
@@ -977,7 +977,7 @@ RsJsonTest >> testJsonArrInsertInvalidIndex [
 	result := stick endpoint jsonArrInsert: key path: (SjJsonPath root / 'items') index: 10 value: 99.
 	
 	"Redis should return nil for invalid index"
-	self assert: result isNil
+	self assert: result value isNil
 ]
 
 { #category : 'tests' }
@@ -1208,7 +1208,7 @@ RsJsonTest >> testJsonArrTrimBasic [
 	
 	"Trim array to keep elements from index 2 to 5"
 	result := stick endpoint jsonArrTrim: key path: (SjJsonPath root / 'items') start: 2 stop: 5.
-	self assert: result first equals: 4.
+	self assert: result value equals: 4.
 	
 	"Verify the array after trim"
 	afterTrim := stick endpoint jsonGet: key path: (SjJsonPath root / 'items').
@@ -1227,7 +1227,7 @@ RsJsonTest >> testJsonArrTrimNegativeIndices [
 	
 	"Trim using negative indices (-4 to -2)"
 	result := stick endpoint jsonArrTrim: key path: (SjJsonPath root / 'data') start: -4 stop: -2.
-	self assert: result first equals: 3.
+	self assert: result value equals: 3.
 	
 	"Verify the array after trim"
 	afterTrim := stick endpoint jsonGet: key path: (SjJsonPath root / 'data').
@@ -1246,7 +1246,7 @@ RsJsonTest >> testJsonArrTrimOutOfRange [
 	
 	"Trim with stop index beyond array length"
 	result := stick endpoint jsonArrTrim: key path: (SjJsonPath root / 'numbers') start: 2 stop: 10.
-	self assert: result first equals: 3.
+	self assert: result value equals: 3.
 	
 	"Verify the array after trim (should keep elements from index 2 to end)"
 	afterTrim := stick endpoint jsonGet: key path: (SjJsonPath root / 'numbers').

@@ -227,6 +227,31 @@ results := suite run.
 'Passed: ', results passedCount asString, ', Failed: ', results failureCount asString
 ```
 
+### Best Practices for Code Modification
+
+**Use smalltalk-interop MCP for Precise Analysis**
+```smalltalk
+# Get exact method source before modification
+mcp__smalltalk-interop__get_method_source: 'ClassName' method_name: 'methodName'
+
+# Verify class structure and method list
+mcp__smalltalk-interop__list_methods: 'PackageName'
+
+# Always reimport after Tonel file changes
+mcp__smalltalk-interop__import_package: 'PackageName' path: '/absolute/path/to/src'
+```
+
+**Avoid Broad Pattern Replacements**
+- ❌ **Wrong**: Use grep with broad patterns like `result first` → `result value` across entire files
+- ✅ **Right**: Use smalltalk-interop to get specific method sources, then make targeted edits
+- **Lesson Learned**: Global replacements can affect unrelated methods outside project scope
+
+**Scope-Aware Test Modifications**
+- Always verify which methods are within the current specification scope
+- Only modify tests for methods that are explicitly being changed
+- Use `mcp__smalltalk-interop__get_method_source` to inspect individual test methods
+- Revert changes to out-of-scope methods immediately when detected
+
 ### Common Pitfalls
 - **Eval Syntax**: Always declare variables: `| var |`
 - **Error Expectations**: Redis often returns `nil` or `[nil]` instead of throwing errors
@@ -234,6 +259,7 @@ results := suite run.
 - **Test Database**: Always use `RsRedisTestCase dbIndex` to avoid conflicts
 - **Array Assertions**: Use `assertCollection:equals:` for better error messages
 - **Package Reimport**: Always reimport packages after file modifications
+- **Broad Replacements**: Never use global find/replace without understanding full method scope
 
 ### Key Classes to Understand
 - `RsRedisEndpoint`: Main Redis command interface with JSON extensions
