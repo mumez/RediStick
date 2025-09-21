@@ -1423,19 +1423,19 @@ RsJsonTest >> testJsonNumIncrByBasic [
 	
 	"Increment integer value"
 	result := stick endpoint jsonNumIncrBy: key path: (SjJsonPath root / 'counter') increment: 5.
-	self assert: result first equals: 15.
-	
+	self assert: result value equals: 15.
+
 	"Verify the increment worked"
 	result := stick endpoint jsonGet: key path: (SjJsonPath root / 'counter').
-	self assert: result first equals: 15.
-	
+	self assert: result value equals: 15.
+
 	"Increment floating point value"
 	result := stick endpoint jsonNumIncrBy: key path: (SjJsonPath root / 'temperature') increment: 2.5.
-	self assert: result first equals: 28.0.
-	
+	self assert: result value equals: 28.0.
+
 	"Verify the float increment worked"
 	result := stick endpoint jsonGet: key path: (SjJsonPath root / 'temperature').
-	self assert: result first equals: 28.0
+	self assert: result value equals: 28.0
 ]
 
 { #category : 'tests' }
@@ -1463,7 +1463,7 @@ RsJsonTest >> testJsonNumIncrByNonExistentKey [
 	
 	"Try to increment value in non-existent key"
 	result := stick endpoint jsonNumIncrBy: key path: SjJsonPath root increment: 10.
-	self assert: result isNil
+	self assert: result isInvalidKey
 ]
 
 { #category : 'tests' }
@@ -1571,7 +1571,7 @@ RsJsonTest >> testJsonNumMultByNonExistentKey [
 	
 	"Try to multiply value in non-existent key"
 	result := stick endpoint jsonNumMultBy: key path: SjJsonPath root multiplier: 2.
-	self assert: result isNil
+	self assert: result isInvalidKey
 ]
 
 { #category : 'tests' }

@@ -299,7 +299,7 @@ RsRedisEndpoint >> jsonNumIncrBy: key path: path increment: increment [
 		        path asString.
 		        increment } asOrderedCollection.
 	result := self unifiedCommand: args.
-	^ result ifNotNil: [ self safeParseJson: result ]
+	^ self buildGetResultFrom: (self safeParseJson: result) key: key path: path
 ]
 
 { #category : '*RediStick-Json' }
@@ -311,7 +311,7 @@ RsRedisEndpoint >> jsonNumMultBy: key path: path multiplier: multiplier [
 		        path asString.
 		        multiplier } asOrderedCollection.
 	result := self unifiedCommand: args.
-	^ result ifNotNil: [ self safeParseJson: result ]
+	^ self buildGetResultFrom: (self safeParseJson: result) key: key path: path
 ]
 
 { #category : '*RediStick-Json' }
