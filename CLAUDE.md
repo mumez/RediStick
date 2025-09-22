@@ -116,14 +116,14 @@ Available Metacello groups:
 
 ### Implementation Details
 - **Automatic conversion**: Smalltalk objects (dictionaries, arrays, numbers, booleans, nil) automatically converted to JSON
-- **Result wrapping**: JSON.GET/MGET operations return `RsJsonGetResult` wrapper objects with metadata and state checking
+- **Result wrapping**: JSON.GET/MGET operations return `RsJsonResult` wrapper objects with metadata and state checking
 - **Smart result handling**: Parsed JSON objects by default, raw strings with formatting options
 - **Option classes**: `RsJsonSetOptions`, `RsJsonGetOptions`, `RsJsonArrOptions` for operation parameters
 - **Safe parsing**: `safeParseJson:` helper method for robust JSON handling
 - **SJsonPath integration**: Full JSON path support for all operations
 - **RFC7396 compliance**: JSON Merge Patch standard for efficient document updates
 
-**RsJsonGetResult Wrapper Features:**
+**RsJsonResult Wrapper Features:**
 - **Metadata access**: `key`, `path` methods return query metadata
 - **State checking**: `isInvalidKey`, `hasValue`, `isEmpty` methods for clear result state
 - **Backward compatibility**: `value`/`first`, `values` accessors maintain existing API
@@ -141,11 +141,11 @@ Available Metacello groups:
 - Mixed existing/non-existing key handling in batch operations
 
 ### Implementation Progress
-- **Overall Completion**: 100% (29/29 tasks completed + RsJsonGetResult wrapper refactoring)
+- **Overall Completion**: 100% (29/29 tasks completed + RsJsonResult wrapper refactoring)
 - **Implemented Commands**: 75+ JSON methods across all major operation categories
 - **Current Phase**: Complete - all Redis JSON API commands implemented with result wrapper enhancement
 - **Latest Enhancement**: JSON.GET/MGET Result Wrapper Refactoring (September 2025)
-  - Enhanced result handling with `RsJsonGetResult` wrapper objects
+  - Enhanced result handling with `RsJsonResult` wrapper objects
   - Clear state checking: `isInvalidKey`, `hasValue`, `isEmpty` methods
   - Maintained full backward compatibility through accessor methods
   - 128/128 tests passing with comprehensive wrapper integration

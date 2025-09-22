@@ -49,9 +49,9 @@ result := stick endpoint jsonGet: 'user:123' path: SjJsonPath root.
 result value. "Returns the parsed dictionary"
 ```
 
-#### Understanding RsJsonGetResult
+#### Understanding RsJsonResult
 
-Most JSON query operations (GET, length operations) return `RsJsonGetResult` wrapper objects that provide consistent access to results and metadata:
+Most JSON query operations (GET, length operations) return `RsJsonResult` wrapper objects that provide consistent access to results and metadata:
 
 ```smalltalk
 "Get JSON data"
@@ -129,7 +129,7 @@ formatted := stick endpoint jsonGet: 'profile:456' path: SjJsonPath root using: 
 ### Type and Structure Operations
 
 ```smalltalk
-"Get JSON value type - returns RsJsonGetResult wrapper"
+"Get JSON value type - returns RsJsonResult wrapper"
 result := stick endpoint jsonType: 'user:123' path: (SjJsonPath root / 'age').
 result value. "Returns 'integer'"
 ```
@@ -137,7 +137,7 @@ result value. "Returns 'integer'"
 ### String Operations
 
 ```smalltalk
-"Get string length - returns RsJsonGetResult wrapper"
+"Get string length - returns RsJsonResult wrapper"
 result := stick endpoint jsonStrLen: 'user:123' path: (SjJsonPath root / 'name').
 length := result value.  "Get the length value"
 
@@ -148,11 +148,11 @@ stick endpoint jsonStrAppend: 'user:123' path: (SjJsonPath root / 'name') value:
 ### Numeric Operations
 
 ```smalltalk
-"Increment numeric values - returns RsJsonGetResult wrapper"
+"Increment numeric values - returns RsJsonResult wrapper"
 result := stick endpoint jsonNumIncrBy: 'user:123' path: (SjJsonPath root / 'age') increment: 1.
 newAge := result value.  "Get the new value"
 
-"Multiply numeric values - returns RsJsonGetResult wrapper"
+"Multiply numeric values - returns RsJsonResult wrapper"
 result := stick endpoint jsonNumMultBy: 'user:123' path: (SjJsonPath root / 'age') multiplier: 2.
 doubled := result value.  "Get the multiplied value"
 ```
@@ -164,7 +164,7 @@ doubled := result value.  "Get the multiplied value"
 data := {'items'->{1. 2. 3}. 'tags'->{'red'. 'blue'}} asDictionary.
 stick endpoint jsonSet: 'data:789' path: SjJsonPath root value: data.
 
-"Get array length - returns RsJsonGetResult wrapper"
+"Get array length - returns RsJsonResult wrapper"
 result := stick endpoint jsonArrLen: 'data:789' path: (SjJsonPath root / 'items').
 length := result value.  "Get the array length"
 
@@ -174,11 +174,11 @@ stick endpoint jsonArrAppend: 'data:789' path: (SjJsonPath root / 'items') value
 "Insert at specific index"
 stick endpoint jsonArrInsert: 'data:789' path: (SjJsonPath root / 'items') index: 1 values: {10}.
 
-"Find value index in array - returns RsJsonGetResult wrapper"
+"Find value index in array - returns RsJsonResult wrapper"
 result := stick endpoint jsonArrIndex: 'data:789' path: (SjJsonPath root / 'items') value: 3.
 index := result value.  "Get the index (-1 if not found)"
 
-"Pop element from array - returns RsJsonGetResult wrapper"
+"Pop element from array - returns RsJsonResult wrapper"
 result := stick endpoint jsonArrPop: 'data:789' path: (SjJsonPath root / 'items').
 popped := result value.  "Get the popped element"
 
@@ -189,11 +189,11 @@ stick endpoint jsonArrTrim: 'data:789' path: (SjJsonPath root / 'items') start: 
 ### Object Operations
 
 ```smalltalk
-"Get object keys - returns RsJsonGetResult wrapper"
+"Get object keys - returns RsJsonResult wrapper"
 result := stick endpoint jsonObjKeys: 'user:123' path: SjJsonPath root.
 keys := result value.  "Get the array of keys"
 
-"Get number of object fields - returns RsJsonGetResult wrapper"
+"Get number of object fields - returns RsJsonResult wrapper"
 result := stick endpoint jsonObjLen: 'user:123' path: SjJsonPath root.
 fieldCount := result value.  "Get the field count"
 ```
@@ -201,7 +201,7 @@ fieldCount := result value.  "Get the field count"
 ### Boolean Operations
 
 ```smalltalk
-"Toggle boolean values - returns RsJsonGetResult wrapper"
+"Toggle boolean values - returns RsJsonResult wrapper"
 result := stick endpoint jsonToggle: 'profile:456' path: (SjJsonPath root / 'user' / 'profile' / 'active').
 result value. "Returns true/false"
 
@@ -265,9 +265,9 @@ results collect: [:result | result value]. "Returns array of names"
 
 ## Result Handling
 
-### RsJsonGetResult Wrapper
+### RsJsonResult Wrapper
 
-All JSON GET operations return `RsJsonGetResult` wrapper objects that provide metadata and state checking:
+All JSON GET operations return `RsJsonResult` wrapper objects that provide metadata and state checking:
 
 ```smalltalk
 result := stick endpoint jsonGet: 'some:key' path: SjJsonPath root.
