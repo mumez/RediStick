@@ -116,14 +116,14 @@ Available Metacello groups:
 
 ### Implementation Details
 - **Automatic conversion**: Smalltalk objects (dictionaries, arrays, numbers, booleans, nil) automatically converted to JSON
-- **Result wrapping**: JSON.GET/MGET operations return `RsJsonGetResult` wrapper objects with metadata and state checking
+- **Result wrapping**: JSON.GET/MGET operations return `RsJsonResult` wrapper objects with metadata and state checking
 - **Smart result handling**: Parsed JSON objects by default, raw strings with formatting options
 - **Option classes**: `RsJsonSetOptions`, `RsJsonGetOptions`, `RsJsonArrOptions` for operation parameters
 - **Safe parsing**: `safeParseJson:` helper method for robust JSON handling
 - **SJsonPath integration**: Full JSON path support for all operations
 - **RFC7396 compliance**: JSON Merge Patch standard for efficient document updates
 
-**RsJsonGetResult Wrapper Features:**
+**RsJsonResult Wrapper Features:**
 - **Metadata access**: `key`, `path` methods return query metadata
 - **State checking**: `isInvalidKey`, `hasValue`, `isEmpty` methods for clear result state
 - **Backward compatibility**: `value`/`first`, `values` accessors maintain existing API
@@ -141,11 +141,11 @@ Available Metacello groups:
 - Mixed existing/non-existing key handling in batch operations
 
 ### Implementation Progress
-- **Overall Completion**: 100% (29/29 tasks completed + RsJsonGetResult wrapper refactoring)
+- **Overall Completion**: 100% (29/29 tasks completed + RsJsonResult wrapper refactoring)
 - **Implemented Commands**: 75+ JSON methods across all major operation categories
 - **Current Phase**: Complete - all Redis JSON API commands implemented with result wrapper enhancement
 - **Latest Enhancement**: JSON.GET/MGET Result Wrapper Refactoring (September 2025)
-  - Enhanced result handling with `RsJsonGetResult` wrapper objects
+  - Enhanced result handling with `RsJsonResult` wrapper objects
   - Clear state checking: `isInvalidKey`, `hasValue`, `isEmpty` methods
   - Maintained full backward compatibility through accessor methods
   - 128/128 tests passing with comprehensive wrapper integration
@@ -227,6 +227,31 @@ results := suite run.
 'Passed: ', results passedCount asString, ', Failed: ', results failureCount asString
 ```
 
+### Best Practices for Code Modification
+
+**Use smalltalk-interop MCP for Precise Analysis**
+```smalltalk
+# Get exact method source before modification
+mcp__smalltalk-interop__get_method_source: 'ClassName' method_name: 'methodName'
+
+# Verify class structure and method list
+mcp__smalltalk-interop__list_methods: 'PackageName'
+
+# Always reimport after Tonel file changes
+mcp__smalltalk-interop__import_package: 'PackageName' path: '/absolute/path/to/src'
+```
+
+**Avoid Broad Pattern Replacements**
+- ❌ **Wrong**: Use grep with broad patterns like `result first` → `result value` across entire files
+- ✅ **Right**: Use smalltalk-interop to get specific method sources, then make targeted edits
+- **Lesson Learned**: Global replacements can affect unrelated methods outside project scope
+
+**Scope-Aware Test Modifications**
+- Always verify which methods are within the current specification scope
+- Only modify tests for methods that are explicitly being changed
+- Use `mcp__smalltalk-interop__get_method_source` to inspect individual test methods
+- Revert changes to out-of-scope methods immediately when detected
+
 ### Common Pitfalls
 - **Eval Syntax**: Always declare variables: `| var |`
 - **Error Expectations**: Redis often returns `nil` or `[nil]` instead of throwing errors
@@ -234,6 +259,7 @@ results := suite run.
 - **Test Database**: Always use `RsRedisTestCase dbIndex` to avoid conflicts
 - **Array Assertions**: Use `assertCollection:equals:` for better error messages
 - **Package Reimport**: Always reimport packages after file modifications
+- **Broad Replacements**: Never use global find/replace without understanding full method scope
 
 ### Key Classes to Understand
 - `RsRedisEndpoint`: Main Redis command interface with JSON extensions

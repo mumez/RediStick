@@ -49,6 +49,28 @@ result := stick endpoint jsonGet: 'user:123' path: SjJsonPath root.
 result value. "Returns the parsed dictionary"
 ```
 
+#### Understanding RsJsonResult
+
+Most JSON query operations (GET, length operations) return `RsJsonResult` wrapper objects that provide consistent access to results and metadata:
+
+```smalltalk
+"Get JSON data"
+result := stick endpoint jsonGet: 'user:123' path: SjJsonPath root.
+
+"Access the actual value"
+user := result value.      "Returns the first/single result"
+data := result values.     "Returns all results as array"
+
+"Check result state"
+result isInvalidKey.       "true if key doesn't exist"
+result hasValue.           "true if key exists (regardless of content)"
+result isEmpty.            "true if key exists but no values returned"
+
+"Access metadata"
+result key.                "Returns the Redis key that was queried"
+result path.               "Returns the JSON path that was used"
+```
+
 #### Working with JSON Paths
 
 ```smalltalk
@@ -107,16 +129,17 @@ formatted := stick endpoint jsonGet: 'profile:456' path: SjJsonPath root using: 
 ### Type and Structure Operations
 
 ```smalltalk
-"Get JSON value type"
-type := stick endpoint jsonType: 'user:123' path: (SjJsonPath root / 'age').
-type. "Returns 'integer'"
+"Get JSON value type - returns RsJsonResult wrapper"
+result := stick endpoint jsonType: 'user:123' path: (SjJsonPath root / 'age').
+result value. "Returns 'integer'"
 ```
 
 ### String Operations
 
 ```smalltalk
-"Get string length"
-length := stick endpoint jsonStrLen: 'user:123' path: (SjJsonPath root / 'name').
+"Get string length - returns RsJsonResult wrapper"
+result := stick endpoint jsonStrLen: 'user:123' path: (SjJsonPath root / 'name').
+length := result value.  "Get the length value"
 
 "Append to string"
 stick endpoint jsonStrAppend: 'user:123' path: (SjJsonPath root / 'name') value: ' Doe'.
@@ -125,11 +148,13 @@ stick endpoint jsonStrAppend: 'user:123' path: (SjJsonPath root / 'name') value:
 ### Numeric Operations
 
 ```smalltalk
-"Increment numeric values"
-newAge := stick endpoint jsonNumIncrBy: 'user:123' path: (SjJsonPath root / 'age') increment: 1.
+"Increment numeric values - returns RsJsonResult wrapper"
+result := stick endpoint jsonNumIncrBy: 'user:123' path: (SjJsonPath root / 'age') increment: 1.
+newAge := result value.  "Get the new value"
 
-"Multiply numeric values"
-doubled := stick endpoint jsonNumMultBy: 'user:123' path: (SjJsonPath root / 'age') multiplier: 2.
+"Multiply numeric values - returns RsJsonResult wrapper"
+result := stick endpoint jsonNumMultBy: 'user:123' path: (SjJsonPath root / 'age') multiplier: 2.
+doubled := result value.  "Get the multiplied value"
 ```
 
 ### Array Operations
@@ -139,8 +164,9 @@ doubled := stick endpoint jsonNumMultBy: 'user:123' path: (SjJsonPath root / 'ag
 data := {'items'->{1. 2. 3}. 'tags'->{'red'. 'blue'}} asDictionary.
 stick endpoint jsonSet: 'data:789' path: SjJsonPath root value: data.
 
-"Get array length"
-length := stick endpoint jsonArrLen: 'data:789' path: (SjJsonPath root / 'items').
+"Get array length - returns RsJsonResult wrapper"
+result := stick endpoint jsonArrLen: 'data:789' path: (SjJsonPath root / 'items').
+length := result value.  "Get the array length"
 
 "Append to array"
 stick endpoint jsonArrAppend: 'data:789' path: (SjJsonPath root / 'items') values: {4. 5}.
@@ -148,11 +174,13 @@ stick endpoint jsonArrAppend: 'data:789' path: (SjJsonPath root / 'items') value
 "Insert at specific index"
 stick endpoint jsonArrInsert: 'data:789' path: (SjJsonPath root / 'items') index: 1 values: {10}.
 
-"Find value index in array"
-index := stick endpoint jsonArrIndex: 'data:789' path: (SjJsonPath root / 'items') value: 3.
+"Find value index in array - returns RsJsonResult wrapper"
+result := stick endpoint jsonArrIndex: 'data:789' path: (SjJsonPath root / 'items') value: 3.
+index := result value.  "Get the index (-1 if not found)"
 
-"Pop element from array"
-popped := stick endpoint jsonArrPop: 'data:789' path: (SjJsonPath root / 'items').
+"Pop element from array - returns RsJsonResult wrapper"
+result := stick endpoint jsonArrPop: 'data:789' path: (SjJsonPath root / 'items').
+popped := result value.  "Get the popped element"
 
 "Trim array to specific range"
 stick endpoint jsonArrTrim: 'data:789' path: (SjJsonPath root / 'items') start: 0 stop: 2.
@@ -161,24 +189,26 @@ stick endpoint jsonArrTrim: 'data:789' path: (SjJsonPath root / 'items') start: 
 ### Object Operations
 
 ```smalltalk
-"Get object keys"
-keys := stick endpoint jsonObjKeys: 'user:123' path: SjJsonPath root.
+"Get object keys - returns RsJsonResult wrapper"
+result := stick endpoint jsonObjKeys: 'user:123' path: SjJsonPath root.
+keys := result value.  "Get the array of keys"
 
-"Get number of object fields"
-fieldCount := stick endpoint jsonObjLen: 'user:123' path: SjJsonPath root.
+"Get number of object fields - returns RsJsonResult wrapper"
+result := stick endpoint jsonObjLen: 'user:123' path: SjJsonPath root.
+fieldCount := result value.  "Get the field count"
 ```
 
 ### Boolean Operations
 
 ```smalltalk
-"Toggle boolean values"
+"Toggle boolean values - returns RsJsonResult wrapper"
 result := stick endpoint jsonToggle: 'profile:456' path: (SjJsonPath root / 'user' / 'profile' / 'active').
-result first. "Returns true/false"
+result value. "Returns true/false"
 
 "Toggle at root path"
 stick endpoint jsonSet: 'flag:test' path: SjJsonPath root value: false.
-toggled := stick endpoint jsonToggle: 'flag:test'.
-toggled first. "Returns true"
+result := stick endpoint jsonToggle: 'flag:test'.
+result value. "Returns true"
 ```
 
 ### JSON Merge Operations
@@ -235,9 +265,9 @@ results collect: [:result | result value]. "Returns array of names"
 
 ## Result Handling
 
-### RsJsonGetResult Wrapper
+### RsJsonResult Wrapper
 
-All JSON GET operations return `RsJsonGetResult` wrapper objects that provide metadata and state checking:
+All JSON GET operations return `RsJsonResult` wrapper objects that provide metadata and state checking:
 
 ```smalltalk
 result := stick endpoint jsonGet: 'some:key' path: SjJsonPath root.
