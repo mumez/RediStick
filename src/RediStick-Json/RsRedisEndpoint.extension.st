@@ -96,17 +96,18 @@ RsRedisEndpoint >> jsonSet: key path: path value: value using: optionsBlock [
 
 { #category : '*RediStick-Json' }
 RsRedisEndpoint >> jsonObjKeys: key [
-	^ self jsonObjKeys: key path: nil
+	^ self jsonObjKeys: key path: SjJsonPath root
 ]
 
 { #category : '*RediStick-Json' }
 RsRedisEndpoint >> jsonObjKeys: key path: path [
-	| args |
+	| args result |
 	args := {
 		        'JSON.OBJKEYS'.
 		        key } asOrderedCollection.
 	path ifNotNil: [ args add: path asString ].
-	^ self unifiedCommand: args.
+	result := self unifiedCommand: args.
+	^ self buildGetResultFrom: result key: key path: path
 ]
 
 { #category : '*RediStick-Json' }
@@ -331,7 +332,7 @@ RsRedisEndpoint >> jsonDel: key path: path [
 
 { #category : '*RediStick-Json' }
 RsRedisEndpoint >> jsonType: key [
-	^ self jsonType: key path: nil
+	^ self jsonType: key path: SjJsonPath root
 ]
 
 { #category : '*RediStick-Json' }
@@ -342,7 +343,7 @@ RsRedisEndpoint >> jsonType: key path: path [
 		        key } asOrderedCollection.
 	path ifNotNil: [ args add: path asString ].
 	result := self unifiedCommand: args.
-	^ path ifNil: [ result ] ifNotNil: [ result asArray ]
+	^ self buildGetResultFrom: result key: key path: path
 ]
 
 { #category : '*RediStick-Json' }
@@ -388,11 +389,12 @@ RsRedisEndpoint >> jsonToggle: key [
 
 { #category : '*RediStick-Json' }
 RsRedisEndpoint >> jsonToggle: key path: path [
-	| rawResult |
+	| rawResult processedResult |
 	rawResult := self jsonToggleRaw: key path: path.
-	^ rawResult ifNotNil: [ 
-		rawResult collect: [ :each | 
-			each ifNotNil: [ each = 1 ] ] ]
+	processedResult := rawResult ifNotNil: [
+		rawResult collect: [ :each |
+			each ifNotNil: [ each = 1 ] ] ].
+	^ self buildGetResultFrom: processedResult key: key path: path
 ]
 
 { #category : '*RediStick-Json' }

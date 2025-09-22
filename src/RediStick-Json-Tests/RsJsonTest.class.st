@@ -215,16 +215,14 @@ RsJsonTest >> testJsonObjKeysBasic [
 	
 	"Get object keys at root"
 	result := stick endpoint jsonObjKeys: key path: SjJsonPath root.
-	
-	"Result should be a nested collection with object keys in first element"
-	self assert: result isSequenceable.
-	self assert: result size equals: 1.
-	self assert: result first isSequenceable.
-	self assert: result first size equals: 4.
-	self assert: (result first includes: 'name').
-	self assert: (result first includes: 'age').
-	self assert: (result first includes: 'city').
-	self assert: (result first includes: 'active')
+
+	"Result should contain the object keys directly"
+	self assert: result value isSequenceable.
+	self assert: result value size equals: 4.
+	self assert: (result value includes: 'name').
+	self assert: (result value includes: 'age').
+	self assert: (result value includes: 'city').
+	self assert: (result value includes: 'active')
 ]
 
 { #category : 'tests' }
@@ -238,14 +236,12 @@ RsJsonTest >> testJsonObjKeysNestedObject [
 	
 	"Get object keys at nested path"
 	result := stick endpoint jsonObjKeys: key path: (SjJsonPath root / 'user' / 'profile').
-	
+
 	"Result should contain keys from the nested object"
-	self assert: result isSequenceable.
-	self assert: result size equals: 1.
-	self assert: result first isSequenceable.
-	self assert: result first size equals: 2.
-	self assert: (result first includes: 'name').
-	self assert: (result first includes: 'email')
+	self assert: result value isSequenceable.
+	self assert: result value size equals: 2.
+	self assert: (result value includes: 'name').
+	self assert: (result value includes: 'email')
 ]
 
 { #category : 'tests' }
@@ -259,11 +255,9 @@ RsJsonTest >> testJsonObjKeysNonObjectPath [
 	
 	"Try to get object keys from an array path (should return null)"
 	result := stick endpoint jsonObjKeys: key path: (SjJsonPath root / 'data').
-	
-	"Result should contain nil for non-object paths"
-	self assert: result isSequenceable.
-	self assert: result size equals: 1.
-	self assert: result first isNil
+
+	"Result should be nil for non-object paths"
+	self assert: result value isNil
 ]
 
 { #category : 'tests' }
@@ -271,7 +265,7 @@ RsJsonTest >> testJsonObjKeysNonExistentKey [
 	| key result |
 	key := 'test:json:objkeys:nonexistent'.
 	result := stick endpoint jsonObjKeys: key.
-	self assert: result isNil
+	self assert: result isInvalidKey
 ]
 
 { #category : 'tests' }
@@ -285,10 +279,9 @@ RsJsonTest >> testJsonObjKeysNonExistentPath [
 	
 	"Try to get object keys from non-existent path"
 	result := stick endpoint jsonObjKeys: key path: (SjJsonPath root / 'nonexistent').
-	
-	"Result should be empty collection for non-existent paths"
-	self assert: result isSequenceable.
-	self assert: result isEmpty
+
+	"Result should be nil for non-existent paths"
+	self assert: result value isNil
 ]
 
 { #category : 'tests' }
@@ -1688,41 +1681,41 @@ RsJsonTest >> testJsonTypeBasic [
 	
 	"Test root type"
 	result := stick endpoint jsonType: key.
-	self assert: result equals: 'object'.
-	
-	"Test string type - returns array with enhanced path syntax"
+	self assert: result value equals: 'object'.
+
+	"Test string type - single path returns single value"
 	result := stick endpoint jsonType: key path: (SjJsonPath root / 'name').
-	self assert: result equals: #('string').
-	
+	self assert: result value equals: 'string'.
+
 	"Test number type - Redis returns 'integer' for whole numbers"
 	result := stick endpoint jsonType: key path: (SjJsonPath root / 'age').
-	self assert: result equals: #('integer').
-	
+	self assert: result value equals: 'integer'.
+
 	"Test boolean type"
 	result := stick endpoint jsonType: key path: (SjJsonPath root / 'active').
-	self assert: result equals: #('boolean').
-	
+	self assert: result value equals: 'boolean'.
+
 	"Test array type"
 	result := stick endpoint jsonType: key path: (SjJsonPath root / 'scores').
-	self assert: result equals: #('array').
-	
+	self assert: result value equals: 'array'.
+
 	"Test object type"
 	result := stick endpoint jsonType: key path: (SjJsonPath root / 'profile').
-	self assert: result equals: #('object').
-	
+	self assert: result value equals: 'object'.
+
 	"Test null type"
 	result := stick endpoint jsonType: key path: (SjJsonPath root / 'empty').
-	self assert: result equals: #('null')
+	self assert: result value equals: 'null'
 ]
 
 { #category : 'tests' }
 RsJsonTest >> testJsonTypeNonExistentKey [
 	| key result |
 	key := 'test:json:type:nokey'.
-	
+
 	"Try to get type from non-existent key"
 	result := stick endpoint jsonType: key.
-	self assert: result isNil
+	self assert: result isInvalidKey
 ]
 
 { #category : 'tests' }
@@ -1736,8 +1729,8 @@ RsJsonTest >> testJsonTypeNonExistentPath [
 	
 	"Try to get type from non-existent path"
 	result := stick endpoint jsonType: key path: (SjJsonPath root / 'missing').
-	"Redis returns empty array for non-existent paths with enhanced path syntax"
-	self assert: result equals: #()
+	"Redis returns nil for non-existent paths"
+	self assert: result value equals: nil
 ]
 
 { #category : 'tests' }
@@ -2062,19 +2055,19 @@ RsJsonTest >> testJsonToggleBasic [
 	
 	"Toggle the boolean value - returns boolean result"
 	result := stick endpoint jsonToggle: key.
-	self assert: result equals: {false}.
-	
+	self assert: result value equals: false.
+
 	"Verify value is now false"
 	result := stick endpoint jsonGet: key path: SjJsonPath root.
-	self assert: result first equals: false.
-	
+	self assert: result value equals: false.
+
 	"Toggle again"
 	result := stick endpoint jsonToggle: key.
-	self assert: result equals: {true}.
-	
+	self assert: result value equals: true.
+
 	"Verify value is now true"
 	result := stick endpoint jsonGet: key path: SjJsonPath root.
-	self assert: result first equals: true
+	self assert: result value equals: true
 ]
 
 { #category : 'tests' }
@@ -2088,19 +2081,19 @@ RsJsonTest >> testJsonToggleWithPath [
 	
 	"Toggle active field"
 	result := stick endpoint jsonToggle: key path: (SjJsonPath root / 'user' / 'active').
-	self assert: result equals: {false}.
-	
+	self assert: result value equals: false.
+
 	"Verify active is now false"
 	result := stick endpoint jsonGet: key path: (SjJsonPath root / 'user' / 'active').
-	self assert: result first equals: false.
-	
+	self assert: result value equals: false.
+
 	"Toggle verified field"
 	result := stick endpoint jsonToggle: key path: (SjJsonPath root / 'user' / 'verified').
-	self assert: result equals: {true}.
-	
+	self assert: result value equals: true.
+
 	"Verify verified is now true"
 	result := stick endpoint jsonGet: key path: (SjJsonPath root / 'user' / 'verified').
-	self assert: result first equals: true
+	self assert: result value equals: true
 ]
 
 { #category : 'tests' }
@@ -2114,11 +2107,11 @@ RsJsonTest >> testJsonToggleMultipleBooleans [
 	
 	"Toggle all boolean values in array"
 	result := stick endpoint jsonToggle: key path: (SjJsonPath root / 'flags' / '*').
-	self assert: result equals: {false. true. false}.
-	
+	self assertCollection: result values equals: {false. true. false}.
+
 	"Verify all values are toggled"
 	result := stick endpoint jsonGet: key path: (SjJsonPath root / 'flags').
-	self assert: result first equals: {false. true. false}
+	self assertCollection: result value equals: {false. true. false}
 ]
 
 { #category : 'tests' }
@@ -2135,7 +2128,7 @@ RsJsonTest >> testJsonToggleNonBooleanValue [
 		do: [:ex | result := nil].
 	
 	"Redis returns null for non-boolean values"
-	self assert: result equals: {nil}
+	self assert: result value equals: nil
 ]
 
 { #category : 'tests' }
@@ -2149,7 +2142,7 @@ RsJsonTest >> testJsonToggleNonExistentKey [
 		do: [:ex | result := nil].
 	
 	"Should handle non-existent key gracefully"
-	self assert: result isNil
+	self assert: result isInvalidKey
 ]
 
 { #category : 'tests' }
@@ -2164,8 +2157,8 @@ RsJsonTest >> testJsonToggleNonExistentPath [
 	"Try to toggle non-existent path"
 	result := stick endpoint jsonToggle: key path: (SjJsonPath root / 'nonexistent').
 	
-	"Should return empty array for non-existent path"
-	self assert: result equals: {}
+	"Should return nil for non-existent path"
+	self assert: result value equals: nil
 ]
 
 { #category : 'tests' }
