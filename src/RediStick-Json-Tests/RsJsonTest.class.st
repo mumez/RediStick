@@ -1730,7 +1730,7 @@ RsJsonTest >> testJsonTypeNonExistentPath [
 	"Try to get type from non-existent path"
 	result := stick endpoint jsonType: key path: (SjJsonPath root / 'missing').
 	"Redis returns nil for non-existent paths"
-	self assert: result value equals: nil
+	self assert: result value isNil
 ]
 
 { #category : 'tests' }
@@ -2128,7 +2128,7 @@ RsJsonTest >> testJsonToggleNonBooleanValue [
 		do: [:ex | result := nil].
 	
 	"Redis returns null for non-boolean values"
-	self assert: result value equals: nil
+	self assert: result value isNil
 ]
 
 { #category : 'tests' }
@@ -2158,7 +2158,7 @@ RsJsonTest >> testJsonToggleNonExistentPath [
 	result := stick endpoint jsonToggle: key path: (SjJsonPath root / 'nonexistent').
 	
 	"Should return nil for non-existent path"
-	self assert: result value equals: nil
+	self assert: result value isNil
 ]
 
 { #category : 'tests' }
@@ -2263,7 +2263,7 @@ RsJsonTest >> testJsonMSetWithBooleans [
 	self assert: result first equals: false.
 	
 	result := stick endpoint jsonGet: 'test:mset:bool3' path: SjJsonPath root.
-	self assert: result first equals: nil
+	self assert: result first isNil
 ]
 
 { #category : 'tests' }
