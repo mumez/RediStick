@@ -235,7 +235,7 @@ RsRedisEndpoint >> jsonArrPop: key path: path using: optionsBlock [
 		args addAll: options asArray.
 	].
 	result := self unifiedCommand: args.
-	^ result ifNotNil: [ (result collect: [:each | self safeParseJson: each]) asArray ]
+	^ self buildGetResultFrom: (result ifNotNil: [ (result collect: [:each | self safeParseJson: each]) asArray ]) key: key path: path
 ]
 
 { #category : '*RediStick-Json' }

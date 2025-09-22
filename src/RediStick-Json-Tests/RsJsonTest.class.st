@@ -1077,9 +1077,9 @@ RsJsonTest >> testJsonArrPopEmptyArray [
 	"Set JSON data with empty array"
 	stick endpoint jsonSet: key path: SjJsonPath root value: value.
 	
-	"Pop from empty array (should return array with nil)"
+	"Pop from empty array (should return nil)"
 	result := stick endpoint jsonArrPop: key path: (SjJsonPath root / 'empty').
-	self assert: result equals: {nil}
+	self assert: result value isNil
 ]
 
 { #category : 'tests' }
@@ -1105,9 +1105,9 @@ RsJsonTest >> testJsonArrPopNonExistentKey [
 	| key result |
 	key := 'test:json:arrpop:nonexistent'.
 	
-	"Pop from non-existent key (should return nil)"
+	"Pop from non-existent key (should return invalid key)"
 	result := stick endpoint jsonArrPop: key path: SjJsonPath root.
-	self assert: result isNil
+	self assert: result isInvalidKey
 ]
 
 { #category : 'tests' }
@@ -1133,9 +1133,9 @@ RsJsonTest >> testJsonArrPopNonArrayPath [
 	"Set JSON data with non-array values"
 	stick endpoint jsonSet: key path: SjJsonPath root value: value.
 	
-	"Try to pop from non-array path (should return array with nil)"
+	"Try to pop from non-array path (should return nil)"
 	result := stick endpoint jsonArrPop: key path: (SjJsonPath root / 'text').
-	self assert: result equals: {nil}
+	self assert: result value isNil
 ]
 
 { #category : 'tests' }
