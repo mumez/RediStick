@@ -46,7 +46,7 @@ RsJsonResult >> hash [
 RsJsonResult >> initializeKey: aKey path: aPath values: valuesArray [
 	key := aKey.
 	path := aPath.
-	values := valuesArray
+	values := valuesArray ifNotNil: [ valuesArray asArray ]
 ]
 
 { #category : 'testing' }

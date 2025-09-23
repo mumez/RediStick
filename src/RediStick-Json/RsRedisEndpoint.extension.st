@@ -1,18 +1,18 @@
 Extension { #name : 'RsRedisEndpoint' }
 
 { #category : '*RediStick-Json' }
-RsRedisEndpoint >> buildGetResultFrom: jsonArrayOrDict key: key path: path [
+RsRedisEndpoint >> buildJsonResultFrom: jsonArrayOrDict key: key path: path [
 	"Helper method for single path results - used by length operations"
 	^ RsJsonResult key: key path: path values: jsonArrayOrDict
 ]
 
 { #category : '*RediStick-Json' }
-RsRedisEndpoint >> buildGetResultFrom: jsonArrayOrDict key: key paths: paths [
+RsRedisEndpoint >> buildJsonResultFrom: jsonArrayOrDict key: key paths: paths [
 	"If result is nil (key doesn't exist), return invalid result"
-	jsonArrayOrDict isNil ifTrue: [
-		paths size = 1
-			ifTrue: [^ RsJsonResult key: key path: paths first values: nil]
-			ifFalse: [^ paths collect: [:eachPath | RsJsonResult key: key path: eachPath values: nil]]
+	jsonArrayOrDict ifNil: [
+		^ paths size = 1
+			ifTrue: [RsJsonResult key: key path: paths first values: nil]
+			ifFalse: [paths collect: [:eachPath | RsJsonResult key: key path: eachPath values: nil]]
 	].
 
 	"If one path, array will be returned"
@@ -32,7 +32,7 @@ RsRedisEndpoint >> jsonArrAppend: key path: path values: values [
 	jsonValues := values collect: [ :value | self toJsonString: value ].
 	args addAll: jsonValues.
 	result := self unifiedCommand: args.
-	^ self buildGetResultFrom: result key: key path: path
+	^ self buildJsonResultFrom: result key: key path: path
 ]
 
 { #category : '*RediStick-Json' }
@@ -65,7 +65,7 @@ RsRedisEndpoint >> jsonArrIndex: key path: path value: value using: optionsBlock
 		args addAll: options asArray.
 	].
 	result := self unifiedCommand: args.
-	^ self buildGetResultFrom: result key: key path: path
+	^ self buildJsonResultFrom: result key: key path: path
 ]
 
 { #category : '*RediStick-Json' }
@@ -84,7 +84,7 @@ RsRedisEndpoint >> jsonArrInsert: key path: path index: index values: values [
 	jsonValues := values collect: [ :value | self toJsonString: value ].
 	args addAll: jsonValues.
 	result := self unifiedCommand: args.
-	^ self buildGetResultFrom: result key: key path: path
+	^ self buildJsonResultFrom: result key: key path: path
 ]
 
 { #category : '*RediStick-Json' }
@@ -100,7 +100,7 @@ RsRedisEndpoint >> jsonArrLen: key path: path [
 		        key } asOrderedCollection.
 	path ifNotNil: [ args add: path asString ].
 	result := self unifiedCommand: args.
-	^ self buildGetResultFrom: result key: key path: path
+	^ self buildJsonResultFrom: result key: key path: path
 ]
 
 { #category : '*RediStick-Json' }
@@ -131,7 +131,7 @@ RsRedisEndpoint >> jsonArrPop: key path: path using: optionsBlock [
 		args addAll: options asArray.
 	].
 	result := self unifiedCommand: args.
-	^ self buildGetResultFrom: (result ifNotNil: [ (result collect: [:each | self safeParseJson: each]) asArray ]) key: key path: path
+	^ self buildJsonResultFrom: (result ifNotNil: [ (result collect: [:each | self safeParseJson: each]) asArray ]) key: key path: path
 ]
 
 { #category : '*RediStick-Json' }
@@ -144,7 +144,7 @@ RsRedisEndpoint >> jsonArrTrim: key path: path start: start stop: stop [
 		        start.
 		        stop } asOrderedCollection.
 	result := self unifiedCommand: args.
-	^ self buildGetResultFrom: result key: key path: path
+	^ self buildJsonResultFrom: result key: key path: path
 ]
 
 { #category : '*RediStick-Json' }
@@ -198,7 +198,7 @@ RsRedisEndpoint >> jsonGet: key options: options paths: paths [
 	result := self unifiedCommand: args.
 	(options notNil and: [ options hasPrettyFormattingOptions ]) 
 		ifTrue: [ ^ result ].
-	^ self buildGetResultFrom: (self safeParseJson: result) key: key paths: paths
+	^ self buildJsonResultFrom: (self safeParseJson: result) key: key paths: paths
 ]
 
 { #category : '*RediStick-Json' }
@@ -245,7 +245,7 @@ RsRedisEndpoint >> jsonMGet: keys path: path [
 	^ keys with: results collect: [:key :result |
 		| parsedResult |
 		parsedResult := self safeParseJson: result.
-		self buildGetResultFrom: parsedResult key: key path: path
+		self buildJsonResultFrom: parsedResult key: key path: path
 	]
 ]
 
@@ -288,7 +288,7 @@ RsRedisEndpoint >> jsonNumIncrBy: key path: path increment: increment [
 		        path asString.
 		        increment } asOrderedCollection.
 	result := self unifiedCommand: args.
-	^ self buildGetResultFrom: (self safeParseJson: result) key: key path: path
+	^ self buildJsonResultFrom: (self safeParseJson: result) key: key path: path
 ]
 
 { #category : '*RediStick-Json' }
@@ -300,7 +300,7 @@ RsRedisEndpoint >> jsonNumMultBy: key path: path multiplier: multiplier [
 		        path asString.
 		        multiplier } asOrderedCollection.
 	result := self unifiedCommand: args.
-	^ self buildGetResultFrom: (self safeParseJson: result) key: key path: path
+	^ self buildJsonResultFrom: (self safeParseJson: result) key: key path: path
 ]
 
 { #category : '*RediStick-Json' }
@@ -316,7 +316,7 @@ RsRedisEndpoint >> jsonObjKeys: key path: path [
 		        key } asOrderedCollection.
 	path ifNotNil: [ args add: path asString ].
 	result := self unifiedCommand: args.
-	^ self buildGetResultFrom: result key: key path: path
+	^ self buildJsonResultFrom: result key: key path: path
 ]
 
 { #category : '*RediStick-Json' }
@@ -332,7 +332,7 @@ RsRedisEndpoint >> jsonObjLen: key path: path [
 		        key } asOrderedCollection.
 	path ifNotNil: [ args add: path asString ].
 	result := self unifiedCommand: args.
-	^ self buildGetResultFrom: result key: key path: path
+	^ self buildJsonResultFrom: result key: key path: path
 ]
 
 { #category : '*RediStick-Json' }
@@ -377,7 +377,7 @@ RsRedisEndpoint >> jsonStrAppend: key path: path value: value [
 	jsonValue := self toJsonString: value.
 	args add: jsonValue.
 	result := self unifiedCommand: args.
-	^ self buildGetResultFrom: result key: key path: (path ifNil: [ SjJsonPath root ])
+	^ self buildJsonResultFrom: result key: key path: (path ifNil: [ SjJsonPath root ])
 ]
 
 { #category : '*RediStick-Json' }
@@ -398,7 +398,7 @@ RsRedisEndpoint >> jsonStrLen: key path: path [
 		        key } asOrderedCollection.
 	path ifNotNil: [ args add: path asString ].
 	result := self unifiedCommand: args.
-	^ self buildGetResultFrom: result key: key path: path
+	^ self buildJsonResultFrom: result key: key path: path
 ]
 
 { #category : '*RediStick-Json' }
@@ -413,7 +413,7 @@ RsRedisEndpoint >> jsonToggle: key path: path [
 	processedResult := rawResult ifNotNil: [
 		rawResult collect: [ :each |
 			each ifNotNil: [ each = 1 ] ] ].
-	^ self buildGetResultFrom: processedResult key: key path: path
+	^ self buildJsonResultFrom: processedResult key: key path: path
 ]
 
 { #category : '*RediStick-Json' }
@@ -440,7 +440,7 @@ RsRedisEndpoint >> jsonType: key path: path [
 		        key } asOrderedCollection.
 	path ifNotNil: [ args add: path asString ].
 	result := self unifiedCommand: args.
-	^ self buildGetResultFrom: result key: key path: path
+	^ self buildJsonResultFrom: result key: key path: path
 ]
 
 { #category : '*RediStick-Json' }

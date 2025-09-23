@@ -46,7 +46,7 @@ stick endpoint jsonSet: 'user:123' path: SjJsonPath root value: user.
 
 "Get the JSON object"
 result := stick endpoint jsonGet: 'user:123' path: SjJsonPath root.
-result value. "Returns the parsed dictionary"
+result value. "a Dictionary('age'->30 'city'->'Tokyo' 'name'->'John' )"
 ```
 
 #### Understanding RsJsonResult
@@ -98,7 +98,12 @@ paths := {
 
 results := stick endpoint jsonGet: 'profile:456' paths: paths.
 results do: [:result |
-    Transcript show: result path asString, ': ', result value asString; cr].
+    Transcript cr; show: result path asString, ': ', result value asString].
+"
+$.user.name: Alice
+$.user.profile.age: 25
+$.user.profile.active: true
+"
 ```
 
 ## Advanced Features
@@ -120,9 +125,9 @@ stick endpoint jsonSet: 'existing:key' path: SjJsonPath root value: {'status'->'
 ```smalltalk
 "Get JSON with pretty formatting"
 formatted := stick endpoint jsonGet: 'profile:456' path: SjJsonPath root using: [:opts |
-    opts indent: String tab.
-    opts newLine: String lf.
-    opts space: ' '].
+    opts indent: String tab;
+        newLine: String lf;
+        space: ' '].
 "Returns formatted JSON string instead of parsed object"
 ```
 
@@ -139,10 +144,13 @@ result value. "Returns 'integer'"
 ```smalltalk
 "Get string length - returns RsJsonResult wrapper"
 result := stick endpoint jsonStrLen: 'user:123' path: (SjJsonPath root / 'name').
-length := result value.  "Get the length value"
+length := result value.  "Get the length value of 'John': 4"
 
 "Append to string"
 stick endpoint jsonStrAppend: 'user:123' path: (SjJsonPath root / 'name') value: ' Doe'.
+
+result := stick endpoint jsonGet: 'user:123' path: SjJsonPath root.  "RsJsonResult(an Array(a Dictionary('age'->30 'city'->'Tokyo' 'name'->'John Doe'
+)))"
 ```
 
 ### Numeric Operations
@@ -150,11 +158,11 @@ stick endpoint jsonStrAppend: 'user:123' path: (SjJsonPath root / 'name') value:
 ```smalltalk
 "Increment numeric values - returns RsJsonResult wrapper"
 result := stick endpoint jsonNumIncrBy: 'user:123' path: (SjJsonPath root / 'age') increment: 1.
-newAge := result value.  "Get the new value"
+newAge := result value.  "Get the new value: 31"
 
 "Multiply numeric values - returns RsJsonResult wrapper"
 result := stick endpoint jsonNumMultBy: 'user:123' path: (SjJsonPath root / 'age') multiplier: 2.
-doubled := result value.  "Get the multiplied value"
+doubled := result value.  "Get the multiplied value: 62"
 ```
 
 ### Array Operations
@@ -166,7 +174,7 @@ stick endpoint jsonSet: 'data:789' path: SjJsonPath root value: data.
 
 "Get array length - returns RsJsonResult wrapper"
 result := stick endpoint jsonArrLen: 'data:789' path: (SjJsonPath root / 'items').
-length := result value.  "Get the array length"
+length := result value.  "Get the array length: 3"
 
 "Append to array"
 stick endpoint jsonArrAppend: 'data:789' path: (SjJsonPath root / 'items') values: {4. 5}.
@@ -174,34 +182,39 @@ stick endpoint jsonArrAppend: 'data:789' path: (SjJsonPath root / 'items') value
 "Insert at specific index"
 stick endpoint jsonArrInsert: 'data:789' path: (SjJsonPath root / 'items') index: 1 values: {10}.
 
-"Find value index in array - returns RsJsonResult wrapper"
-result := stick endpoint jsonArrIndex: 'data:789' path: (SjJsonPath root / 'items') value: 3.
-index := result value.  "Get the index (-1 if not found)"
+result := stick endpoint jsonGet: 'data:789' path: (SjJsonPath root / 'items').
+result value.  "#(1 10 2 3 4 5)"
 
-"Pop element from array - returns RsJsonResult wrapper"
+"Find value index in array"
+result := stick endpoint jsonArrIndex: 'data:789' path: (SjJsonPath root / 'items') value: 3.
+index := result value.  "Get the index: 3 (-1 if not found)"
+
+"Pop element from array"
 result := stick endpoint jsonArrPop: 'data:789' path: (SjJsonPath root / 'items').
-popped := result value.  "Get the popped element"
+popped := result value.  "Get the popped element: 5"
 
 "Trim array to specific range"
 stick endpoint jsonArrTrim: 'data:789' path: (SjJsonPath root / 'items') start: 0 stop: 2.
+
+stick endpoint jsonGet: 'data:789' path: (SjJsonPath root / 'items')  "RsJsonResult(#(#(1 10 2)))"
 ```
 
 ### Object Operations
 
 ```smalltalk
-"Get object keys - returns RsJsonResult wrapper"
+"Get object keys"
 result := stick endpoint jsonObjKeys: 'user:123' path: SjJsonPath root.
-keys := result value.  "Get the array of keys"
+keys := result value.  "Get the object keys: an OrderedCollection('name' 'age' 'city')"
 
-"Get number of object fields - returns RsJsonResult wrapper"
+"Get number of object fields"
 result := stick endpoint jsonObjLen: 'user:123' path: SjJsonPath root.
-fieldCount := result value.  "Get the field count"
+fieldCount := result value.  "Get the field count: 3"
 ```
 
 ### Boolean Operations
 
 ```smalltalk
-"Toggle boolean values - returns RsJsonResult wrapper"
+"Toggle boolean values"
 result := stick endpoint jsonToggle: 'profile:456' path: (SjJsonPath root / 'user' / 'profile' / 'active').
 result value. "Returns true/false"
 
@@ -223,7 +236,8 @@ patch := {'user'->({'age'->31. 'city'->'Tokyo'} asDictionary). 'premium'->true} 
 result := stick endpoint jsonMerge: 'merge:test' path: SjJsonPath root value: patch.
 
 final := stick endpoint jsonGet: 'merge:test' path: SjJsonPath root.
-"Result: {'user'->{'name'->'John'. 'age'->31. 'city'->'Tokyo'}. 'active'->true. 'premium'->true}"
+final value. "a Dictionary('active'->true 'premium'->true 'user'->a Dictionary('age'->31
+'city'->'Tokyo' 'name'->'John' ) )"
 ```
 
 ### Batch Operations
@@ -253,54 +267,19 @@ stick endpoint jsonMSet: multiSet.
 results := stick endpoint jsonMGet: {'user:1'. 'user:2'. 'user:3'}.
 results do: [:result |
     result hasValue ifTrue: [
-        Transcript show: result key, ': ', result value asString; cr
+        Transcript cr; show: result key, ': ', result value asString
     ] ifFalse: [
-        Transcript show: result key, ': (no data)'; cr
+        Transcript cr; show: result key, ': (no data)'
     ]].
+"
+user:1: a Dictionary('age'->25 'name'->'Alice' )
+user:2: a Dictionary('age'->30 'name'->'Bob' )
+user:3: a Dictionary('name'->'Charlie' 'status'->'active' )
+"
 
 "Get specific path from multiple keys"
 results := stick endpoint jsonMGet: {'user:1'. 'user:2'} path: (SjJsonPath root / 'name').
-results collect: [:result | result value]. "Returns array of names"
-```
-
-## Result Handling
-
-### RsJsonResult Wrapper
-
-All JSON GET operations return `RsJsonResult` wrapper objects that provide metadata and state checking:
-
-```smalltalk
-result := stick endpoint jsonGet: 'some:key' path: SjJsonPath root.
-
-"Check result state"
-result isInvalidKey. "true if key doesn't exist"
-result hasValue. "true if key exists (regardless of value)"
-result isEmpty. "true if key exists but value is empty"
-
-"Access metadata"
-result key. "Returns the original key"
-result path. "Returns the original path"
-
-"Access values"
-result value. "Returns first value or nil"
-result first. "Alias for value"
-result values. "Returns array of values or nil if invalid key"
-```
-
-## Error Handling
-
-```smalltalk
-"Handle potential errors"
-[
-    result := stick endpoint jsonGet: 'nonexistent:key' path: SjJsonPath root.
-    result isInvalidKey ifTrue: [
-        Transcript show: 'Key does not exist'; cr
-    ] ifFalse: [
-        Transcript show: 'Value: ', result value asString; cr
-    ]
-] on: Error do: [:error |
-    Transcript show: 'Redis error: ', error messageText; cr
-].
+results collect: [:result | result value]. "Returns array of names: #('Alice' 'Bob')"
 ```
 
 ## Performance Tips
@@ -309,17 +288,6 @@ result values. "Returns array of values or nil if invalid key"
 2. **Specify exact paths** instead of retrieving entire documents when possible
 3. **Use conditional operations** to avoid unnecessary overwrites
 4. **Consider using JSON merge** for partial document updates
-5. **Cache path objects** when using the same paths repeatedly:
-
-```smalltalk
-"Cache commonly used paths"
-userNamePath := SjJsonPath root / 'user' / 'name'.
-userAgePath := SjJsonPath root / 'user' / 'age'.
-
-"Reuse in multiple operations"
-name := stick endpoint jsonGet: 'profile:123' path: userNamePath.
-age := stick endpoint jsonGet: 'profile:123' path: userAgePath.
-```
 
 ## Cleanup Operations
 
