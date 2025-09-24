@@ -11,6 +11,7 @@ BaselineOfRediStick >> baseline: spec [
 
 	spec for: #'common' do: [
 		self stick: spec.
+		self sjsonPath: spec.
 		spec 
 			package: 'RediStick-Core' with: [spec requires: 'Stick'].
 		spec package: 'RediStick-Connection-Pool' with: [
@@ -28,6 +29,11 @@ BaselineOfRediStick >> baseline: spec [
 				spec requires: #('RediStick-Stream')].
 		spec package: 'RediStick-Stream-Objects-Tests' with: [
 				spec requires: #('RediStick-Tests' 'RediStick-Stream-Objects')].
+			
+		spec package: 'RediStick-Json' with: [
+				spec requires: #('SJsonPath' 'RediStick-Core')].
+		spec package: 'RediStick-Json-Tests' with: [
+				spec requires: #('RediStick-Tests' 'RediStick-Json')].
 			
 		spec package: 'RediStick-Search' with: [
 				spec requires: #('RediStick-Core')].
@@ -50,9 +56,22 @@ BaselineOfRediStick >> baseline: spec [
 			group: 'StreamObjectsTests' with: #('RediStick-Stream-Objects-Tests').
 			
 		spec
+			group: 'Json' with: #('RediStick-Json');
+			group: 'JsonTests' with: #('RediStick-Json-Tests').
+			
+		spec
 			group: 'Search' with: #('RediStick-Search');
 			group: 'SearchTests' with: #('RediStick-Search-Tests')].
 
+]
+
+{ #category : 'external projects' }
+BaselineOfRediStick >> sjsonPath: spec [
+	spec
+		baseline: 'SJsonPath'
+		with: [ spec
+				repository: 'github://mumez/SJsonPath:main/src';
+				loads: 'default' ]
 ]
 
 { #category : 'external projects' }
