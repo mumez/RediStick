@@ -70,14 +70,26 @@ RsSearchIndexSchema >> geoFieldNamed: fieldName using: optionsBlock [
 ]
 
 { #category : 'adding' }
+RsSearchIndexSchema >> geoshapeFieldNamed: fieldName [
+	^ self geoshapeFieldNamed: fieldName using: [:opts|]
+]
+
+{ #category : 'adding' }
+RsSearchIndexSchema >> geoshapeFieldNamed: fieldName using: optionsBlock [
+	^ self addField: (self createFieldNamed: fieldName) geoshape using: optionsBlock.
+
+]
+
+{ #category : 'adding' }
 RsSearchIndexSchema >> geometryFieldNamed: fieldName [
-	^ self geometryFieldNamed: fieldName using: [:opts|]
+	"Deprecated. Use #geoshapeFieldNamed: instead. GEOMETRY type has been renamed to GEOSHAPE in the latest Redis Search API."
+	^ self geoshapeFieldNamed: fieldName
 ]
 
 { #category : 'adding' }
 RsSearchIndexSchema >> geometryFieldNamed: fieldName using: optionsBlock [
-	^ self addField: (self createFieldNamed: fieldName) geometry using: optionsBlock.
-	 
+	"Deprecated. Use #geoshapeFieldNamed:using: instead. GEOMETRY type has been renamed to GEOSHAPE in the latest Redis Search API."
+	^ self geoshapeFieldNamed: fieldName using: optionsBlock
 ]
 
 { #category : 'adding' }

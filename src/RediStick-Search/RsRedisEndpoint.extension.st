@@ -1,7 +1,7 @@
-Extension { #name : 'RsRedisStackEndpoint' }
+Extension { #name : 'RsRedisEndpoint' }
 
 { #category : '*RediStick-Search' }
-RsRedisStackEndpoint >> dictionaryFrom: pairs except: keys [
+RsRedisEndpoint >> dictionaryFrom: pairs except: keys [
 	| dict |
 	dict := Dictionary newFromPairs: pairs.
 	dict keysAndValuesDo: [ :k :v |
@@ -11,12 +11,12 @@ RsRedisStackEndpoint >> dictionaryFrom: pairs except: keys [
 ]
 
 { #category : '*RediStick-Search' }
-RsRedisStackEndpoint >> ftAddAlias: alias of: indexName [
+RsRedisEndpoint >> ftAddAlias: alias of: indexName [
 	^ self ftCommand: 'ALIASADD' withAll: {alias. indexName} 
 ]
 
 { #category : '*RediStick-Search' }
-RsRedisStackEndpoint >> ftAggregateProfile: indexName isLimited: isLimited query: query [
+RsRedisEndpoint >> ftAggregateProfile: indexName isLimited: isLimited query: query [
 	^ self
 		  ftProfile: indexName
 		  type: 'AGGREGATE'
@@ -25,13 +25,13 @@ RsRedisStackEndpoint >> ftAggregateProfile: indexName isLimited: isLimited query
 ]
 
 { #category : '*RediStick-Search' }
-RsRedisStackEndpoint >> ftCommand: commandName withAll: arguments [
+RsRedisEndpoint >> ftCommand: commandName withAll: arguments [
 
 	^ self unifiedCommand: { ('FT.' , commandName) } , arguments
 ]
 
 { #category : '*RediStick-Search' }
-RsRedisStackEndpoint >> ftCreate: indexName schema: schema options: options [ 
+RsRedisEndpoint >> ftCreate: indexName schema: schema options: options [ 
 	| args |
 	args := OrderedCollection new.
 	options ifNotNil: [options createArgumentsOn: args].
@@ -40,12 +40,12 @@ RsRedisStackEndpoint >> ftCreate: indexName schema: schema options: options [
 ]
 
 { #category : '*RediStick-Search' }
-RsRedisStackEndpoint >> ftCreate: indexName schemaUsing: schemaBuilder [
+RsRedisEndpoint >> ftCreate: indexName schemaUsing: schemaBuilder [
 	^self ftCreate: indexName schemaUsing: schemaBuilder optionsUsing: nil
 ]
 
 { #category : '*RediStick-Search' }
-RsRedisStackEndpoint >> ftCreate: indexName schemaUsing: schemaBuilder optionsUsing: optionsBuilder [
+RsRedisEndpoint >> ftCreate: indexName schemaUsing: schemaBuilder optionsUsing: optionsBuilder [
 	| schema options |
 	schema := RsSearchIndexSchema in: schemaBuilder.
 	options := nil.
@@ -55,17 +55,17 @@ RsRedisStackEndpoint >> ftCreate: indexName schemaUsing: schemaBuilder optionsUs
 ]
 
 { #category : '*RediStick-Search' }
-RsRedisStackEndpoint >> ftDropIndex: indexName [
-	^ self ftCommand: 'DROP' withAll: {indexName} 
+RsRedisEndpoint >> ftDropIndex: indexName [
+	^ self ftCommand: 'DROPINDEX' withAll: {indexName} 
 ]
 
 { #category : '*RediStick-Search' }
-RsRedisStackEndpoint >> ftDropIndexWithDocuments: indexName [
-	^ self ftCommand: 'DROP' withAll: {indexName. 'DD'} 
+RsRedisEndpoint >> ftDropIndexWithDocuments: indexName [
+	^ self ftCommand: 'DROPINDEX' withAll: {indexName. 'DD'} 
 ]
 
 { #category : '*RediStick-Search' }
-RsRedisStackEndpoint >> ftExplain: indexName query: query dialect: dialect [
+RsRedisEndpoint >> ftExplain: indexName query: query dialect: dialect [
 	| args |
 	args := OrderedCollection new.
 	dialect ifNotNil: [
@@ -78,7 +78,7 @@ RsRedisStackEndpoint >> ftExplain: indexName query: query dialect: dialect [
 ]
 
 { #category : '*RediStick-Search' }
-RsRedisStackEndpoint >> ftExplainCli: indexName query: query dialect: dialect [
+RsRedisEndpoint >> ftExplainCli: indexName query: query dialect: dialect [
 	| args |
 	args := OrderedCollection new.
 	dialect ifNotNil: [
@@ -91,12 +91,12 @@ RsRedisStackEndpoint >> ftExplainCli: indexName query: query dialect: dialect [
 ]
 
 { #category : '*RediStick-Search' }
-RsRedisStackEndpoint >> ftGetConfig: optionName [
+RsRedisEndpoint >> ftGetConfig: optionName [
 	^ self ftCommand: 'CONFIG' withAll: {'GET'. optionName} 
 ]
 
 { #category : '*RediStick-Search' }
-RsRedisStackEndpoint >> ftInfo: indexName [
+RsRedisEndpoint >> ftInfo: indexName [
 	| infoPairs info rawAttributes |
 	infoPairs := self ftCommand: 'INFO' withAll: {indexName}.
 	info := self dictionaryFrom: infoPairs except: #('attributes').
@@ -108,12 +108,12 @@ RsRedisStackEndpoint >> ftInfo: indexName [
 ]
 
 { #category : '*RediStick-Search' }
-RsRedisStackEndpoint >> ftListIndexes [
+RsRedisEndpoint >> ftListIndexes [
 	^ self ftCommand: '_LIST' withAll: {} 
 ]
 
 { #category : '*RediStick-Search' }
-RsRedisStackEndpoint >> ftProfile: indexName type: type isLimited: isLimited query: query [
+RsRedisEndpoint >> ftProfile: indexName type: type isLimited: isLimited query: query [
 	| args |
 	args := {indexName. type }.
 	isLimited ifTrue: [ args add: 'LIMITED' ].
@@ -122,17 +122,17 @@ RsRedisStackEndpoint >> ftProfile: indexName type: type isLimited: isLimited que
 ]
 
 { #category : '*RediStick-Search' }
-RsRedisStackEndpoint >> ftRemoveAlias: alias [
+RsRedisEndpoint >> ftRemoveAlias: alias [
 	^ self ftCommand: 'ALIASDEL' withAll: {alias} 
 ]
 
 { #category : '*RediStick-Search' }
-RsRedisStackEndpoint >> ftSearch: indexName query: query [
+RsRedisEndpoint >> ftSearch: indexName query: query [
 	^self ftSearch: indexName query: query options: nil
 ]
 
 { #category : '*RediStick-Search' }
-RsRedisStackEndpoint >> ftSearch: indexName query: query options: options [ 
+RsRedisEndpoint >> ftSearch: indexName query: query options: options [ 
 	| args results |
 	args := OrderedCollection new.
 	options ifNotNil: [options createArgumentsOn: args].
@@ -141,7 +141,7 @@ RsRedisStackEndpoint >> ftSearch: indexName query: query options: options [
 ]
 
 { #category : '*RediStick-Search' }
-RsRedisStackEndpoint >> ftSearch: indexName query: query optionsUsing: optionsBuilder [
+RsRedisEndpoint >> ftSearch: indexName query: query optionsUsing: optionsBuilder [
 	| options |
 	options := nil.
 	optionsBuilder ifNotNil: [
@@ -150,7 +150,7 @@ RsRedisStackEndpoint >> ftSearch: indexName query: query optionsUsing: optionsBu
 ]
 
 { #category : '*RediStick-Search' }
-RsRedisStackEndpoint >> ftSearchProfile: indexName isLimited: isLimited query: query [
+RsRedisEndpoint >> ftSearchProfile: indexName isLimited: isLimited query: query [
 	^ self
 		  ftProfile: indexName
 		  type: 'SEARCH'
@@ -159,16 +159,16 @@ RsRedisStackEndpoint >> ftSearchProfile: indexName isLimited: isLimited query: q
 ]
 
 { #category : '*RediStick-Search' }
-RsRedisStackEndpoint >> ftSetConfig: optionName to: value [
+RsRedisEndpoint >> ftSetConfig: optionName to: value [
 	^ self ftCommand: 'CONFIG' withAll: {'SET'. optionName. value} 
 ]
 
 { #category : '*RediStick-Search' }
-RsRedisStackEndpoint >> ftTagValues: fieldName in: indexName [
+RsRedisEndpoint >> ftTagValues: fieldName in: indexName [
 	^ self ftCommand: 'TAGVALS' withAll: {indexName. fieldName} 
 ]
 
 { #category : '*RediStick-Search' }
-RsRedisStackEndpoint >> ftUpdateAlias: alias of: indexName [
+RsRedisEndpoint >> ftUpdateAlias: alias of: indexName [
 	^ self ftCommand: 'ALIASUPDATE' withAll: {alias. indexName} 
 ]

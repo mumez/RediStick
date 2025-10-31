@@ -17,8 +17,14 @@ RsSearchIndexField class >> geo: fieldName [
 ]
 
 { #category : 'instance creation' }
+RsSearchIndexField class >> geoshape: fieldName [
+	^(self name: fieldName) geoshape
+]
+
+{ #category : 'instance creation' }
 RsSearchIndexField class >> geometry: fieldName [
-	^(self name: fieldName) geometry
+	"Deprecated. Use #geoshape: instead. GEOMETRY type has been renamed to GEOSHAPE in the latest Redis Search API."
+	^self geoshape: fieldName
 ]
 
 { #category : 'instance creation' }
@@ -94,8 +100,14 @@ RsSearchIndexField >> geo [
 ]
 
 { #category : 'actions-type' }
+RsSearchIndexField >> geoshape [
+	^self type: 'GEOSHAPE'
+]
+
+{ #category : 'actions-type' }
 RsSearchIndexField >> geometry [
-	^self type: 'GEOMETRY'
+	"Deprecated. Use #geoshape instead. GEOMETRY type has been renamed to GEOSHAPE in the latest Redis Search API."
+	^self geoshape
 ]
 
 { #category : 'accessing' }
@@ -108,6 +120,16 @@ RsSearchIndexField >> name [
 RsSearchIndexField >> name: anObject [
 
 	name := anObject
+]
+
+{ #category : 'actions' }
+RsSearchIndexField >> indexEmpty [
+	self options add: 'INDEXEMPTY'
+]
+
+{ #category : 'actions' }
+RsSearchIndexField >> indexMissing [
+	self options add: 'INDEXMISSING'
 ]
 
 { #category : 'actions' }
