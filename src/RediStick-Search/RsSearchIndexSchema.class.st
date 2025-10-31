@@ -77,7 +77,6 @@ RsSearchIndexSchema >> geoshapeFieldNamed: fieldName [
 { #category : 'adding' }
 RsSearchIndexSchema >> geoshapeFieldNamed: fieldName using: optionsBlock [
 	^ self addField: (self createFieldNamed: fieldName) geoshape using: optionsBlock.
-
 ]
 
 { #category : 'adding' }
