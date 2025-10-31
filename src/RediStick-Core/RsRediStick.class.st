@@ -32,8 +32,6 @@ RsRediStick >> destroy [
 
 { #category : 'factory' }
 RsRediStick >> endpointClassForScheme: schemeName [
-	schemeName ifNil: [ ^nil ].
-	schemeName asString = 'stack' ifTrue: [^RsRedisStackEndpoint].
 	^RsRedisEndpoint
 ]
 
