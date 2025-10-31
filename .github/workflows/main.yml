@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-24.04
     services:
       redis:
-        image: redis:8
+        image: redis/redis-stack:latest
         ports:
           - "6379:6379"
           - "8001:8001"
