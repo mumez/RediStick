@@ -1,3 +1,71 @@
+"
+I represent the primary Redis protocol interface providing comprehensive Redis command execution and data type operations.
+
+Responsibility:
+- Execute Redis commands using the unified protocol (RESP - REdis Serialization Protocol)
+- Parse Redis server responses (simple strings, integers, bulk replies, multi-bulk replies, errors)
+- Manage Pub/Sub subscription lifecycle and message routing
+- Handle Redis transactions (MULTI/EXEC/WATCH/DISCARD)
+- Provide thread-safe command execution via mutex-protected send operations
+- Support modular Redis extensions (JSON, Streams, Search) through package extensions
+- Convert between Redis wire format and Smalltalk objects
+
+Collaborators:
+- RsRediStick: I am created and managed by RsRediStick instances for connection lifecycle
+- RsGenericError: I signal and delegate Redis protocol errors for custom error handling
+- RsPubsubMessage: I parse raw Pub/Sub message arrays and route them to callback blocks
+- RsSortQuery: I execute complex SORT commands via query builder pattern
+- SkSyncStickEndpoint: I inherit socket stream management and connection state tracking
+- Extension modules: Stream, JSON, Search packages extend me with specialized Redis commands
+
+Public API and Key Messages:
+Core Commands:
+- #get:, #set:value: - Basic string operations
+- #hSet:field:value:, #hGet:field: - Hash operations
+- #lPush:value:, #rPop: - List operations
+- #sAdd:member:, #sMembers: - Set operations
+- #zAdd:score:member:, #zRange:start:end: - Sorted set operations
+
+Connection Management:
+- #auth:, #auth:user: - Authentication (ACL support)
+- #select: - Database selection
+- #ping - Connection health check
+- #quit - Clean connection shutdown
+
+Pub/Sub Operations:
+- #subscribe:callback:, #unsubscribe: - Channel-based pub/sub
+- #psubscribe:callback:, #punsubscribe: - Pattern-based pub/sub
+- #publish:message: - Message publishing
+
+Transaction Support:
+- #multi, #exec, #discard - Transaction boundaries
+- #watch:, #unwatch - Optimistic locking
+- #atomic: - Block-based transaction wrapper
+
+Extended Operations (via package extensions):
+- JSON module: #jsonGet:path:, #jsonSet:path:value: (75+ JSON commands)
+- Streams module: #xAdd:values:, #xRead:options: (40+ stream commands)
+- Search module: #ftSearch:query:, #ftCreate:schema: (20+ search commands)
+
+Internal Representation:
+- pubsub - Boolean flag indicating Pub/Sub mode (blocks normal command responses)
+- channels - Collection of currently subscribed channels or patterns
+- subscriptionMode - Symbol (#normal or #patterns) tracking subscription type
+- timeout - Command timeout in seconds (default: 30)
+- listener - Background process receiving Pub/Sub messages
+- sendMutex - Mutex ensuring thread-safe command serialization
+
+Implementation Points:
+- Thread-safe via sendMutex protecting all socket write operations
+- Pub/Sub mode alters protocol behavior: commands queued, responses received asynchronously
+- RESP protocol parsing handles 5 reply types: +simple, :integer, $bulk, *multi-bulk, -error
+- UTF-8 encoding/decoding for all string operations via portable utilities
+- Error responses converted to RsGenericError exceptions with custom handler delegation
+- Extension methods leverage unified command protocol for modular feature additions
+- Multi-bulk replies parsed recursively supporting nested data structures
+- Subscription listener runs at configurable priority in background process
+- Clean shutdown releases Pub/Sub subscriptions before closing connection
+"
 Class {
 	#name : 'RsRedisEndpoint',
 	#superclass : 'SkSyncStickEndpoint',
