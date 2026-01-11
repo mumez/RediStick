@@ -11,11 +11,6 @@ RsSearchTest class >> dbIndex [
 	^ 0
 ]
 
-{ #category : 'accessing' }
-RsSearchTest class >> urlString [
-	^ super urlString ifNotNil: [ :str | str copyReplaceAll: 'sync:' with: 'stack:' ]
-]
-
 { #category : 'private' }
 RsSearchTest >> populateDateOn: endpoint [
 	endpoint hSet:'rs:test:doc:1' dictionary: ({'id'-> 1. 'name'->'Pharo Smalltalk'} as: Dictionary).
