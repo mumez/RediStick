@@ -3,7 +3,7 @@ SmalltalkCISpec {
     SCIMetacelloLoadSpec {
       #baseline : 'RediStick',
       #directory : 'src',
-      #load : [ 'Tests', 'StreamTests', 'StreamObjectsTests', 'SearchTests'],
+      #load : [ 'Tests', 'StreamTests', 'StreamObjectsTests', 'SearchTests', 'TimeSeriesTests'],
       #onConflict : #useLoaded,
       #useLatestMetacello : false,
       #onWarningLog : true,

@@ -39,8 +39,13 @@ BaselineOfRediStick >> baseline: spec [
 				spec requires: #('RediStick-Core')].
 		spec package: 'RediStick-Search-Tests' with: [
 				spec requires: #('RediStick-Tests' 'RediStick-Search')].
-			
-		spec 
+
+		spec package: 'RediStick-TimeSeries' with: [
+				spec requires: #('RediStick-Core')].
+		spec package: 'RediStick-TimeSeries-Tests' with: [
+				spec requires: #('RediStick-Tests' 'RediStick-TimeSeries')].
+
+		spec
 			group: 'default' with: #('Core');
 			group: 'Core' with: #('RediStick-Core');
 			group: 'ConnectionPool' with: #('RediStick-Connection-Pool');
@@ -61,7 +66,11 @@ BaselineOfRediStick >> baseline: spec [
 			
 		spec
 			group: 'Search' with: #('RediStick-Search');
-			group: 'SearchTests' with: #('RediStick-Search-Tests')].
+			group: 'SearchTests' with: #('RediStick-Search-Tests').
+
+		spec
+			group: 'TimeSeries' with: #('RediStick-TimeSeries');
+			group: 'TimeSeriesTests' with: #('RediStick-TimeSeries-Tests')].
 
 ]
 
