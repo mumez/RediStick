@@ -120,7 +120,7 @@ Please read [Stream.md](./doc/Stream.md).
 
 ### Using Search
 
-RediStick supports [RediSearch](https://redis.io/docs/stack/search/) - a full-text search extension for Redis.
+RediStick supports [RediSearch](https://redis.io/docs/latest/develop/ai/search-and-query/) - a full-text search extension for Redis.
 
 Please read [Search.md](./doc/Search.md).
 

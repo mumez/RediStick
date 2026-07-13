@@ -1,16 +1,16 @@
 # Working with RediSearch in RediStick
 
-[RediStick](https://github.com/mumez/RediStick) supports [RediSearch](https://redis.io/docs/stack/search/) - a full-text search extension for Redis.
+[RediStick](https://github.com/mumez/RediStick) supports [RediSearch](https://redis.io/docs/latest/develop/ai/search-and-query/) - a full-text search extension for Redis.
 
 ## Installation
 
 ### Setting up RediSearch
 
-RediSearch is a component of the [Redis Stack](https://redis.io/docs/stack/) and it is not included in Redis by default.
-The easiest way to start a RediSearch enabled Redis is to use the [official docker image](https://hub.docker.com/r/redis/redis-stack).
+From Redis 8 onward, RediSearch capabilities are available in the standard Redis image.
+The easiest way to start a RediSearch-enabled server is to use the [official Redis image](https://hub.docker.com/_/redis).
 
 ```bash
-docker run -d --name redis-stack -p 6379:6379 -p 8001:8001 -v /local-data/:/data redis/redis-stack:latest
+docker run -d --name redis8 -p 6379:6379 -v /local-data/:/data redis:8
 ```
 
 ### Installing RediStick Search packages
@@ -38,7 +38,7 @@ Metacello new
 ### Creating an index
 
 ```Smalltalk
-stick := RsRediStick targetUrl: 'stack://localhost'.
+stick := RsRediStick targetUrl: 'sync://localhost'.
 stick connect.
 
 indexName := 'smalltalk-index'.
@@ -116,7 +116,7 @@ resultSet results collect: [:each | each content]. "an OrderedCollection(a Dicti
 Smalltalk' 'tags'->'Commercial,Seaside,AppeX' ))"
 ```
 
-For more query patterns, you can see the [query syntax](https://redis.io/docs/stack/search/reference/query_syntax/) reference.
+For more query patterns, see the [RediSearch query documentation](https://redis.io/docs/latest/develop/ai/search-and-query/).
 
 ### Dropping an index
 
@@ -133,4 +133,4 @@ endpoint ftListIndexes.
 
 ## ToDo
 
-- [ ] [Aggregations](https://redis.io/docs/stack/search/reference/aggregations/) Support
+- [ ] [Aggregations](https://redis.io/docs/latest/develop/ai/search-and-query/) Support
