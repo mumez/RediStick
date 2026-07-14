@@ -63,7 +63,7 @@ Add `TimeSeriesTests` to the `load:` list in `.smalltalk.ston`.
 ### Result Value Conversion
 - Attempt to parse string-typed numeric results with `NumberParser parse:onError:`
 - If parsing fails, return the original string value as-is (to handle the rare case of a
-  non-numeric label value)
+  non-numeric sample value)
 
 ### Query Result Representation
 - `[timestamp, value]` pairs returned by `TS.GET` / `TS.RANGE` etc. are represented as an array
