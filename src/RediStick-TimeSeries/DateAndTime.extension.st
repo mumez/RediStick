@@ -1,6 +1,6 @@
 Extension { #name : 'DateAndTime' }
 
 { #category : '*RediStick-TimeSeries' }
-DateAndTime >> asUnixTimestampValue [
-	^ (self asUnixTime * 1000) truncated
+DateAndTime >> asRediStickUnixTimestampMillis [
+	^ (self - DateAndTime epoch) asMilliSeconds
 ]

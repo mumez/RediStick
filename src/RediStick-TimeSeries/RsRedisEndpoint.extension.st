@@ -10,7 +10,7 @@ RsRedisEndpoint >> tsAdd: key timestamp: tsMSecsOrDateTime value: value using: o
 	| args options tsValue |
 	tsValue := tsMSecsOrDateTime
 		ifNil: [ '*' ]
-		ifNotNil: [ tsMSecsOrDateTime asUnixTimestampValue ].
+		ifNotNil: [ tsMSecsOrDateTime asRediStickUnixTimestampMillis ].
 	args := {
 		        'TS.ADD'.
 		        key.
@@ -65,8 +65,8 @@ RsRedisEndpoint >> tsDel: key from: fromTimestamp to: toTimestamp [
 		unifiedCommand: {
 				'TS.DEL'.
 				key.
-				fromTimestamp asUnixTimestampValue.
-				toTimestamp asUnixTimestampValue }
+				fromTimestamp asRediStickUnixTimestampMillis.
+				toTimestamp asRediStickUnixTimestampMillis }
 ]
 
 { #category : '*RediStick-TimeSeries' }
@@ -85,6 +85,21 @@ RsRedisEndpoint >> tsGet: key latest: aBoolean [
 	^ (result isNil or: [ result isEmpty ])
 		ifTrue: [ nil ]
 		ifFalse: [ result first -> (self tsParseValue: result second) ]
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsInfo: key [
+	"Returns a Dictionary of TS.INFO fields for the given time series key,
+	 or nil if the key does not exist. Numeric fields are parsed as Numbers;
+	 the 'labels' field is kept as the nested array returned by Redis so
+	 callers can map it to a Dictionary if needed."
+	| result info |
+	result := self unifiedCommand: { 'TS.INFO'. key }.
+	result isNil ifTrue: [ ^ nil ].
+	info := Dictionary new.
+	1 to: result size by: 2 do: [ :i |
+		info at: (result at: i) put: (self tsParseValue: (result at: i + 1)) ].
+	^ info
 ]
 
 { #category : '*RediStick-TimeSeries' }
