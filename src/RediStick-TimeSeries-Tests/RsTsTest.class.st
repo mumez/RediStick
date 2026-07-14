@@ -127,7 +127,5 @@ RsTsTest >> testTsGetLatestSample [
 
 { #category : 'tests' }
 RsTsTest >> testTsGetNonExistingKey [
-	self
-		should: [ stick endpoint tsGet: 'test:ts:get:nonexisting' ]
-		raise: Error
+	self assert: (stick endpoint tsGet: 'test:ts:get:nonexisting') isNil
 ]
