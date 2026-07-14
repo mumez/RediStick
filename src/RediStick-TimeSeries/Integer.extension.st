@@ -1,6 +1,6 @@
 Extension { #name : 'Integer' }
 
 { #category : '*RediStick-TimeSeries' }
-Integer >> asUnixTimestampValue [
+Integer >> asRediStickUnixTimestampMillis [
 	^ self
 ]
