@@ -37,23 +37,10 @@ parked for follow-up work (Phase 1b/2/3 or a dedicated cleanup PR).
 - Same 3-line block in two places: append `'LABELS'` then
   `flattenedKeysAndValuesFrom: options labels`. Local drift hazard in a
   94-line file.
-- Suggested refactor: move the labels emission into the options class
-  so `options asArray` returns the full trailing sequence (including
-  `LABELS k v ...`), and have both endpoint methods just do
-  `args addAll: options asArray`.
+- Suggested refactor: add a private method for common LABELS+values part.
 
-### 4. `DateAndTime >> asRediStickUnixTimestampMillis` performance
-- File: `src/RediStick-TimeSeries/DateAndTime.extension.st:5`
-- Current implementation uses Integer arithmetic
-  (`(self - DateAndTime epoch) asMilliSeconds`), so the original Float
-  round-trip performance concern is largely addressed.
-- However, the new method also benefits from being on the DateAndTime
-  receiver itself — for high-frequency ingest the receiver re-derives
-  the Julian/seconds pair on every call. If profiling shows a hot path,
-  consider caching the result on the receiver or precomputing the millis
-  in the construction path.
 
-### 5. `tsParseValue:` silently returns a String on parse failure
+### 4. `tsParseValue:` silently returns a String on parse failure
 - File: `src/RediStick-TimeSeries/RsRedisEndpoint.extension.st:91-94`
 - The design doc justifies the fallback as handling non-numeric label
   values, but the method is only called on `result second` (the sample
@@ -65,32 +52,6 @@ parked for follow-up work (Phase 1b/2/3 or a dedicated cleanup PR).
   planned `TS.INFO` / `TS.RANGE` paths. If a non-numeric label case
   really needs to be supported, add a separate helper for that.
 
-### 6. Extension selector name conflict risk (partially addressed by rename)
-- Files: `src/RediStick-TimeSeries/DateAndTime.extension.st:5`,
-  `src/RediStick-TimeSeries/Integer.extension.st:5`
-- The selector was renamed from `asUnixTimestampValue` to
-  `asRediStickUnixTimestampMillis` to encode the unit explicitly and
-  reduce the chance of collision with other libraries under
-  `.smalltalk.ston`'s `#useLoaded` policy.
-- If other RediStick packages or sister projects define similarly
-  generic extensions, the safer long-term move is to move
-  `asRediStickUnixTimestampMillis` into a shared `RediStick-Core`
-  extension to control its definition and ownership.
-
-## Additional deployment-safety notes (informational)
-
-- `README.md` does not mention the new `RediStick-TimeSeries` package.
-  Users who only read the README will not know the package exists, and
-  the Phase 1a-only scope (TS.CREATE / TS.ADD / TS.DEL / TS.GET) is
-  undocumented for end users. Plan to add a "With TimeSeries package"
-  Metacello example and a usage snippet covering `tsCreate:` /
-  `tsAdd: value:` / `tsGet:` in a follow-up.
-- `doc/specs/2026-07-13-timeseries-commands-design.md` describes
-  unimplemented Phase 1b/2/3 commands (`tsMAdd:`, `tsRange:`,
-  `tsIncrBy:`, `tsCreateRule:`, etc.) as if they were committed. Add a
-  "Status" line near the top stating that only Phase 1a is currently
-  implemented, and move the future-phase section under a
-  "## Planned (not yet implemented)" heading.
 
 ## Performance / dead-code findings dropped after filter
 
