@@ -20,10 +20,7 @@ RsRedisEndpoint >> tsAdd: key timestamp: tsMSecsOrDateTime value: value using: o
 		options := RsTsAddOptions new.
 		optionsBlock value: options.
 		args addAll: options asArray.
-		options labels ifNotNil: [ :labels |
-			args add: 'LABELS'.
-			args addAll: (self flattenedKeysAndValuesFrom: labels) ]
-	].
+		self tsAppendLabelsFrom: options to: args ].
 	^ self unifiedCommand: args
 ]
 
@@ -52,10 +49,7 @@ RsRedisEndpoint >> tsCreate: key using: optionsBlock [
 		options := RsTsCreateOptions new.
 		optionsBlock value: options.
 		args addAll: options asArray.
-		options labels ifNotNil: [ :labels |
-			args add: 'LABELS'.
-			args addAll: (self flattenedKeysAndValuesFrom: labels) ]
-	].
+		self tsAppendLabelsFrom: options to: args ].
 	^ self unifiedCommand: args
 ]
 
@@ -95,11 +89,18 @@ RsRedisEndpoint >> tsInfo: key [
 	 callers can map it to a Dictionary if needed."
 	| result info |
 	result := self unifiedCommand: { 'TS.INFO'. key }.
-	result isNil ifTrue: [ ^ nil ].
+	result ifNil: [ ^ nil ].
 	info := Dictionary new.
 	1 to: result size by: 2 do: [ :i |
 		info at: (result at: i) put: (self tsParseValue: (result at: i + 1)) ].
 	^ info
+]
+
+{ #category : '*RediStick-TimeSeries-private' }
+RsRedisEndpoint >> tsAppendLabelsFrom: options to: args [
+	options labels ifNotNil: [ :labels |
+		args add: 'LABELS'.
+		args addAll: (self flattenedKeysAndValuesFrom: labels) ]
 ]
 
 { #category : '*RediStick-TimeSeries' }

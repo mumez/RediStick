@@ -39,7 +39,6 @@ parked for follow-up work (Phase 1b/2/3 or a dedicated cleanup PR).
   94-line file.
 - Suggested refactor: add a private method for common LABELS+values part.
 
-
 ### 4. `tsParseValue:` silently returns a String on parse failure
 - File: `src/RediStick-TimeSeries/RsRedisEndpoint.extension.st:91-94`
 - The design doc justifies the fallback as handling non-numeric label
