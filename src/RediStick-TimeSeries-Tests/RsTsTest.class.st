@@ -50,6 +50,18 @@ RsTsTest >> testTsAddWithExplicitTimestamp [
 ]
 
 { #category : 'tests' }
+RsTsTest >> testTsAddAutoTimestampWithOptions [
+	| key result |
+	key := 'test:ts:add:auto:options'.
+	result := stick endpoint
+		tsAdd: key
+		value: 55
+		using: [ :opts | opts retention: 60000; encoding: 'UNCOMPRESSED' ].
+	self assert: result isNumber.
+	self assert: (stick endpoint tsGet: key) value equals: 55
+]
+
+{ #category : 'tests' }
 RsTsTest >> testTsAddWithOptions [
 	| key result |
 	key := 'test:ts:add:options'.
