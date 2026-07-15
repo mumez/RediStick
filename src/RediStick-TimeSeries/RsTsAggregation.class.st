@@ -32,11 +32,13 @@ RsTsAggregation >> count [
 
 { #category : 'aggregators' }
 RsTsAggregation >> countAll [
+	"Requires Redis TimeSeries 8.6+"
 	aggregators add: 'countAll'
 ]
 
 { #category : 'aggregators' }
 RsTsAggregation >> countNaN [
+	"Requires Redis TimeSeries 8.6+"
 	aggregators add: 'countNaN'
 ]
 
@@ -97,5 +99,7 @@ RsTsAggregation >> varS [
 
 { #category : 'converting' }
 RsTsAggregation >> asArray [
+	aggregators isEmpty ifTrue: [ Error signal: 'At least one aggregator must be selected' ].
+	bucketDuration ifNil: [ Error signal: 'bucketDuration must be set' ].
 	^ { 'AGGREGATION'. (aggregators fold: [ :a :b | a , ',' , b ]). bucketDuration }
 ]
