@@ -114,6 +114,27 @@ RsRedisEndpoint >> tsRange: key rangeBy: rangeBlock using: optionsBlock [
 	^ self tsParseRangeSamples: (self unifiedCommand: args)
 ]
 
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsRange: key rangeBy: rangeBlock aggregationBy: aggregationBlock using: optionsBlock [
+	| range options args aggregation aggOptions |
+	range := self tsRangeFrom: (rangeBlock value: RsTsRange).
+	options := nil.
+	optionsBlock ifNotNil: [
+		options := RsTsRangeOptions new.
+		optionsBlock value: options ].
+	aggregation := RsTsAggregation new.
+	aggOptions := RsTsAggregationOptions new.
+	aggregationBlock value: aggregation value: aggOptions.
+	args := self
+		tsRangeArgsFor: 'TS.RANGE'
+		key: key
+		range: range
+		options: options
+		aggregation: aggregation
+		aggOptions: aggOptions.
+	^ self tsParseRangeSamples: (self unifiedCommand: args)
+]
+
 { #category : '*RediStick-TimeSeries-private' }
 RsRedisEndpoint >> tsRangeFrom: rangeBlockResult [
 	(rangeBlockResult isKindOf: RsTsRange) ifTrue: [ ^ rangeBlockResult ].

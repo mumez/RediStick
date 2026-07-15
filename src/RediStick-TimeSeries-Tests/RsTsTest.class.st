@@ -226,6 +226,79 @@ RsTsTest >> testTsRangeWithFilterByValueAndCount [
 	self assert: (result at: 2) value equals: 40
 ]
 
+{ #category : 'tests' }
+RsTsTest >> testTsRangeWithSingleAggregator [
+	| key result |
+	key := 'test:ts:range:agg:single'.
+	stick endpoint tsAdd: key timestamp: 1000 value: 100.
+	stick endpoint tsAdd: key timestamp: 1010 value: 110.
+	stick endpoint tsAdd: key timestamp: 1020 value: 120.
+
+	result := stick endpoint
+		tsRange: key
+		rangeBy: [ :r | r all ]
+		aggregationBy: [ :aggs :aggOpts | aggs min; bucketDuration: 20 ]
+		using: nil.
+	self assert: result size equals: 2.
+	self assert: (result at: 1) value equals: 100.
+	self assert: (result at: 2) value equals: 120
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsRangeWithMultipleAggregators [
+	| key result |
+	key := 'test:ts:range:agg:multi'.
+	stick endpoint tsAdd: key timestamp: 1000 value: 30.
+	stick endpoint tsAdd: key timestamp: 1010 value: 35.
+	stick endpoint tsAdd: key timestamp: 1020 value: 40.
+
+	result := stick endpoint
+		tsRange: key
+		rangeBy: [ :r | r all ]
+		aggregationBy: [ :aggs :aggOpts | aggs min; avg; max; bucketDuration: 1000 ]
+		using: nil.
+	self assert: result size equals: 1.
+	self assert: (result at: 1) value size equals: 3.
+	self assert: ((result at: 1) value at: 1) equals: 30.
+	self assert: ((result at: 1) value at: 3) equals: 40
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsRangeAggregationWithAlign [
+	| key result |
+	key := 'test:ts:range:agg:align'.
+	stick endpoint tsAdd: key timestamp: 1000 value: 100.
+	stick endpoint tsAdd: key timestamp: 1010 value: 110.
+	stick endpoint tsAdd: key timestamp: 1020 value: 120.
+
+	result := stick endpoint
+		tsRange: key
+		rangeBy: [ :r | r all ]
+		aggregationBy: [ :aggs :aggOpts |
+			aggOpts align: 10.
+			aggs min; bucketDuration: 20 ]
+		using: nil.
+	self assert: (result at: 1) key equals: 990
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsRangeAggregationWithBucketTimestampAndEmpty [
+	| key result |
+	key := 'test:ts:range:agg:empty'.
+	stick endpoint tsAdd: key timestamp: 1000 value: 100.
+	stick endpoint tsAdd: key timestamp: 3000 value: 300.
+
+	result := stick endpoint
+		tsRange: key
+		rangeBy: [ :r | r all ]
+		aggregationBy: [ :aggs :aggOpts |
+			aggOpts bucketTimestamp: '+'; empty.
+			aggs sum; bucketDuration: 1000 ]
+		using: nil.
+	self assert: result size equals: 3.
+	self assert: (result at: 2) value equals: 0
+]
+
 { #category : 'helpers' }
 RsTsTest >> labelsAsDictionary: aLabelsArray [
 	"Converts the nested labels array returned by TS.INFO
