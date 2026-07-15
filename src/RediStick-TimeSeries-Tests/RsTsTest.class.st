@@ -158,6 +158,74 @@ RsTsTest >> testTsGetNonExistingKey [
 	self assert: (stick endpoint tsGet: 'test:ts:get:nonexisting') isNil
 ]
 
+{ #category : 'tests' }
+RsTsTest >> testTsRangeBasic [
+	| key result |
+	key := 'test:ts:range:basic'.
+	stick endpoint tsAdd: key timestamp: 1000 value: 30.
+	stick endpoint tsAdd: key timestamp: 1010 value: 35.
+	stick endpoint tsAdd: key timestamp: 1020 value: 40.
+
+	result := stick endpoint tsRange: key rangeBy: [ :r | r all ] using: nil.
+	self assert: result size equals: 3.
+	self assert: (result at: 1) key equals: 1000.
+	self assert: (result at: 1) value equals: 30.
+	self assert: (result at: 3) value equals: 40
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsRangeWithExplicitFromTo [
+	| key result |
+	key := 'test:ts:range:explicit'.
+	stick endpoint tsAdd: key timestamp: 1000 value: 30.
+	stick endpoint tsAdd: key timestamp: 1010 value: 35.
+	stick endpoint tsAdd: key timestamp: 1020 value: 40.
+
+	result := stick endpoint
+		tsRange: key
+		rangeBy: [ :r | r from: 1000 to: 1010 ]
+		using: nil.
+	self assert: result size equals: 2.
+	self assert: (result at: 2) key equals: 1010
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsRangeWithAssociationRangeBlock [
+	| key result |
+	key := 'test:ts:range:association'.
+	stick endpoint tsAdd: key timestamp: 1000 value: 30.
+	stick endpoint tsAdd: key timestamp: 1010 value: 35.
+
+	result := stick endpoint tsRange: key rangeBy: [ :r | 1000 -> r end ] using: nil.
+	self assert: result size equals: 2
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsRangeEmptySeriesReturnsEmptyArray [
+	| key result |
+	key := 'test:ts:range:empty'.
+	stick endpoint tsCreate: key.
+	result := stick endpoint tsRange: key rangeBy: [ :r | r all ] using: nil.
+	self assertCollection: result equals: #()
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsRangeWithFilterByValueAndCount [
+	| key result |
+	key := 'test:ts:range:filters'.
+	stick endpoint tsAdd: key timestamp: 1000 value: 30.
+	stick endpoint tsAdd: key timestamp: 1010 value: 9999.
+	stick endpoint tsAdd: key timestamp: 1020 value: 40.
+
+	result := stick endpoint
+		tsRange: key
+		rangeBy: [ :r | r all ]
+		using: [ :opts | opts filterByValueMin: -100 max: 100 ].
+	self assert: result size equals: 2.
+	self assert: (result at: 1) value equals: 30.
+	self assert: (result at: 2) value equals: 40
+]
+
 { #category : 'helpers' }
 RsTsTest >> labelsAsDictionary: aLabelsArray [
 	"Converts the nested labels array returned by TS.INFO

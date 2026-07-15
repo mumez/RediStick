@@ -96,6 +96,53 @@ RsRedisEndpoint >> tsInfo: key [
 	^ info
 ]
 
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsRange: key rangeBy: rangeBlock using: optionsBlock [
+	| range options args |
+	range := self tsRangeFrom: (rangeBlock value: RsTsRange).
+	options := nil.
+	optionsBlock ifNotNil: [
+		options := RsTsRangeOptions new.
+		optionsBlock value: options ].
+	args := self
+		tsRangeArgsFor: 'TS.RANGE'
+		key: key
+		range: range
+		options: options
+		aggregation: nil
+		aggOptions: nil.
+	^ self tsParseRangeSamples: (self unifiedCommand: args)
+]
+
+{ #category : '*RediStick-TimeSeries-private' }
+RsRedisEndpoint >> tsRangeFrom: rangeBlockResult [
+	(rangeBlockResult isKindOf: RsTsRange) ifTrue: [ ^ rangeBlockResult ].
+	^ RsTsRange from: rangeBlockResult key to: rangeBlockResult value
+]
+
+{ #category : '*RediStick-TimeSeries-private' }
+RsRedisEndpoint >> tsRangeArgsFor: cmdName key: key range: aTsRange options: options aggregation: aggregation aggOptions: aggOptions [
+	| args |
+	args := OrderedCollection new.
+	args add: cmdName; add: key.
+	args addAll: aTsRange asArray.
+	options ifNotNil: [ args addAll: options asArray ].
+	aggOptions ifNotNil: [ args addAll: aggOptions alignArray ].
+	aggregation ifNotNil: [ args addAll: aggregation asArray ].
+	aggOptions ifNotNil: [ args addAll: aggOptions tailArray ].
+	^ args asArray
+]
+
+{ #category : '*RediStick-TimeSeries-private' }
+RsRedisEndpoint >> tsParseRangeSamples: rawResult [
+	rawResult ifNil: [ ^ #() ].
+	^ (rawResult collect: [ :row |
+		row size = 2
+			ifTrue: [ row first -> (self tsParseValue: row second) ]
+			ifFalse: [ row first -> ((row allButFirst) collect: [ :v | self tsParseValue: v ]) ] ])
+		asArray
+]
+
 { #category : '*RediStick-TimeSeries-private' }
 RsRedisEndpoint >> tsAppendLabelsFrom: options to: args [
 	options labels ifNotNil: [ :labels |
