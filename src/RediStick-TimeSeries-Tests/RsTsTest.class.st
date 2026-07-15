@@ -299,6 +299,56 @@ RsTsTest >> testTsRangeAggregationWithBucketTimestampAndEmpty [
 	self assert: (result at: 2) value equals: 0
 ]
 
+{ #category : 'tests' }
+RsTsTest >> testTsRevRangeBasic [
+	| key result |
+	key := 'test:ts:revrange:basic'.
+	stick endpoint tsAdd: key timestamp: 1000 value: 30.
+	stick endpoint tsAdd: key timestamp: 1010 value: 35.
+	stick endpoint tsAdd: key timestamp: 1020 value: 40.
+
+	result := stick endpoint tsRevRange: key rangeBy: [ :r | r all ] using: nil.
+	self assert: result size equals: 3.
+	self assert: (result at: 1) key equals: 1020.
+	self assert: (result at: 1) value equals: 40.
+	self assert: (result at: 3) key equals: 1000
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsRevRangeWithCountOption [
+	| key result |
+	key := 'test:ts:revrange:count'.
+	stick endpoint tsAdd: key timestamp: 1000 value: 30.
+	stick endpoint tsAdd: key timestamp: 1010 value: 35.
+	stick endpoint tsAdd: key timestamp: 1020 value: 40.
+
+	result := stick endpoint
+		tsRevRange: key
+		rangeBy: [ :r | r all ]
+		using: [ :opts | opts count: 2 ].
+	self assert: result size equals: 2.
+	self assert: (result at: 1) key equals: 1020.
+	self assert: (result at: 2) key equals: 1010
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsRevRangeWithAggregation [
+	| key result |
+	key := 'test:ts:revrange:agg'.
+	stick endpoint tsAdd: key timestamp: 1000 value: 100.
+	stick endpoint tsAdd: key timestamp: 1010 value: 110.
+	stick endpoint tsAdd: key timestamp: 1020 value: 120.
+
+	result := stick endpoint
+		tsRevRange: key
+		rangeBy: [ :r | r all ]
+		aggregationBy: [ :aggs :aggOpts | aggs max; bucketDuration: 20 ]
+		using: nil.
+	self assert: result size equals: 2.
+	self assert: (result at: 1) value equals: 120.
+	self assert: (result at: 2) value equals: 110
+]
+
 { #category : 'helpers' }
 RsTsTest >> labelsAsDictionary: aLabelsArray [
 	"Converts the nested labels array returned by TS.INFO
