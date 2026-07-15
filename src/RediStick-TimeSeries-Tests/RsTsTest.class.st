@@ -349,6 +349,53 @@ RsTsTest >> testTsRevRangeWithAggregation [
 	self assert: (result at: 2) value equals: 110
 ]
 
+{ #category : 'tests' }
+RsTsTest >> testTsAlterBasic [
+	| key result info |
+	key := 'test:ts:alter:basic'.
+	stick endpoint tsCreate: key using: [ :opts | opts retention: 60000 ].
+	result := stick endpoint tsAlter: key using: [ :opts | opts retention: 120000 ].
+	self assert: result equals: 'OK'.
+	info := stick endpoint tsInfo: key.
+	self assert: (info at: 'retentionTime') equals: 120000
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsAlterLabels [
+	| key result labels info |
+	key := 'test:ts:alter:labels'.
+	stick endpoint tsCreate: key using: [ :opts |
+		opts labels: { 'sensor_id' -> '1' } ].
+	result := stick endpoint tsAlter: key using: [ :opts |
+		opts labels: { 'sensor_id' -> '2'. 'area_id' -> '5' } ].
+	self assert: result equals: 'OK'.
+	info := stick endpoint tsInfo: key.
+	labels := self labelsAsDictionary: (info at: 'labels').
+	self assert: (labels at: 'sensor_id') equals: '2'.
+	self assert: (labels at: 'area_id') equals: '5'
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsAlterDuplicatePolicy [
+	| key result info |
+	key := 'test:ts:alter:dupolicy'.
+	stick endpoint tsCreate: key.
+	result := stick endpoint tsAlter: key using: [ :opts |
+		opts duplicatePolicy: 'MAX' ].
+	self assert: result equals: 'OK'.
+	info := stick endpoint tsInfo: key.
+	self assert: (info at: 'duplicatePolicy') equals: 'max'
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsAlterNoOptions [
+	| key result |
+	key := 'test:ts:alter:noopts'.
+	stick endpoint tsCreate: key.
+	result := stick endpoint tsAlter: key.
+	self assert: result equals: 'OK'
+]
+
 { #category : 'helpers' }
 RsTsTest >> labelsAsDictionary: aLabelsArray [
 	"Converts the nested labels array returned by TS.INFO

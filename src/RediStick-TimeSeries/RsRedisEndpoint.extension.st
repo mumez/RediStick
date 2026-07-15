@@ -1,6 +1,25 @@
 Extension { #name : 'RsRedisEndpoint' }
 
 { #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsAlter: key [
+	^ self tsAlter: key using: nil
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsAlter: key using: optionsBlock [
+	| args options |
+	args := {
+		        'TS.ALTER'.
+		        key } asOrderedCollection.
+	optionsBlock ifNotNil: [
+		options := RsTsAlterOptions new.
+		optionsBlock value: options.
+		args addAll: options asArray.
+		self tsAppendLabelsFrom: options to: args ].
+	^ self unifiedCommand: args
+]
+
+{ #category : '*RediStick-TimeSeries' }
 RsRedisEndpoint >> tsAdd: key timestamp: tsMSecsOrDateTime value: value [
 	^ self tsAdd: key timestamp: tsMSecsOrDateTime value: value using: nil
 ]
