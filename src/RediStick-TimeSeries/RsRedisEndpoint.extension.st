@@ -129,7 +129,7 @@ RsRedisEndpoint >> tsExecuteRange: cmdName key: key rangeBy: rangeBlock aggregat
 	aggregationBlock ifNotNil: [
 		aggregation := RsTsAggregation new.
 		aggOptions := RsTsAggregationOptions new.
-		aggregationBlock value: aggregation value: aggOptions ].
+		aggregationBlock cull: aggregation cull: aggOptions ].
 	args := self
 		tsRangeArgsFor: cmdName
 		key: key
@@ -142,8 +142,9 @@ RsRedisEndpoint >> tsExecuteRange: cmdName key: key rangeBy: rangeBlock aggregat
 
 { #category : '*RediStick-TimeSeries-private' }
 RsRedisEndpoint >> tsRangeFrom: rangeBlockResult [
-	(rangeBlockResult isKindOf: RsTsRange) ifTrue: [ ^ rangeBlockResult ].
-	^ RsTsRange from: rangeBlockResult key to: rangeBlockResult value
+	rangeBlockResult isAssociation ifTrue: [
+		^ RsTsRange from: rangeBlockResult key to: rangeBlockResult value ].
+	^ rangeBlockResult
 ]
 
 { #category : '*RediStick-TimeSeries-private' }
