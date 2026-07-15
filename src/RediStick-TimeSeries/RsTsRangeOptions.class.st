@@ -22,14 +22,19 @@ RsTsRangeOptions >> initialize [
 RsTsRangeOptions >> asArray [
 	| opts |
 	opts := OrderedCollection new.
-	latest ifTrue: [ opts add: 'LATEST' ].
-	filterByTs ifNotNil: [ :ts |
+	self isLatest ifTrue: [ opts add: 'LATEST' ].
+	self filterByTs ifNotNil: [ :ts |
 		opts add: 'FILTER_BY_TS'.
 		opts addAll: ts ].
-	(filterByValueMin notNil and: [ filterByValueMax notNil ]) ifTrue: [
-		opts addAll: { 'FILTER_BY_VALUE'. filterByValueMin. filterByValueMax } ].
-	count ifNotNil: [ :c | opts addAll: { 'COUNT'. c } ].
+	(self filterByValueMin notNil and: [ self filterByValueMax notNil ]) ifTrue: [
+		opts addAll: { 'FILTER_BY_VALUE'. self filterByValueMin. self filterByValueMax } ].
+	self count ifNotNil: [ :c | opts addAll: { 'COUNT'. c } ].
 	^ opts asArray
+]
+
+{ #category : 'accessing' }
+RsTsRangeOptions >> count [
+	^ count
 ]
 
 { #category : 'accessing' }
@@ -38,14 +43,34 @@ RsTsRangeOptions >> count: anInteger [
 ]
 
 { #category : 'accessing' }
+RsTsRangeOptions >> filterByTs [
+	^ filterByTs
+]
+
+{ #category : 'accessing' }
 RsTsRangeOptions >> filterByTs: aCollectionOfTimestamps [
 	filterByTs := aCollectionOfTimestamps collect: [ :ts | RsTsRange normalizeTimestamp: ts ]
+]
+
+{ #category : 'accessing' }
+RsTsRangeOptions >> filterByValueMax [
+	^ filterByValueMax
+]
+
+{ #category : 'accessing' }
+RsTsRangeOptions >> filterByValueMin [
+	^ filterByValueMin
 ]
 
 { #category : 'accessing' }
 RsTsRangeOptions >> filterByValueMin: aMin max: aMax [
 	filterByValueMin := aMin.
 	filterByValueMax := aMax
+]
+
+{ #category : 'accessing' }
+RsTsRangeOptions >> isLatest [
+	^ latest
 ]
 
 { #category : 'accessing' }

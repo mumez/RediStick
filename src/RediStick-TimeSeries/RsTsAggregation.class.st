@@ -15,9 +15,19 @@ RsTsAggregation >> initialize [
 	aggregators := OrderedCollection new
 ]
 
+{ #category : 'accessing' }
+RsTsAggregation >> aggregators [
+	^ aggregators
+]
+
 { #category : 'aggregators' }
 RsTsAggregation >> avg [
-	aggregators add: 'avg'
+	self aggregators add: 'avg'
+]
+
+{ #category : 'accessing' }
+RsTsAggregation >> bucketDuration [
+	^ bucketDuration
 ]
 
 { #category : 'accessing' }
@@ -27,79 +37,79 @@ RsTsAggregation >> bucketDuration: anInteger [
 
 { #category : 'aggregators' }
 RsTsAggregation >> count [
-	aggregators add: 'count'
+	self aggregators add: 'count'
 ]
 
 { #category : 'aggregators' }
 RsTsAggregation >> countAll [
 	"Requires Redis TimeSeries 8.6+"
-	aggregators add: 'countAll'
+	self aggregators add: 'countAll'
 ]
 
 { #category : 'aggregators' }
 RsTsAggregation >> countNaN [
 	"Requires Redis TimeSeries 8.6+"
-	aggregators add: 'countNaN'
+	self aggregators add: 'countNaN'
 ]
 
 { #category : 'aggregators' }
 RsTsAggregation >> first [
-	aggregators add: 'first'
+	self aggregators add: 'first'
 ]
 
 { #category : 'aggregators' }
 RsTsAggregation >> last [
-	aggregators add: 'last'
+	self aggregators add: 'last'
 ]
 
 { #category : 'aggregators' }
 RsTsAggregation >> max [
-	aggregators add: 'max'
+	self aggregators add: 'max'
 ]
 
 { #category : 'aggregators' }
 RsTsAggregation >> min [
-	aggregators add: 'min'
+	self aggregators add: 'min'
 ]
 
 { #category : 'aggregators' }
 RsTsAggregation >> range [
-	aggregators add: 'range'
+	self aggregators add: 'range'
 ]
 
 { #category : 'aggregators' }
 RsTsAggregation >> stdP [
-	aggregators add: 'std.p'
+	self aggregators add: 'std.p'
 ]
 
 { #category : 'aggregators' }
 RsTsAggregation >> stdS [
-	aggregators add: 'std.s'
+	self aggregators add: 'std.s'
 ]
 
 { #category : 'aggregators' }
 RsTsAggregation >> sum [
-	aggregators add: 'sum'
+	self aggregators add: 'sum'
 ]
 
 { #category : 'aggregators' }
 RsTsAggregation >> twa [
-	aggregators add: 'twa'
+	self aggregators add: 'twa'
 ]
 
 { #category : 'aggregators' }
 RsTsAggregation >> varP [
-	aggregators add: 'var.p'
+	self aggregators add: 'var.p'
 ]
 
 { #category : 'aggregators' }
 RsTsAggregation >> varS [
-	aggregators add: 'var.s'
+	self aggregators add: 'var.s'
 ]
 
 { #category : 'converting' }
 RsTsAggregation >> asArray [
-	aggregators isEmpty ifTrue: [ Error signal: 'At least one aggregator must be selected' ].
-	bucketDuration ifNil: [ Error signal: 'bucketDuration must be set' ].
-	^ { 'AGGREGATION'. (aggregators fold: [ :a :b | a , ',' , b ]). bucketDuration }
+	self aggregators isEmpty ifTrue: [ Error signal: 'At least one aggregator must be selected' ].
+	self bucketDuration ifNil: [ Error signal: 'bucketDuration must be set' ].
+	^ { 'AGGREGATION'. (self aggregators fold: [ :a :b | a , ',' , b ]). self bucketDuration }
 ]

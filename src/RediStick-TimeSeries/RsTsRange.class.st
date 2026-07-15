@@ -49,7 +49,7 @@ RsTsRange class >> to: aTo [
 
 { #category : 'converting' }
 RsTsRange >> asArray [
-	^ { from. to }
+	^ { self from. self to }
 ]
 
 { #category : 'accessing' }
