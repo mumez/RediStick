@@ -388,12 +388,25 @@ RsTsTest >> testTsAlterDuplicatePolicy [
 ]
 
 { #category : 'tests' }
-RsTsTest >> testTsAlterNoOptions [
-	| key result |
-	key := 'test:ts:alter:noopts'.
+RsTsTest >> testTsAlterChunkSize [
+	| key result info |
+	key := 'test:ts:alter:chunksize'.
 	stick endpoint tsCreate: key.
-	result := stick endpoint tsAlter: key.
-	self assert: result equals: 'OK'
+	result := stick endpoint tsAlter: key chunkSize: 2048.
+	self assert: result equals: 'OK'.
+	info := stick endpoint tsInfo: key.
+	self assert: (info at: 'chunkSize') equals: 2048
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsAlterRetention [
+	| key result info |
+	key := 'test:ts:alter:retention'.
+	stick endpoint tsCreate: key using: [ :opts | opts retention: 60000 ].
+	result := stick endpoint tsAlter: key retention: 180000.
+	self assert: result equals: 'OK'.
+	info := stick endpoint tsInfo: key.
+	self assert: (info at: 'retentionTime') equals: 180000
 ]
 
 { #category : 'helpers' }

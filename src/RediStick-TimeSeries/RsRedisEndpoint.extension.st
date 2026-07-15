@@ -1,8 +1,23 @@
 Extension { #name : 'RsRedisEndpoint' }
 
 { #category : '*RediStick-TimeSeries' }
-RsRedisEndpoint >> tsAlter: key [
-	^ self tsAlter: key using: nil
+RsRedisEndpoint >> tsAlter: key chunkSize: aSize [
+	^ self tsAlter: key using: [ :opts | opts chunkSize: aSize ]
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsAlter: key duplicatePolicy: aPolicy [
+	^ self tsAlter: key using: [ :opts | opts duplicatePolicy: aPolicy ]
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsAlter: key labels: labelsAssoc [
+	^ self tsAlter: key using: [ :opts | opts labels: labelsAssoc ]
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsAlter: key retention: aRetentionMs [
+	^ self tsAlter: key using: [ :opts | opts retention: aRetentionMs ]
 ]
 
 { #category : '*RediStick-TimeSeries' }
