@@ -118,7 +118,8 @@ RsRedisEndpoint >> tsRevRange: key rangeBy: rangeBlock aggregationBy: aggregatio
 
 { #category : '*RediStick-TimeSeries-private' }
 RsRedisEndpoint >> tsExecuteRange: cmdName key: key rangeBy: rangeBlock aggregationBy: aggregationBlock using: optionsBlock [
-	| range options aggregation aggOptions args |
+    "private"
+    | range options aggregation aggOptions args |
 	range := self tsRangeFrom: (rangeBlock value: RsTsRange).
 	options := nil.
 	optionsBlock ifNotNil: [
@@ -142,6 +143,7 @@ RsRedisEndpoint >> tsExecuteRange: cmdName key: key rangeBy: rangeBlock aggregat
 
 { #category : '*RediStick-TimeSeries-private' }
 RsRedisEndpoint >> tsRangeFrom: rangeBlockResult [
+    "private"
 	rangeBlockResult isAssociation ifTrue: [
 		^ RsTsRange from: rangeBlockResult key to: rangeBlockResult value ].
 	^ rangeBlockResult
@@ -149,6 +151,7 @@ RsRedisEndpoint >> tsRangeFrom: rangeBlockResult [
 
 { #category : '*RediStick-TimeSeries-private' }
 RsRedisEndpoint >> tsRangeArgsFor: cmdName key: key range: aTsRange options: options aggregation: aggregation aggOptions: aggOptions [
+	"private"
 	| args |
 	args := OrderedCollection new.
 	args add: cmdName; add: key.
@@ -162,6 +165,7 @@ RsRedisEndpoint >> tsRangeArgsFor: cmdName key: key range: aTsRange options: opt
 
 { #category : '*RediStick-TimeSeries-private' }
 RsRedisEndpoint >> tsParseRangeSamples: rawResult [
+    "private"
 	rawResult ifNil: [ ^ #() ].
 	^ (rawResult collect: [ :row |
 		row size = 2
@@ -172,13 +176,15 @@ RsRedisEndpoint >> tsParseRangeSamples: rawResult [
 
 { #category : '*RediStick-TimeSeries-private' }
 RsRedisEndpoint >> tsAppendLabelsFrom: options to: args [
+    "private"
 	options labels ifNotNil: [ :labels |
 		args add: 'LABELS'.
 		args addAll: (self flattenedKeysAndValuesFrom: labels) ]
 ]
 
-{ #category : '*RediStick-TimeSeries' }
+{ #category : '*RediStick-TimeSeries-private' }
 RsRedisEndpoint >> tsParseValue: aValue [
+    "private"
 	aValue isString ifFalse: [ ^ aValue ].
 	^ NumberParser parse: aValue onError: [ aValue ]
 ]
