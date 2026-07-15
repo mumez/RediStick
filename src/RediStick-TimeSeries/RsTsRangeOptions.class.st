@@ -39,8 +39,7 @@ RsTsRangeOptions >> count: anInteger [
 
 { #category : 'accessing' }
 RsTsRangeOptions >> filterByTs: aCollectionOfTimestamps [
-	filterByTs := aCollectionOfTimestamps collect: [ :ts |
-		ts isString ifTrue: [ ts ] ifFalse: [ ts asRediStickUnixTimestampMillis ] ]
+	filterByTs := aCollectionOfTimestamps collect: [ :ts | RsTsRange normalizeTimestamp: ts ]
 ]
 
 { #category : 'accessing' }

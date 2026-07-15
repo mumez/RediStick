@@ -23,7 +23,7 @@ RsTsAggregationOptions >> alignArray [
 
 { #category : 'accessing' }
 RsTsAggregationOptions >> align: aValue [
-	align := aValue isString ifTrue: [ aValue ] ifFalse: [ aValue asRediStickUnixTimestampMillis ]
+	align := RsTsRange normalizeTimestamp: aValue
 ]
 
 { #category : 'accessing' }

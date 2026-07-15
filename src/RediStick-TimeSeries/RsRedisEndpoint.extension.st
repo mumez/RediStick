@@ -98,74 +98,40 @@ RsRedisEndpoint >> tsInfo: key [
 
 { #category : '*RediStick-TimeSeries' }
 RsRedisEndpoint >> tsRange: key rangeBy: rangeBlock using: optionsBlock [
-	| range options args |
-	range := self tsRangeFrom: (rangeBlock value: RsTsRange).
-	options := nil.
-	optionsBlock ifNotNil: [
-		options := RsTsRangeOptions new.
-		optionsBlock value: options ].
-	args := self
-		tsRangeArgsFor: 'TS.RANGE'
-		key: key
-		range: range
-		options: options
-		aggregation: nil
-		aggOptions: nil.
-	^ self tsParseRangeSamples: (self unifiedCommand: args)
+	^ self tsExecuteRange: 'TS.RANGE' key: key rangeBy: rangeBlock aggregationBy: nil using: optionsBlock
 ]
 
 { #category : '*RediStick-TimeSeries' }
 RsRedisEndpoint >> tsRange: key rangeBy: rangeBlock aggregationBy: aggregationBlock using: optionsBlock [
-	| range options args aggregation aggOptions |
-	range := self tsRangeFrom: (rangeBlock value: RsTsRange).
-	options := nil.
-	optionsBlock ifNotNil: [
-		options := RsTsRangeOptions new.
-		optionsBlock value: options ].
-	aggregation := RsTsAggregation new.
-	aggOptions := RsTsAggregationOptions new.
-	aggregationBlock value: aggregation value: aggOptions.
-	args := self
-		tsRangeArgsFor: 'TS.RANGE'
-		key: key
-		range: range
-		options: options
-		aggregation: aggregation
-		aggOptions: aggOptions.
-	^ self tsParseRangeSamples: (self unifiedCommand: args)
+	^ self tsExecuteRange: 'TS.RANGE' key: key rangeBy: rangeBlock aggregationBy: aggregationBlock using: optionsBlock
 ]
 
 { #category : '*RediStick-TimeSeries' }
 RsRedisEndpoint >> tsRevRange: key rangeBy: rangeBlock using: optionsBlock [
-	| range options args |
-	range := self tsRangeFrom: (rangeBlock value: RsTsRange).
-	options := nil.
-	optionsBlock ifNotNil: [
-		options := RsTsRangeOptions new.
-		optionsBlock value: options ].
-	args := self
-		tsRangeArgsFor: 'TS.REVRANGE'
-		key: key
-		range: range
-		options: options
-		aggregation: nil
-		aggOptions: nil.
-	^ self tsParseRangeSamples: (self unifiedCommand: args)
+	^ self tsExecuteRange: 'TS.REVRANGE' key: key rangeBy: rangeBlock aggregationBy: nil using: optionsBlock
 ]
 
 { #category : '*RediStick-TimeSeries' }
 RsRedisEndpoint >> tsRevRange: key rangeBy: rangeBlock aggregationBy: aggregationBlock using: optionsBlock [
-	| range options args aggregation aggOptions |
+	^ self tsExecuteRange: 'TS.REVRANGE' key: key rangeBy: rangeBlock aggregationBy: aggregationBlock using: optionsBlock
+]
+
+{ #category : '*RediStick-TimeSeries-private' }
+RsRedisEndpoint >> tsExecuteRange: cmdName key: key rangeBy: rangeBlock aggregationBy: aggregationBlock using: optionsBlock [
+	| range options aggregation aggOptions args |
 	range := self tsRangeFrom: (rangeBlock value: RsTsRange).
 	options := nil.
 	optionsBlock ifNotNil: [
 		options := RsTsRangeOptions new.
 		optionsBlock value: options ].
-	aggregation := RsTsAggregation new.
-	aggOptions := RsTsAggregationOptions new.
-	aggregationBlock value: aggregation value: aggOptions.
+	aggregation := nil.
+	aggOptions := nil.
+	aggregationBlock ifNotNil: [
+		aggregation := RsTsAggregation new.
+		aggOptions := RsTsAggregationOptions new.
+		aggregationBlock value: aggregation value: aggOptions ].
 	args := self
-		tsRangeArgsFor: 'TS.REVRANGE'
+		tsRangeArgsFor: cmdName
 		key: key
 		range: range
 		options: options
