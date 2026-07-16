@@ -150,17 +150,69 @@ RsRedisEndpoint >> tsRevRange: key rangeBy: rangeBlock aggregationBy: aggregatio
 	^ self tsExecuteRange: 'TS.REVRANGE' key: key rangeBy: rangeBlock aggregationBy: aggregationBlock using: optionsBlock
 ]
 
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsIncrBy: key increment: addend [
+	^ self tsIncrBy: key timestamp: nil increment: addend using: nil
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsIncrBy: key increment: addend using: optionsBlock [
+	^ self tsIncrBy: key timestamp: nil increment: addend using: optionsBlock
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsIncrBy: key timestamp: tsMSecsOrDateTime increment: addend [
+	^ self tsIncrBy: key timestamp: tsMSecsOrDateTime increment: addend using: nil
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsIncrBy: key timestamp: tsMSecsOrDateTime increment: addend using: optionsBlock [
+	^ self tsIncrOrDecr: 'TS.INCRBY' key: key timestamp: tsMSecsOrDateTime value: addend using: optionsBlock
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsDecrBy: key decrement: subtrahend [
+	^ self tsDecrBy: key timestamp: nil decrement: subtrahend using: nil
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsDecrBy: key decrement: subtrahend using: optionsBlock [
+	^ self tsDecrBy: key timestamp: nil decrement: subtrahend using: optionsBlock
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsDecrBy: key timestamp: tsMSecsOrDateTime decrement: subtrahend [
+	^ self tsDecrBy: key timestamp: tsMSecsOrDateTime decrement: subtrahend using: nil
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsDecrBy: key timestamp: tsMSecsOrDateTime decrement: subtrahend using: optionsBlock [
+	^ self tsIncrOrDecr: 'TS.DECRBY' key: key timestamp: tsMSecsOrDateTime value: subtrahend using: optionsBlock
+]
+
+{ #category : '*RediStick-TimeSeries-private' }
+RsRedisEndpoint >> tsIncrOrDecr: cmdName key: key timestamp: tsMSecsOrDateTimeOrNil value: aValue using: optionsBlock [
+	"private"
+	| args options |
+	args := { cmdName. key. aValue } asOrderedCollection.
+	tsMSecsOrDateTimeOrNil ifNotNil: [ :ts |
+		args addAll: { 'TIMESTAMP'. ts asRediStickUnixTimestampMillis } ].
+	optionsBlock ifNotNil: [
+		options := RsTsAlterOptions new.
+		optionsBlock value: options.
+		args addAll: options asArray.
+		self tsAppendLabelsFrom: options to: args ].
+	^ self unifiedCommand: args
+]
+
 { #category : '*RediStick-TimeSeries-private' }
 RsRedisEndpoint >> tsExecuteRange: cmdName key: key rangeBy: rangeBlock aggregationBy: aggregationBlock using: optionsBlock [
     "private"
     | range options aggregation aggOptions args |
 	range := self tsRangeFrom: (rangeBlock value: RsTsRange).
-	options := nil.
 	optionsBlock ifNotNil: [
 		options := RsTsRangeOptions new.
 		optionsBlock value: options ].
-	aggregation := nil.
-	aggOptions := nil.
 	aggregationBlock ifNotNil: [
 		aggregation := RsTsAggregation new.
 		aggOptions := RsTsAggregationOptions new.

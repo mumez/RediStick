@@ -87,11 +87,7 @@ RsTsTest >> testTsCreateWithLabels [
 	key := 'test:ts:create:labels'.
 	result := stick endpoint
 		tsCreate: key
-		using: [ :opts |
-			opts
-				retention: 60000;
-				duplicatePolicy: 'MAX';
-				labels: { 'sensor_id' -> '2'. 'area_id' -> '32' } ].
+		using: [ :opts | opts retention: 60000; duplicatePolicy: 'MAX'; labels: { 'sensor_id' -> '2'. 'area_id' -> '32' } ].
 	self assert: result equals: 'OK'.
 	info := stick endpoint tsInfo: key.
 	self assert: info isNotNil.
@@ -168,9 +164,9 @@ RsTsTest >> testTsRangeBasic [
 
 	result := stick endpoint tsRange: key rangeBy: [ :r | r all ] using: nil.
 	self assert: result size equals: 3.
-	self assert: (result at: 1) key equals: 1000.
-	self assert: (result at: 1) value equals: 30.
-	self assert: (result at: 3) value equals: 40
+	self assert: result first key equals: 1000.
+	self assert: result first value equals: 30.
+	self assert: result third value equals: 40
 ]
 
 { #category : 'tests' }
@@ -186,7 +182,7 @@ RsTsTest >> testTsRangeWithExplicitFromTo [
 		rangeBy: [ :r | r from: 1000 to: 1010 ]
 		using: nil.
 	self assert: result size equals: 2.
-	self assert: (result at: 2) key equals: 1010
+	self assert: result second key equals: 1010
 ]
 
 { #category : 'tests' }
@@ -222,8 +218,8 @@ RsTsTest >> testTsRangeWithFilterByValueAndCount [
 		rangeBy: [ :r | r all ]
 		using: [ :opts | opts filterByValueMin: -100 max: 100 ].
 	self assert: result size equals: 2.
-	self assert: (result at: 1) value equals: 30.
-	self assert: (result at: 2) value equals: 40
+	self assert: result first value equals: 30.
+	self assert: result second value equals: 40
 ]
 
 { #category : 'tests' }
@@ -240,8 +236,8 @@ RsTsTest >> testTsRangeWithSingleAggregator [
 		aggregationBy: [ :aggs :aggOpts | aggs min; bucketDuration: 20 ]
 		using: nil.
 	self assert: result size equals: 2.
-	self assert: (result at: 1) value equals: 100.
-	self assert: (result at: 2) value equals: 120
+	self assert: result first value equals: 100.
+	self assert: result second value equals: 120
 ]
 
 { #category : 'tests' }
@@ -258,9 +254,9 @@ RsTsTest >> testTsRangeWithMultipleAggregators [
 		aggregationBy: [ :aggs :aggOpts | aggs min; avg; max; bucketDuration: 1000 ]
 		using: nil.
 	self assert: result size equals: 1.
-	self assert: (result at: 1) value size equals: 3.
-	self assert: ((result at: 1) value at: 1) equals: 30.
-	self assert: ((result at: 1) value at: 3) equals: 40
+	self assert: result first value size equals: 3.
+	self assert: result first value first equals: 30.
+	self assert: result first value third equals: 40
 ]
 
 { #category : 'tests' }
@@ -278,7 +274,7 @@ RsTsTest >> testTsRangeAggregationWithAlign [
 			aggOpts align: 10.
 			aggs min; bucketDuration: 20 ]
 		using: nil.
-	self assert: (result at: 1) key equals: 990
+	self assert: result first key equals: 990
 ]
 
 { #category : 'tests' }
@@ -296,7 +292,7 @@ RsTsTest >> testTsRangeAggregationWithBucketTimestampAndEmpty [
 			aggs sum; bucketDuration: 1000 ]
 		using: nil.
 	self assert: result size equals: 3.
-	self assert: (result at: 2) value equals: 0
+	self assert: result second value equals: 0
 ]
 
 { #category : 'tests' }
@@ -309,9 +305,9 @@ RsTsTest >> testTsRevRangeBasic [
 
 	result := stick endpoint tsRevRange: key rangeBy: [ :r | r all ] using: nil.
 	self assert: result size equals: 3.
-	self assert: (result at: 1) key equals: 1020.
-	self assert: (result at: 1) value equals: 40.
-	self assert: (result at: 3) key equals: 1000
+	self assert: result first key equals: 1020.
+	self assert: result first value equals: 40.
+	self assert: result third key equals: 1000
 ]
 
 { #category : 'tests' }
@@ -327,8 +323,8 @@ RsTsTest >> testTsRevRangeWithCountOption [
 		rangeBy: [ :r | r all ]
 		using: [ :opts | opts count: 2 ].
 	self assert: result size equals: 2.
-	self assert: (result at: 1) key equals: 1020.
-	self assert: (result at: 2) key equals: 1010
+	self assert: result first key equals: 1020.
+	self assert: result second key equals: 1010
 ]
 
 { #category : 'tests' }
@@ -345,8 +341,8 @@ RsTsTest >> testTsRevRangeWithAggregation [
 		aggregationBy: [ :aggs :aggOpts | aggs max; bucketDuration: 20 ]
 		using: nil.
 	self assert: result size equals: 2.
-	self assert: (result at: 1) value equals: 120.
-	self assert: (result at: 2) value equals: 110
+	self assert: result first value equals: 120.
+	self assert: result second value equals: 110
 ]
 
 { #category : 'tests' }
@@ -407,6 +403,96 @@ RsTsTest >> testTsAlterRetention [
 	self assert: result equals: 'OK'.
 	info := stick endpoint tsInfo: key.
 	self assert: (info at: 'retentionTime') equals: 180000
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsIncrByAutoTimestamp [
+	| key result |
+	key := 'test:ts:incrby:auto'.
+	result := stick endpoint tsIncrBy: key increment: 10.
+	self assert: result isNumber.
+	self assert: (stick endpoint tsGet: key) value equals: 10
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsIncrByAccumulation [
+	| key |
+	key := 'test:ts:incrby:accum'.
+	stick endpoint tsIncrBy: key increment: 10.
+	stick endpoint tsIncrBy: key increment: 5.
+	self assert: (stick endpoint tsGet: key) value equals: 15
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsIncrByWithExplicitTimestamp [
+	| key result |
+	key := 'test:ts:incrby:explicit'.
+	result := stick endpoint tsIncrBy: key timestamp: 2000 increment: 7.
+	self assert: result equals: 2000.
+	self assert: (stick endpoint tsGet: key) key equals: 2000.
+	self assert: (stick endpoint tsGet: key) value equals: 7
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsIncrByWithOptions [
+	| key result labels info |
+	key := 'test:ts:incrby:options'.
+	result := stick endpoint
+		tsIncrBy: key
+		increment: 42
+		using: [ :opts | opts retention: 60000; labels: { 'device' -> 'A'. 'unit' -> 'celsius' } ].
+	self assert: result isNumber.
+	info := stick endpoint tsInfo: key.
+	self assert: info isNotNil.
+	self assert: (info at: 'retentionTime') equals: 60000.
+	labels := self labelsAsDictionary: (info at: 'labels').
+	self assert: (labels at: 'device') equals: 'A'.
+	self assert: (labels at: 'unit') equals: 'celsius'
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsDecrByAutoTimestamp [
+	| key result |
+	key := 'test:ts:decrby:auto'.
+	result := stick endpoint tsDecrBy: key decrement: 5.
+	self assert: result isNumber.
+	self assert: (stick endpoint tsGet: key) value equals: -5
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsDecrByAccumulation [
+	| key |
+	key := 'test:ts:decrby:accum'.
+	stick endpoint tsDecrBy: key decrement: 5.
+	stick endpoint tsDecrBy: key decrement: 3.
+	self assert: (stick endpoint tsGet: key) value equals: -8
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsDecrByWithExplicitTimestamp [
+	| key result |
+	key := 'test:ts:decrby:explicit'.
+	result := stick endpoint tsDecrBy: key timestamp: 3000 decrement: 4.
+	self assert: result equals: 3000.
+	self assert: (stick endpoint tsGet: key) key equals: 3000.
+	self assert: (stick endpoint tsGet: key) value equals: -4
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsDecrByWithOptions [
+	| key result labels info |
+	key := 'test:ts:decrby:options'.
+	result := stick endpoint
+		tsDecrBy: key
+		decrement: 3
+		using: [ :opts | opts retention: 90000; labels: { 'sensor' -> 'B'. 'unit' -> 'hpa' } ].
+	self assert: result isNumber.
+	info := stick endpoint tsInfo: key.
+	self assert: info isNotNil.
+	self assert: (info at: 'retentionTime') equals: 90000.
+	labels := self labelsAsDictionary: (info at: 'labels').
+	self assert: (labels at: 'sensor') equals: 'B'.
+	self assert: (labels at: 'unit') equals: 'hpa'
 ]
 
 { #category : 'helpers' }
