@@ -46,6 +46,18 @@ RsTsOptions >> encoding: anObject [
 ]
 
 { #category : 'accessing' }
+RsTsOptions >> encodingCompressed [
+
+	self encoding: 'COMPRESSED'
+]
+
+{ #category : 'accessing' }
+RsTsOptions >> encodingUncompressed [
+
+	self encoding: 'UNCOMPRESSED'
+]
+
+{ #category : 'accessing' }
 RsTsOptions >> labels [
 
 	^ labels

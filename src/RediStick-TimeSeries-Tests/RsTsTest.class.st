@@ -56,7 +56,7 @@ RsTsTest >> testTsAddAutoTimestampWithOptions [
 	result := stick endpoint
 		tsAdd: key
 		value: 55
-		using: [ :opts | opts retention: 60000; encoding: 'UNCOMPRESSED' ].
+		using: [ :opts | opts retention: 60000; encodingUncompressed ].
 	self assert: result isNumber.
 	self assert: (stick endpoint tsGet: key) value equals: 55
 ]
@@ -69,7 +69,7 @@ RsTsTest >> testTsAddWithOptions [
 		tsAdd: key
 		timestamp: 1000
 		value: 30
-		using: [ :opts | opts retention: 60000; encoding: 'UNCOMPRESSED' ].
+		using: [ :opts | opts retention: 60000; encodingUncompressed ].
 	self assert: result equals: 1000
 ]
 
@@ -106,7 +106,7 @@ RsTsTest >> testTsCreateWithOptions [
 		using: [ :opts |
 			opts
 				retention: 60000;
-				encoding: 'COMPRESSED';
+				encodingCompressed;
 				chunkSize: 4096 ].
 	self assert: result equals: 'OK'.
 	info := stick endpoint tsInfo: key.
