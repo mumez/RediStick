@@ -279,10 +279,7 @@ RsRedisEndpoint >> tsParseValue: aValue [
 RsRedisEndpoint >> tsMAdd: tsMultiValues [
 	| args |
 	args := { 'TS.MADD' } asOrderedCollection.
-	tsMultiValues triplets do: [ :triplet |
-		args add: triplet first.
-		args add: triplet second.
-		args add: triplet third ].
+	args addAll: tsMultiValues triplets flattened.
 	^ self unifiedCommand: args
 ]
 
