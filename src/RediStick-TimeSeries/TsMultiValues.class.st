@@ -11,26 +11,26 @@ Class {
 
 { #category : 'instance creation' }
 TsMultiValues class >> fromDictionary: aDictionary [
-	| mv |
-	mv := self new.
-	aDictionary associationsDo: [ :assoc | mv key: assoc key value: assoc value ].
-	^ mv
+	| inst |
+	inst := self new.
+	aDictionary associationsDo: [ :assoc | inst key: assoc key value: assoc value ].
+	^ inst
 ]
 
 { #category : 'instance creation' }
 TsMultiValues class >> fromKeyTimestampValues: aCollection [
-	| mv |
-	mv := self new.
-	aCollection do: [ :triplet | mv key: triplet first timestamp: triplet second value: triplet third ].
-	^ mv
+	| inst |
+	inst := self new.
+	aCollection do: [ :triplet | inst key: triplet first timestamp: triplet second value: triplet third ].
+	^ inst
 ]
 
 { #category : 'instance creation' }
 TsMultiValues class >> fromKeyValues: aCollection [
 	| mv |
-	mv := self new.
-	aCollection do: [ :pair | mv key: pair first value: pair last ].
-	^ mv
+	inst := self new.
+	aCollection do: [ :pair | inst key: pair first value: pair last ].
+	^ inst
 ]
 
 { #category : 'initialization' }
