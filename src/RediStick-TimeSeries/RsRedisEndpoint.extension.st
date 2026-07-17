@@ -274,3 +274,37 @@ RsRedisEndpoint >> tsParseValue: aValue [
 	aValue isString ifFalse: [ ^ aValue ].
 	^ NumberParser parse: aValue onError: [ aValue ]
 ]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsMAdd: tsMultiValues [
+	| args |
+	args := { 'TS.MADD' } asOrderedCollection.
+	tsMultiValues triplets do: [ :triplet |
+		args add: triplet first.
+		args add: triplet second.
+		args add: triplet third ].
+	^ self unifiedCommand: args
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsMAddUsing: tsMultiValuesAddingBlock [
+	| multiAdd |
+	multiAdd := TsMultiValues new.
+	tsMultiValuesAddingBlock value: multiAdd.
+	^ self tsMAdd: multiAdd
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsMAddWithDictionary: aDictionary [
+	^ self tsMAdd: (TsMultiValues fromDictionary: aDictionary)
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsMAddWithKeyTimestampValues: aCollection [
+	^ self tsMAdd: (TsMultiValues fromKeyTimestampValues: aCollection)
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsMAddWithKeyValues: aCollection [
+	^ self tsMAdd: (TsMultiValues fromKeyValues: aCollection)
+]
