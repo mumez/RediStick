@@ -29,7 +29,7 @@ TsMultiValues class >> fromKeyTimestampValues: aCollection [
 TsMultiValues class >> fromKeyValues: aCollection [
 	| mv |
 	mv := self new.
-	aCollection do: [ :assoc | mv key: assoc key value: assoc value ].
+	aCollection do: [ :pair | mv key: pair first value: pair last ].
 	^ mv
 ]
 

@@ -27,7 +27,7 @@ RsTsMAddTest >> testTsMAddFromKeyTimestampValues [
 { #category : 'tests' }
 RsTsMAddTest >> testTsMAddFromKeyValues [
 	| mv |
-	mv := TsMultiValues fromKeyValues: { 'test:ts:madd:kv:k1' -> 10. 'test:ts:madd:kv:k2' -> 20 }.
+	mv := TsMultiValues fromKeyValues: { #('test:ts:madd:kv:k1' 10). #('test:ts:madd:kv:k2' 20) }.
 	self assert: mv triplets size equals: 2.
 	mv triplets do: [ :t | self assert: t second equals: '*' ]
 ]
@@ -143,7 +143,7 @@ RsTsMAddTest >> testTsMAddWithKeyValues [
 	key2 := 'test:ts:madd:withkv:k2'.
 	stick endpoint tsCreate: key1.
 	stick endpoint tsCreate: key2.
-	result := stick endpoint tsMAddWithKeyValues: { key1 -> 10. key2 -> 20 }.
+	result := stick endpoint tsMAddWithKeyValues: { { key1. 10 }. { key2. 20 } }.
 	self assert: result size equals: 2.
 	result do: [ :ts | self assert: ts isNumber ]
 ]
