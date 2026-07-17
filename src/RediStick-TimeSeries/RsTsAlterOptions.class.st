@@ -1,9 +1,8 @@
 Class {
 	#name : 'RsTsAlterOptions',
-	#superclass : 'RsTsCreateOptions',
+	#superclass : 'RsTsOptions',
 	#instVars : [
-		'ignoreMaxTimediff',
-		'ignoreMaxValDiff'
+		'duplicatePolicy'
 	],
 	#category : 'RediStick-TimeSeries',
 	#package : 'RediStick-TimeSeries'
@@ -13,31 +12,23 @@ Class {
 RsTsAlterOptions >> asArray [
 	| opts |
 	opts := super asArray asOrderedCollection.
-	(self ignoreMaxTimediff notNil and: [ self ignoreMaxValDiff notNil ]) ifTrue: [
-		opts addAll: { 'IGNORE'. self ignoreMaxTimediff. self ignoreMaxValDiff } ].
+	self duplicatePolicy ifNotNil: [ :op | opts addAll: { 'DUPLICATE_POLICY'. op } ].
 	^ opts asArray
 ]
 
 { #category : 'accessing' }
-RsTsAlterOptions >> ignoreMaxTimediff [
-
-	^ ignoreMaxTimediff
+RsTsAlterOptions >> encoding: anObject [
+	"TS.ALTER does not support ENCODING — ignored"
 ]
 
 { #category : 'accessing' }
-RsTsAlterOptions >> ignoreMaxTimediff: anInteger [
+RsTsAlterOptions >> duplicatePolicy [
 
-	ignoreMaxTimediff := anInteger
+	^ duplicatePolicy
 ]
 
 { #category : 'accessing' }
-RsTsAlterOptions >> ignoreMaxValDiff [
+RsTsAlterOptions >> duplicatePolicy: anObject [
 
-	^ ignoreMaxValDiff
-]
-
-{ #category : 'accessing' }
-RsTsAlterOptions >> ignoreMaxValDiff: aNumber [
-
-	ignoreMaxValDiff := aNumber
+	duplicatePolicy := anObject
 ]
