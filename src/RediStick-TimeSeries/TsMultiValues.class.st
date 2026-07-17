@@ -27,7 +27,7 @@ TsMultiValues class >> fromKeyTimestampValues: aCollection [
 
 { #category : 'instance creation' }
 TsMultiValues class >> fromKeyValues: aCollection [
-	| mv |
+	| inst |
 	inst := self new.
 	aCollection do: [ :pair | inst key: pair first value: pair last ].
 	^ inst
