@@ -305,3 +305,53 @@ RsRedisEndpoint >> tsMAddWithKeyTimestampValues: aCollection [
 RsRedisEndpoint >> tsMAddWithKeyValues: aCollection [
 	^ self tsMAdd: (TsMultiValues fromKeyValues: aCollection)
 ]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsMGetFilterBy: filterBlock [
+	^ self tsMGetFilterBy: filterBlock using: nil
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsMGetFilterBy: filterBlock using: optionsBlock [
+	| builder options args result |
+	builder := RsTsFilterBuilder new.
+	filterBlock value: builder.
+	builder filters isEmpty ifTrue: [ Error signal: 'At least one filter expression is required' ].
+	options := RsTsMGetOptions new.
+	optionsBlock ifNotNil: [ optionsBlock value: options ].
+	args := { 'TS.MGET' } asOrderedCollection.
+	args addAll: options asArray.
+	args add: 'FILTER'.
+	args addAll: (builder filters collect: [ :f | f asString ]).
+	result := self unifiedCommand: args asArray.
+	^ self tsParseMGetResult: result
+]
+
+{ #category : '*RediStick-TimeSeries-private' }
+RsRedisEndpoint >> tsParseMGetResult: rawResult [
+	"private"
+	rawResult ifNil: [ ^ #() ].
+	^ (rawResult collect: [ :row | self tsValueFromMGetRow: row ]) asArray
+]
+
+{ #category : '*RediStick-TimeSeries-private' }
+RsRedisEndpoint >> tsValueFromMGetRow: row [
+	"private"
+	| key labelsPairs sample |
+	key := row first.
+	labelsPairs := row second.
+	sample := row third.
+	^ RsTsValue
+		key: key
+		timestamp: sample first
+		value: (self tsParseValue: sample second)
+		labels: (self tsLabelsDictionaryFrom: labelsPairs)
+]
+
+{ #category : '*RediStick-TimeSeries-private' }
+RsRedisEndpoint >> tsLabelsDictionaryFrom: labelsPairs [
+	"private"
+	^ labelsPairs
+		inject: Dictionary new
+		into: [ :dict :pair | dict at: pair first put: pair second; yourself ]
+]
