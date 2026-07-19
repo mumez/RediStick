@@ -47,12 +47,42 @@ RsTsFilter class >> parenListFrom: aCollection [
 
 { #category : 'converting' }
 RsTsFilter >> asString [
-	^ label , operator , value
+	^ self label , self operator , self value
+]
+
+{ #category : 'accessing' }
+RsTsFilter >> label [
+	^ label
+]
+
+{ #category : 'accessing' }
+RsTsFilter >> label: aLabel [
+	label := aLabel
+]
+
+{ #category : 'accessing' }
+RsTsFilter >> operator [
+	^ operator
+]
+
+{ #category : 'accessing' }
+RsTsFilter >> operator: anOperator [
+	operator := anOperator
 ]
 
 { #category : 'private' }
 RsTsFilter >> setLabel: aLabel operator: anOperator value: aValue [
-	label := aLabel.
-	operator := anOperator.
+	self label: aLabel.
+	self operator: anOperator.
+	self value: aValue
+]
+
+{ #category : 'accessing' }
+RsTsFilter >> value [
+	^ value
+]
+
+{ #category : 'accessing' }
+RsTsFilter >> value: aValue [
 	value := aValue
 ]

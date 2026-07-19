@@ -19,38 +19,43 @@ RsTsFilterBuilder >> filters [
 	^ filters asArray
 ]
 
+{ #category : 'accessing' }
+RsTsFilterBuilder >> filtersCollection [
+	^ filters
+]
+
 { #category : 'building' }
 RsTsFilterBuilder >> label: aLabel eq: aValue [
-	filters add: (RsTsFilter label: aLabel eq: aValue).
+	self filtersCollection add: (RsTsFilter label: aLabel eq: aValue).
 	^ self
 ]
 
 { #category : 'building' }
 RsTsFilterBuilder >> label: aLabel notEq: aValue [
-	filters add: (RsTsFilter label: aLabel notEq: aValue).
+	self filtersCollection add: (RsTsFilter label: aLabel notEq: aValue).
 	^ self
 ]
 
 { #category : 'building' }
 RsTsFilterBuilder >> label: aLabel in: aCollection [
-	filters add: (RsTsFilter label: aLabel in: aCollection).
+	self filtersCollection add: (RsTsFilter label: aLabel in: aCollection).
 	^ self
 ]
 
 { #category : 'building' }
 RsTsFilterBuilder >> label: aLabel notIn: aCollection [
-	filters add: (RsTsFilter label: aLabel notIn: aCollection).
+	self filtersCollection add: (RsTsFilter label: aLabel notIn: aCollection).
 	^ self
 ]
 
 { #category : 'building' }
 RsTsFilterBuilder >> hasLabel: aLabel [
-	filters add: (RsTsFilter hasLabel: aLabel).
+	self filtersCollection add: (RsTsFilter hasLabel: aLabel).
 	^ self
 ]
 
 { #category : 'building' }
 RsTsFilterBuilder >> noLabel: aLabel [
-	filters add: (RsTsFilter noLabel: aLabel).
+	self filtersCollection add: (RsTsFilter noLabel: aLabel).
 	^ self
 ]

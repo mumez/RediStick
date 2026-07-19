@@ -316,7 +316,7 @@ RsRedisEndpoint >> tsMGetFilterBy: filterBlock using: optionsBlock [
 	| builder options args result |
 	builder := RsTsFilterBuilder new.
 	filterBlock value: builder.
-	builder filters isEmpty ifTrue: [ Error signal: 'At least one filter expression is required' ].
+	builder filters ifEmpty: [ Error signal: 'At least one filter expression is required' ].
 	options := RsTsMGetOptions new.
 	optionsBlock ifNotNil: [ optionsBlock value: options ].
 	args := { 'TS.MGET' } asOrderedCollection.
