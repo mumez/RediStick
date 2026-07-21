@@ -380,3 +380,148 @@ RsRedisEndpoint >> tsLabelsDictionaryFrom: labelsPairs [
 		inject: Dictionary new
 		into: [ :dict :pair | dict at: pair first put: pair second; yourself ]
 ]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsMRangeBy: rangeBlock filterBy: filterBlock [
+	^ self
+		tsExecuteMRange: 'TS.MRANGE'
+		rangeBy: rangeBlock
+		filterBy: filterBlock
+		aggregationBy: nil
+		groupBy: nil
+		using: nil
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsMRangeBy: rangeBlock filterBy: filterBlock aggregationBy: aggregationBlock using: optionsBlock [
+	^ self
+		tsExecuteMRange: 'TS.MRANGE'
+		rangeBy: rangeBlock
+		filterBy: filterBlock
+		aggregationBy: aggregationBlock
+		groupBy: nil
+		using: optionsBlock
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsMRangeBy: rangeBlock filterBy: filterBlock aggregationBy: aggregationBlock groupBy: groupingBlock using: optionsBlock [
+	^ self
+		tsExecuteMRange: 'TS.MRANGE'
+		rangeBy: rangeBlock
+		filterBy: filterBlock
+		aggregationBy: aggregationBlock
+		groupBy: groupingBlock
+		using: optionsBlock
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsMRevRangeBy: rangeBlock filterBy: filterBlock [
+	^ self
+		tsExecuteMRange: 'TS.MREVRANGE'
+		rangeBy: rangeBlock
+		filterBy: filterBlock
+		aggregationBy: nil
+		groupBy: nil
+		using: nil
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsMRevRangeBy: rangeBlock filterBy: filterBlock aggregationBy: aggregationBlock using: optionsBlock [
+	^ self
+		tsExecuteMRange: 'TS.MREVRANGE'
+		rangeBy: rangeBlock
+		filterBy: filterBlock
+		aggregationBy: aggregationBlock
+		groupBy: nil
+		using: optionsBlock
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsMRevRangeBy: rangeBlock filterBy: filterBlock aggregationBy: aggregationBlock groupBy: groupingBlock using: optionsBlock [
+	^ self
+		tsExecuteMRange: 'TS.MREVRANGE'
+		rangeBy: rangeBlock
+		filterBy: filterBlock
+		aggregationBy: aggregationBlock
+		groupBy: groupingBlock
+		using: optionsBlock
+]
+
+{ #category : '*RediStick-TimeSeries-private' }
+RsRedisEndpoint >> tsExecuteMRange: cmdName rangeBy: rangeBlock filterBy: filterBlock aggregationBy: aggregationBlock groupBy: groupingBlock using: optionsBlock [
+	"private"
+	| range builder options aggregation aggOptions groupBy |
+	range := self tsRangeFrom: (rangeBlock value: RsTsRange).
+	builder := RsTsFilterBuilder new.
+	filterBlock value: builder.
+	builder filters ifEmpty: [ Error signal: 'At least one filter expression is required' ].
+	optionsBlock ifNotNil: [
+		options := RsTsMRangeOptions new.
+		optionsBlock value: options ].
+	aggregationBlock ifNotNil: [
+		aggregation := RsTsAggregation new.
+		aggOptions := RsTsAggregationOptions new.
+		aggregationBlock cull: aggregation cull: aggOptions ].
+	groupingBlock ifNotNil: [
+		groupBy := RsTsGroupBy new.
+		groupingBlock value: groupBy ].
+	^ self
+		tsParseMRangeResult: (self unifiedCommand: (self
+			tsMRangeArgsFor: cmdName range: range options: options
+			aggregation: aggregation aggOptions: aggOptions
+			filterBuilder: builder groupBy: groupBy))
+		groupBy: groupBy
+]
+
+{ #category : '*RediStick-TimeSeries-private' }
+RsRedisEndpoint >> tsMRangeArgsFor: cmdName range: range options: options aggregation: aggregation aggOptions: aggOptions filterBuilder: builder groupBy: groupBy [
+	"private"
+	| args |
+	args := OrderedCollection new.
+	args add: cmdName.
+	args addAll: range asArray.
+	options ifNotNil: [ args addAll: options asArray ].
+	groupBy ifNotNil: [
+		(options isNil or: [ options isWithLabels not and: [ options selectedLabels isNil ] ])
+			ifTrue: [ args add: 'WITHLABELS' ] ].
+	aggOptions ifNotNil: [ args addAll: aggOptions alignArray ].
+	aggregation ifNotNil: [ args addAll: aggregation asArray ].
+	aggOptions ifNotNil: [ args addAll: aggOptions tailArray ].
+	args add: 'FILTER'.
+	args addAll: (builder filters collect: [ :f | f asString ]).
+	groupBy ifNotNil: [ args addAll: groupBy asArray ].
+	^ args asArray
+]
+
+{ #category : '*RediStick-TimeSeries-private' }
+RsRedisEndpoint >> tsParseMRangeResult: rawResult groupBy: groupBy [
+	"private"
+	rawResult ifNil: [ ^ #() ].
+	^ (rawResult collect: [ :row |
+		groupBy
+			ifNil: [ self tsParseRangeRow: row ]
+			ifNotNil: [ self tsParseGroupedRangeRow: row groupBy: groupBy ] ]) asArray
+]
+
+{ #category : '*RediStick-TimeSeries-private' }
+RsRedisEndpoint >> tsParseRangeRow: row [
+	"private"
+	^ RsTsRangeValue
+		key: row first
+		labels: (self tsLabelsDictionaryFrom: row second)
+		values: (self tsParseRangeSamples: row third)
+]
+
+{ #category : '*RediStick-TimeSeries-private' }
+RsRedisEndpoint >> tsParseGroupedRangeRow: row groupBy: groupBy [
+	"private"
+	| labelsDict |
+	labelsDict := self tsLabelsDictionaryFrom: row second.
+	^ RsTsGroupedRangeValue
+		key: row first
+		labels: labelsDict
+		groupByLabel: groupBy label -> (labelsDict at: groupBy label ifAbsent: [ nil ])
+		reducer: (labelsDict at: '__reducer__' ifAbsent: [ nil ])
+		sourceKeys: ((labelsDict at: '__source__' ifAbsent: [ '' ]) substrings: ',') asArray
+		values: (self tsParseRangeSamples: row third)
+]
