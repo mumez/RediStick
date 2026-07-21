@@ -117,10 +117,6 @@ RsRedisEndpoint >> tsGet: key latest: aBoolean [
 
 { #category : '*RediStick-TimeSeries' }
 RsRedisEndpoint >> tsInfo: key [
-	"Returns a Dictionary of TS.INFO fields for the given time series key,
-	 or nil if the key does not exist. Numeric fields are parsed as Numbers;
-	 the 'labels' field is kept as the nested array returned by Redis so
-	 callers can map it to a Dictionary if needed."
 	| result info |
 	result := self unifiedCommand: { 'TS.INFO'. key }.
 	result ifNil: [ ^ nil ].
@@ -218,12 +214,9 @@ RsRedisEndpoint >> tsExecuteRange: cmdName key: key rangeBy: rangeBlock aggregat
 		aggOptions := RsTsAggregationOptions new.
 		aggregationBlock cull: aggregation cull: aggOptions ].
 	args := self
-		tsRangeArgsFor: cmdName
-		key: key
-		range: range
-		options: options
-		aggregation: aggregation
-		aggOptions: aggOptions.
+		tsRangeArgsFor: cmdName key: key
+		range: range options: options
+		aggregation: aggregation aggOptions: aggOptions.
 	^ self tsParseRangeSamples: (self unifiedCommand: args)
 ]
 
@@ -307,6 +300,17 @@ RsRedisEndpoint >> tsMAddWithKeyValues: aCollection [
 ]
 
 { #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsQueryIndexFilterBy: filterBlock [
+	| builder args |
+	builder := RsTsFilterBuilder new.
+	filterBlock value: builder.
+	builder filters ifEmpty: [ Error signal: 'At least one filter expression is required' ].
+	args := { 'TS.QUERYINDEX' } asOrderedCollection.
+	args addAll: (builder filters collect: [ :f | f asString ]).
+	^ (self unifiedCommand: args asArray) ifNil: [ #() ] ifNotNil: [ :r | r asArray ]
+]
+
+{ #category : '*RediStick-TimeSeries' }
 RsRedisEndpoint >> tsMGetFilterBy: filterBlock [
 	^ self tsMGetFilterBy: filterBlock using: nil
 ]
@@ -350,7 +354,6 @@ RsRedisEndpoint >> tsValueFromMGetRow: row [
 
 { #category : '*RediStick-TimeSeries-private' }
 RsRedisEndpoint >> tsLabelsDictionaryFrom: labelsPairs [
-	"private"
 	^ labelsPairs
 		inject: Dictionary new
 		into: [ :dict :pair | dict at: pair first put: pair second; yourself ]
