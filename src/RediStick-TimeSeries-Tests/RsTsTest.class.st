@@ -495,6 +495,62 @@ RsTsTest >> testTsDecrByWithOptions [
 	self assert: (labels at: 'unit') equals: 'hpa'
 ]
 
+{ #category : 'tests' }
+RsTsTest >> testTsCreateRuleBasic [
+	| srcKey dstKey result info rules |
+	srcKey := 'test:ts:createrule:src'.
+	dstKey := 'test:ts:createrule:dst'.
+	stick endpoint tsCreate: srcKey.
+	stick endpoint tsCreate: dstKey.
+	result := stick endpoint
+		tsCreateRule: srcKey
+		dest: dstKey
+		aggregationBy: [ :agg | agg sum; bucketDuration: 1000 ].
+	self assert: result equals: 'OK'.
+	info := stick endpoint tsInfo: srcKey.
+	rules := info at: 'rules'.
+	self assert: rules isNotNil.
+	self assert: rules isEmpty not.
+	self assert: rules first first equals: dstKey
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsCreateRuleWithAlignTimestamp [
+	| srcKey dstKey result info rules |
+	srcKey := 'test:ts:createrule:align:src'.
+	dstKey := 'test:ts:createrule:align:dst'.
+	stick endpoint tsCreate: srcKey.
+	stick endpoint tsCreate: dstKey.
+	result := stick endpoint
+		tsCreateRule: srcKey
+		dest: dstKey
+		aggregationBy: [ :agg | agg avg; bucketDuration: 5000 ]
+		alignTimestamp: 0.
+	self assert: result equals: 'OK'.
+	info := stick endpoint tsInfo: srcKey.
+	rules := info at: 'rules'.
+	self assert: rules isEmpty not.
+	self assert: rules first first equals: dstKey
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsDeleteRule [
+	| srcKey dstKey result info rules |
+	srcKey := 'test:ts:deleterule:src'.
+	dstKey := 'test:ts:deleterule:dst'.
+	stick endpoint tsCreate: srcKey.
+	stick endpoint tsCreate: dstKey.
+	stick endpoint
+		tsCreateRule: srcKey
+		dest: dstKey
+		aggregationBy: [ :agg | agg sum; bucketDuration: 1000 ].
+	result := stick endpoint tsDeleteRule: srcKey dest: dstKey.
+	self assert: result equals: 'OK'.
+	info := stick endpoint tsInfo: srcKey.
+	rules := info at: 'rules'.
+	self assert: rules isEmpty
+]
+
 { #category : 'helpers' }
 RsTsTest >> labelsAsDictionary: aLabelsArray [
 	"Converts the nested labels array returned by TS.INFO

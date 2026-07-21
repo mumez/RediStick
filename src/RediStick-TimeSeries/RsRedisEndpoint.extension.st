@@ -300,6 +300,28 @@ RsRedisEndpoint >> tsMAddWithKeyValues: aCollection [
 ]
 
 { #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsCreateRule: sourceKey dest: destKey aggregationBy: aggregationBlock [
+	^ self tsCreateRule: sourceKey dest: destKey aggregationBy: aggregationBlock alignTimestamp: nil
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsCreateRule: sourceKey dest: destKey aggregationBy: aggregationBlock alignTimestamp: tsMSecsOrDateTimeOrNil [
+	| args aggregation |
+	args := { 'TS.CREATERULE'. sourceKey. destKey } asOrderedCollection.
+	aggregation := RsTsAggregation new.
+	aggregationBlock value: aggregation.
+	args addAll: aggregation asArray.
+	tsMSecsOrDateTimeOrNil ifNotNil: [ :ts |
+		args add: ts asRediStickUnixTimestampMillis ].
+	^ self unifiedCommand: args
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsDeleteRule: sourceKey dest: destKey [
+	^ self unifiedCommand: { 'TS.DELETERULE'. sourceKey. destKey }
+]
+
+{ #category : '*RediStick-TimeSeries' }
 RsRedisEndpoint >> tsQueryIndexFilterBy: filterBlock [
 	| builder args |
 	builder := RsTsFilterBuilder new.
