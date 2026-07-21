@@ -3,21 +3,38 @@ Class {
 	#superclass : 'Object',
 	#instVars : [
 		'aggregators',
-		'bucketDuration'
+		'bucketDuration',
+		'isSingleAggregator'
 	],
 	#category : 'RediStick-TimeSeries',
 	#package : 'RediStick-TimeSeries'
 }
 
 { #category : 'initialization' }
+RsTsAggregation class >> forSingle [
+	^ self new isSingleAggregator: true; yourself.
+]
+
+{ #category : 'initialization' }
 RsTsAggregation >> initialize [
 	super initialize.
-	aggregators := OrderedCollection new
+	aggregators := OrderedCollection new.
+	isSingleAggregator := false
 ]
 
 { #category : 'accessing' }
 RsTsAggregation >> aggregators [
 	^ aggregators
+]
+
+{ #category : 'private-accessing' }
+RsTsAggregation >> isSingleAggregator [
+	^ isSingleAggregator
+]
+
+{ #category : 'private-accessing' }
+RsTsAggregation >> isSingleAggregator: aBoolean [
+	isSingleAggregator := aBoolean
 ]
 
 { #category : 'aggregators' }
@@ -109,7 +126,9 @@ RsTsAggregation >> varS [
 
 { #category : 'converting' }
 RsTsAggregation >> asArray [
-	self aggregators isEmpty ifTrue: [ Error signal: 'At least one aggregator must be selected' ].
+	self aggregators ifEmpty: [ Error signal: 'At least one aggregator must be selected' ].
 	self bucketDuration ifNil: [ Error signal: 'bucketDuration must be set' ].
-	^ { 'AGGREGATION'. (self aggregators fold: [ :a :b | a , ',' , b ]). self bucketDuration }
+	(self isSingleAggregator and: [ self aggregators size > 1 ])
+		ifTrue: [ Error signal: 'Only one aggregator is allowed in this context' ].
+	^ { 'AGGREGATION'. ($, join: self aggregators). self bucketDuration }
 ]

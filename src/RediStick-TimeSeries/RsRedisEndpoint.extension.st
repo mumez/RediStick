@@ -308,7 +308,7 @@ RsRedisEndpoint >> tsCreateRule: sourceKey dest: destKey aggregationBy: aggregat
 RsRedisEndpoint >> tsCreateRule: sourceKey dest: destKey aggregationBy: aggregationBlock alignTimestamp: tsMSecsOrDateTimeOrNil [
 	| args aggregation |
 	args := { 'TS.CREATERULE'. sourceKey. destKey } asOrderedCollection.
-	aggregation := RsTsAggregation new.
+	aggregation := RsTsAggregation forSingle.
 	aggregationBlock value: aggregation.
 	args addAll: aggregation asArray.
 	tsMSecsOrDateTimeOrNil ifNotNil: [ :ts |
