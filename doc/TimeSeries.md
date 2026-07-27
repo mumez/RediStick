@@ -53,10 +53,14 @@ stick endpoint tsCreate: 'temperature:2' using: [:opts |
 "Add a sample with an explicit timestamp (DateAndTime or milliseconds)"
 stick endpoint tsAdd: 'temperature:1' timestamp: DateAndTime now value: 25.5.
 
-"Add a sample, letting Redis auto-assign the timestamp ('*')"
-stick endpoint tsAdd: 'temperature:1' value: 26.1.
+"Add a later sample with an explicit timestamp, so it becomes the last one"
+stick endpoint tsAdd: 'temperature:1' timestamp: DateAndTime now + 10 minutes value: 26.1.
 
-"Add with options - e.g. auto-create the series with labels"
+"Add a sample, letting Redis auto-assign the timestamp ('*')"
+stick endpoint tsAdd: 'temperature:2' value: 21.0.
+
+"Add with options - e.g. set retention and labels on auto-create (the series is
+auto-created by TS.ADD even without options)"
 stick endpoint tsAdd: 'temperature:3' value: 22.0 using: [:opts |
     opts retention: 3600000; labels: {'sensor_id'->'3'} asDictionary].
 ```
@@ -67,10 +71,7 @@ stick endpoint tsAdd: 'temperature:3' value: 22.0 using: [:opts |
 "Returns a timestamp -> value Association, or nil if the series is empty"
 sample := stick endpoint tsGet: 'temperature:1'.
 sample key.    "the timestamp in milliseconds"
-sample value.  "25.5"
-
-"Use the LATEST flag for compacted series"
-sample := stick endpoint tsGet: 'temperature:1' latest: true.
+sample value.  "26.1, the most recently added sample"
 ```
 
 ### Incrementing / Decrementing Values
@@ -82,13 +83,6 @@ stick endpoint tsDecrBy: 'temperature:1' decrement: 0.2.
 "With an explicit timestamp and options"
 stick endpoint tsIncrBy: 'temperature:1' timestamp: DateAndTime now increment: 1
     using: [:opts | opts retention: 86400000].
-```
-
-### Deleting Samples
-
-```smalltalk
-"Delete all samples between two timestamps (inclusive)"
-stick endpoint tsDel: 'temperature:1' from: (DateAndTime now - 1 hour) to: DateAndTime now.
 ```
 
 ### Series Info
@@ -229,6 +223,30 @@ stick endpoint tsCreateRule: 'temperature:1' dest: 'temperature:1:hourly'
 
 "Delete the rule"
 stick endpoint tsDeleteRule: 'temperature:1' dest: 'temperature:1:hourly'.
+```
+
+A destination series with a compaction rule is a *compacted* series: its samples are
+derived aggregates written by Redis rather than points added directly. When reading
+from a compacted series, the last bucket may still be incomplete (not yet closed),
+so `TS.GET`/`TS.MGET` can return a partial, still-changing value by default. Pass
+`LATEST` to include that last, possibly incomplete, bucket instead of skipping it:
+
+```smalltalk
+"Use the LATEST flag when reading from a compacted series"
+sample := stick endpoint tsGet: 'temperature:1:hourly' latest: true.
+
+values := stick endpoint tsMGetFilterBy: [:filter | filter label: 'area' eq: 'kitchen']
+    using: [:opts | opts latest].
+```
+
+## Deleting Samples and Cleaning Up
+
+```smalltalk
+"Delete all samples between two timestamps (inclusive)"
+stick endpoint tsDel: 'temperature:1' from: (DateAndTime now - 1 hour) to: DateAndTime now.
+
+"Remove the demo keys entirely"
+stick endpoint del: #('temperature:1' 'temperature:2' 'temperature:3' 'temperature:1:hourly').
 ```
 
 ## References
