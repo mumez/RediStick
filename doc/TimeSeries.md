@@ -51,10 +51,10 @@ stick endpoint tsCreate: 'temperature:2' using: [:opts |
 
 ```smalltalk
 "Add a sample with an explicit timestamp (DateAndTime or milliseconds)"
-stick endpoint tsAdd: 'temperature:1' timestamp: DateAndTime now value: 25.5.
+stick endpoint tsAdd: 'temperature:1' timestamp: (ts := DateAndTime now) value: 25.5.
 
-"Add a later sample with an explicit timestamp, so it becomes the last one"
-stick endpoint tsAdd: 'temperature:1' timestamp: DateAndTime now + 10 minutes value: 26.1.
+"Add a later sample with an explicit timestamp, so it becomes the previous one"
+stick endpoint tsAdd: 'temperature:1' timestamp: ts - 10 minutes value: 26.1.
 
 "Add a sample, letting Redis auto-assign the timestamp ('*')"
 stick endpoint tsAdd: 'temperature:2' value: 21.0.
@@ -70,8 +70,8 @@ stick endpoint tsAdd: 'temperature:3' value: 22.0 using: [:opts |
 ```smalltalk
 "Returns a timestamp -> value Association, or nil if the series is empty"
 sample := stick endpoint tsGet: 'temperature:1'.
-sample key.    "the timestamp in milliseconds"
-sample value.  "26.1, the most recently added sample"
+sample key.    "the timestamp in milliseconds (ts asRediStickUnixTimestampMillis)"
+sample value.  "25.5, the most recently added sample"
 ```
 
 ### Incrementing / Decrementing Values
@@ -89,8 +89,8 @@ stick endpoint tsIncrBy: 'temperature:1' timestamp: DateAndTime now increment: 1
 
 ```smalltalk
 info := stick endpoint tsInfo: 'temperature:1'.
-info at: 'totalSamples'.
-info at: 'retentionTime'.
+info at: 'totalSamples'.   "5"
+info at: 'retentionTime'.  "0"
 ```
 
 ### Altering a Series
@@ -107,10 +107,12 @@ stick endpoint tsAlter: 'temperature:1' using: [:opts |
 ```smalltalk
 "Query the whole series"
 values := stick endpoint tsRange: 'temperature:1' rangeBy: [:range | range all] using: nil.
+"{1785221260286->26.1. 1785221860286->25.5. 1785221992582->26.
+1785221996713->25.8. 1785222002419->26.8}"
 
-"Query a specific range - '-'/'+' via `all`, or explicit timestamps/Associations"
+"Query a specific range - '-'/'+' via `all`, or explicit timestamps association"
 values := stick endpoint tsRange: 'temperature:1'
-    rangeBy: [:range | (DateAndTime now - 1 hour) -> DateAndTime now] using: nil.
+    rangeBy: [:range | ts -> DateAndTime now] using: nil.
 
 "Each element is a timestamp -> value Association"
 values do: [:sample | Transcript cr; show: sample key asString, ': ', sample value asString].
