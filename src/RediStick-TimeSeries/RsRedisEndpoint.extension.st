@@ -127,8 +127,18 @@ RsRedisEndpoint >> tsInfo: key [
 ]
 
 { #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsRange: key rangeBy: rangeBlock [
+	^ self tsRange: key rangeBy: rangeBlock using: nil
+]
+
+{ #category : '*RediStick-TimeSeries' }
 RsRedisEndpoint >> tsRange: key rangeBy: rangeBlock using: optionsBlock [
 	^ self tsExecuteRange: 'TS.RANGE' key: key rangeBy: rangeBlock aggregationBy: nil using: optionsBlock
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsRange: key rangeBy: rangeBlock aggregationBy: aggregationBlock [
+	^ self tsRange: key rangeBy: rangeBlock aggregationBy: aggregationBlock using: nil
 ]
 
 { #category : '*RediStick-TimeSeries' }
@@ -137,8 +147,18 @@ RsRedisEndpoint >> tsRange: key rangeBy: rangeBlock aggregationBy: aggregationBl
 ]
 
 { #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsRevRange: key rangeBy: rangeBlock [
+	^ self tsRevRange: key rangeBy: rangeBlock using: nil
+]
+
+{ #category : '*RediStick-TimeSeries' }
 RsRedisEndpoint >> tsRevRange: key rangeBy: rangeBlock using: optionsBlock [
 	^ self tsExecuteRange: 'TS.REVRANGE' key: key rangeBy: rangeBlock aggregationBy: nil using: optionsBlock
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsRevRange: key rangeBy: rangeBlock aggregationBy: aggregationBlock [
+	^ self tsRevRange: key rangeBy: rangeBlock aggregationBy: aggregationBlock using: nil
 ]
 
 { #category : '*RediStick-TimeSeries' }
@@ -393,6 +413,11 @@ RsRedisEndpoint >> tsMRangeBy: rangeBlock filterBy: filterBlock [
 ]
 
 { #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsMRangeBy: rangeBlock filterBy: filterBlock aggregationBy: aggregationBlock [
+	^ self tsMRangeBy: rangeBlock filterBy: filterBlock aggregationBy: aggregationBlock using: nil
+]
+
+{ #category : '*RediStick-TimeSeries' }
 RsRedisEndpoint >> tsMRangeBy: rangeBlock filterBy: filterBlock aggregationBy: aggregationBlock using: optionsBlock [
 	^ self
 		tsExecuteMRange: 'TS.MRANGE'
@@ -401,6 +426,11 @@ RsRedisEndpoint >> tsMRangeBy: rangeBlock filterBy: filterBlock aggregationBy: a
 		aggregationBy: aggregationBlock
 		groupBy: nil
 		using: optionsBlock
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsMRangeBy: rangeBlock filterBy: filterBlock aggregationBy: aggregationBlock groupBy: groupingBlock [
+	^ self tsMRangeBy: rangeBlock filterBy: filterBlock aggregationBy: aggregationBlock groupBy: groupingBlock using: nil
 ]
 
 { #category : '*RediStick-TimeSeries' }
@@ -426,6 +456,11 @@ RsRedisEndpoint >> tsMRevRangeBy: rangeBlock filterBy: filterBlock [
 ]
 
 { #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsMRevRangeBy: rangeBlock filterBy: filterBlock aggregationBy: aggregationBlock [
+	^ self tsMRevRangeBy: rangeBlock filterBy: filterBlock aggregationBy: aggregationBlock using: nil
+]
+
+{ #category : '*RediStick-TimeSeries' }
 RsRedisEndpoint >> tsMRevRangeBy: rangeBlock filterBy: filterBlock aggregationBy: aggregationBlock using: optionsBlock [
 	^ self
 		tsExecuteMRange: 'TS.MREVRANGE'
@@ -434,6 +469,11 @@ RsRedisEndpoint >> tsMRevRangeBy: rangeBlock filterBy: filterBlock aggregationBy
 		aggregationBy: aggregationBlock
 		groupBy: nil
 		using: optionsBlock
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsMRevRangeBy: rangeBlock filterBy: filterBlock aggregationBy: aggregationBlock groupBy: groupingBlock [
+	^ self tsMRevRangeBy: rangeBlock filterBy: filterBlock aggregationBy: aggregationBlock groupBy: groupingBlock using: nil
 ]
 
 { #category : '*RediStick-TimeSeries' }
