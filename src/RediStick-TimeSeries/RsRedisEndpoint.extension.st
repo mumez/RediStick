@@ -224,19 +224,19 @@ RsRedisEndpoint >> tsIncrOrDecr: cmdName key: key timestamp: tsMSecsOrDateTimeOr
 { #category : '*RediStick-TimeSeries-private' }
 RsRedisEndpoint >> tsExecuteRange: cmdName key: key rangeBy: rangeBlock aggregationBy: aggregationBlock using: optionsBlock [
     "private"
-    | range options aggregation aggOptions args |
+    | range options aggOptions args |
 	range := self tsRangeFrom: (rangeBlock value: RsTsRange).
 	optionsBlock ifNotNil: [
 		options := RsTsRangeOptions new.
 		optionsBlock value: options ].
 	aggregationBlock ifNotNil: [
-		aggregation := RsTsAggregation new.
 		aggOptions := RsTsAggregationOptions new.
-		aggregationBlock cull: aggregation cull: aggOptions ].
+		aggOptions aggregation: RsTsAggregation new.
+		aggregationBlock cull: aggOptions aggregation cull: aggOptions ].
 	args := self
 		tsRangeArgsFor: cmdName key: key
 		range: range options: options
-		aggregation: aggregation aggOptions: aggOptions.
+		aggOptions: aggOptions.
 	^ self tsParseRangeSamples: (self unifiedCommand: args)
 ]
 
@@ -249,16 +249,14 @@ RsRedisEndpoint >> tsRangeFrom: rangeBlockResult [
 ]
 
 { #category : '*RediStick-TimeSeries-private' }
-RsRedisEndpoint >> tsRangeArgsFor: cmdName key: key range: aTsRange options: options aggregation: aggregation aggOptions: aggOptions [
+RsRedisEndpoint >> tsRangeArgsFor: cmdName key: key range: aTsRange options: options aggOptions: aggOptions [
 	"private"
 	| args |
 	args := OrderedCollection new.
 	args add: cmdName; add: key.
 	args addAll: aTsRange asArray.
 	options ifNotNil: [ args addAll: options asArray ].
-	aggOptions ifNotNil: [ args addAll: aggOptions alignArray ].
-	aggregation ifNotNil: [ args addAll: aggregation asArray ].
-	aggOptions ifNotNil: [ args addAll: aggOptions tailArray ].
+	aggOptions ifNotNil: [ args addAll: aggOptions asArray ].
 	^ args asArray
 ]
 
@@ -490,7 +488,7 @@ RsRedisEndpoint >> tsMRevRangeBy: rangeBlock filterBy: filterBlock aggregationBy
 { #category : '*RediStick-TimeSeries-private' }
 RsRedisEndpoint >> tsExecuteMRange: cmdName rangeBy: rangeBlock filterBy: filterBlock aggregationBy: aggregationBlock groupBy: groupingBlock using: optionsBlock [
 	"private"
-	| range builder options aggregation aggOptions groupBy |
+	| range builder options aggOptions groupBy |
 	range := self tsRangeFrom: (rangeBlock value: RsTsRange).
 	builder := RsTsFilterBuilder new.
 	filterBlock value: builder.
@@ -499,22 +497,22 @@ RsRedisEndpoint >> tsExecuteMRange: cmdName rangeBy: rangeBlock filterBy: filter
 		options := RsTsMRangeOptions new.
 		optionsBlock value: options ].
 	aggregationBlock ifNotNil: [
-		aggregation := RsTsAggregation new.
 		aggOptions := RsTsAggregationOptions new.
-		aggregationBlock cull: aggregation cull: aggOptions ].
+		aggOptions aggregation: RsTsAggregation new.
+		aggregationBlock cull: aggOptions aggregation cull: aggOptions ].
 	groupingBlock ifNotNil: [
 		groupBy := RsTsGroupBy new.
 		groupingBlock value: groupBy ].
 	^ self
 		tsParseMRangeResult: (self unifiedCommand: (self
 			tsMRangeArgsFor: cmdName range: range options: options
-			aggregation: aggregation aggOptions: aggOptions
+			aggOptions: aggOptions
 			filterBuilder: builder groupBy: groupBy))
 		groupBy: groupBy
 ]
 
 { #category : '*RediStick-TimeSeries-private' }
-RsRedisEndpoint >> tsMRangeArgsFor: cmdName range: range options: options aggregation: aggregation aggOptions: aggOptions filterBuilder: builder groupBy: groupBy [
+RsRedisEndpoint >> tsMRangeArgsFor: cmdName range: range options: options aggOptions: aggOptions filterBuilder: builder groupBy: groupBy [
 	"private"
 	| args |
 	args := OrderedCollection new.
@@ -524,9 +522,7 @@ RsRedisEndpoint >> tsMRangeArgsFor: cmdName range: range options: options aggreg
 	groupBy ifNotNil: [
 		(options isNil or: [ options isWithLabels not and: [ options selectedLabels isNil ] ])
 			ifTrue: [ args add: 'WITHLABELS' ] ].
-	aggOptions ifNotNil: [ args addAll: aggOptions alignArray ].
-	aggregation ifNotNil: [ args addAll: aggregation asArray ].
-	aggOptions ifNotNil: [ args addAll: aggOptions tailArray ].
+	aggOptions ifNotNil: [ args addAll: aggOptions asArray ].
 	args add: 'FILTER'.
 	args addAll: (builder filters collect: [ :f | f asString ]).
 	groupBy ifNotNil: [ args addAll: groupBy asArray ].

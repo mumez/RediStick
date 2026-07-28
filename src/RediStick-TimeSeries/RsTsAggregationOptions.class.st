@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'align',
 		'bucketTimestamp',
-		'empty'
+		'empty',
+		'aggregation'
 	],
 	#category : 'RediStick-TimeSeries',
 	#package : 'RediStick-TimeSeries'
@@ -17,13 +18,18 @@ RsTsAggregationOptions >> initialize [
 ]
 
 { #category : 'accessing' }
-RsTsAggregationOptions >> align [
-	^ align
+RsTsAggregationOptions >> aggregation [
+	^ aggregation
 ]
 
-{ #category : 'converting' }
-RsTsAggregationOptions >> alignArray [
-	^ self align ifNil: [ #() ] ifNotNil: [ { 'ALIGN'. self align } ]
+{ #category : 'accessing' }
+RsTsAggregationOptions >> aggregation: anAggregation [
+	aggregation := anAggregation
+]
+
+{ #category : 'accessing' }
+RsTsAggregationOptions >> align [
+	^ align
 ]
 
 { #category : 'accessing' }
@@ -52,9 +58,11 @@ RsTsAggregationOptions >> isEmpty [
 ]
 
 { #category : 'converting' }
-RsTsAggregationOptions >> tailArray [
+RsTsAggregationOptions >> asArray [
 	| opts |
 	opts := OrderedCollection new.
+	self align ifNotNil: [ :a | opts addAll: { 'ALIGN'. a } ].
+	self aggregation ifNotNil: [ opts addAll: self aggregation asArray ].
 	self bucketTimestamp ifNotNil: [ :bt | opts addAll: { 'BUCKETTIMESTAMP'. bt } ].
 	self isEmpty ifTrue: [ opts add: 'EMPTY' ].
 	^ opts asArray
