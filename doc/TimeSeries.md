@@ -106,19 +106,19 @@ stick endpoint tsAlter: 'temperature:1' using: [:opts |
 
 ```smalltalk
 "Query the whole series"
-values := stick endpoint tsRange: 'temperature:1' rangeBy: [:range | range all] using: nil.
+values := stick endpoint tsRange: 'temperature:1' rangeBy: [:range | range all].
 "{1785221260286->26.1. 1785221860286->25.5. 1785221992582->26.
 1785221996713->25.8. 1785222002419->26.8}"
 
 "Query a specific range - '-'/'+' via `all`, or explicit timestamps association"
 values := stick endpoint tsRange: 'temperature:1'
-    rangeBy: [:range | ts -> DateAndTime now] using: nil.
+    rangeBy: [:range | ts -> DateAndTime now].
 
 "Each element is a timestamp -> value Association"
 values do: [:sample | Transcript cr; show: sample key asString, ': ', sample value asString].
 
 "Reverse order"
-values := stick endpoint tsRevRange: 'temperature:1' rangeBy: [:range | range all] using: nil.
+values := stick endpoint tsRevRange: 'temperature:1' rangeBy: [:range | range all].
 ```
 
 ### Range with Aggregation
@@ -127,16 +127,14 @@ values := stick endpoint tsRevRange: 'temperature:1' rangeBy: [:range | range al
 "Average over 1-minute (60000ms) buckets"
 values := stick endpoint tsRange: 'temperature:1'
     rangeBy: [:range | range all]
-    aggregationBy: [:agg :aggOpts | agg avg; bucketDuration: 60000]
-    using: nil.
+    aggregationBy: [:agg :aggOpts | agg avg; bucketDuration: 60000].
 
 "Additional aggregation options: ALIGN, BUCKETTIMESTAMP, EMPTY"
 values := stick endpoint tsRange: 'temperature:1'
     rangeBy: [:range | range all]
     aggregationBy: [:agg :aggOpts |
         agg avg; bucketDuration: 60000.
-        aggOpts bucketTimestamp: '+'; empty]
-    using: nil.
+        aggOpts bucketTimestamp: '+'; empty].
 ```
 
 ## Batch Adding Samples
@@ -198,8 +196,7 @@ results := stick endpoint tsMRangeBy: [:range | range all]
 grouped := stick endpoint tsMRangeBy: [:range | range all]
     filterBy: [:filter | filter hasLabel: 'area']
     aggregationBy: [:agg :aggOpts | agg avg; bucketDuration: 60000]
-    groupBy: [:g | g label: 'area'; reduce: 'avg']
-    using: nil.
+    groupBy: [:g | g label: 'area'; reduce: 'avg'].
 grouped first groupByLabel. "'area'->'kitchen'"
 grouped first sourceKeys.   "series keys that contributed to this group"
 
