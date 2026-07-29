@@ -231,7 +231,6 @@ RsRedisEndpoint >> tsExecuteRange: cmdName key: key rangeBy: rangeBlock aggregat
 		optionsBlock value: options ].
 	aggregationBlock ifNotNil: [
 		aggOptions := RsTsAggregationOptions new.
-		aggOptions aggregation: RsTsAggregation new.
 		aggregationBlock cull: aggOptions aggregation cull: aggOptions ].
 	args := self
 		tsRangeArgsFor: cmdName key: key
@@ -498,7 +497,6 @@ RsRedisEndpoint >> tsExecuteMRange: cmdName rangeBy: rangeBlock filterBy: filter
 		optionsBlock value: options ].
 	aggregationBlock ifNotNil: [
 		aggOptions := RsTsAggregationOptions new.
-		aggOptions aggregation: RsTsAggregation new.
 		aggregationBlock cull: aggOptions aggregation cull: aggOptions ].
 	groupingBlock ifNotNil: [
 		groupBy := RsTsGroupBy new.

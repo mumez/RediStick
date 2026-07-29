@@ -19,7 +19,7 @@ RsTsAggregationOptions >> initialize [
 
 { #category : 'accessing' }
 RsTsAggregationOptions >> aggregation [
-	^ aggregation
+	^ aggregation ifNil: [ aggregation := RsTsAggregation new ]
 ]
 
 { #category : 'accessing' }
