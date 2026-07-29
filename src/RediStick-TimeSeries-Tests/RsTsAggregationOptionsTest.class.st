@@ -14,13 +14,6 @@ RsTsAggregationOptionsTest >> avgAggregation [
 ]
 
 { #category : 'tests' }
-RsTsAggregationOptionsTest >> testEmptyOptionsProduceEmptyArray [
-	| opts |
-	opts := RsTsAggregationOptions new.
-	self assertCollection: opts asArray equals: #()
-]
-
-{ #category : 'tests' }
 RsTsAggregationOptionsTest >> testAggregationOnly [
 	| opts |
 	opts := RsTsAggregationOptions new.

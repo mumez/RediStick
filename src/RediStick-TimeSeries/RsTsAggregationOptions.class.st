@@ -62,7 +62,7 @@ RsTsAggregationOptions >> asArray [
 	| opts |
 	opts := OrderedCollection new.
 	self align ifNotNil: [ :a | opts addAll: { 'ALIGN'. a } ].
-	self aggregation ifNotNil: [ opts addAll: self aggregation asArray ].
+	opts addAll: self aggregation asArray.
 	self bucketTimestamp ifNotNil: [ :bt | opts addAll: { 'BUCKETTIMESTAMP'. bt } ].
 	self isEmpty ifTrue: [ opts add: 'EMPTY' ].
 	^ opts asArray
