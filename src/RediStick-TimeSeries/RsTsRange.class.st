@@ -14,10 +14,6 @@ RsTsRange class >> all [
 	^ self from: self start to: self end
 ]
 
-{ #category : 'instance creation' }
-RsTsRange class >> end [
-	^ '+'
-]
 
 { #category : 'instance creation' }
 RsTsRange class >> from: aFrom [
@@ -31,20 +27,30 @@ RsTsRange class >> from: aFrom to: aTo [
 		to: (self normalizeTimestamp: aTo)
 ]
 
+{ #category : 'instance creation' }
+RsTsRange class >> to: aTo [
+	^ self from: self start to: aTo
+]
+
 { #category : 'private' }
 RsTsRange class >> normalizeTimestamp: aValue [
 	aValue isString ifTrue: [ ^ aValue ].
 	^ aValue asRediStickUnixTimestampMillis
 ]
 
-{ #category : 'instance creation' }
+{ #category : 'constants' }
 RsTsRange class >> start [
 	^ '-'
 ]
 
-{ #category : 'instance creation' }
-RsTsRange class >> to: aTo [
-	^ self from: self start to: aTo
+{ #category : 'constants' }
+RsTsRange class >> end [
+	^ '~'
+]
+
+{ #category : 'constants' }
+RsTsRange class >> mid [
+	^ '+'
 ]
 
 { #category : 'converting' }
