@@ -45,12 +45,12 @@ RsTsRange class >> start [
 
 { #category : 'constants' }
 RsTsRange class >> end [
-	^ '~'
+	^ '+'
 ]
 
 { #category : 'constants' }
 RsTsRange class >> mid [
-	^ '+'
+	^ '~'
 ]
 
 { #category : 'converting' }

@@ -57,6 +57,31 @@ RsTsAggregationOptions >> isEmpty [
 	^ empty
 ]
 
+{ #category : 'shortcuts-align' }
+RsTsAggregationOptions >> alignEnd [
+	self align: RsTsRange end
+]
+
+{ #category : 'shortcuts-align' }
+RsTsAggregationOptions >> alignStart [
+	self align: RsTsRange start
+]
+
+{ #category : 'shortcuts-bucketTimestamp' }
+RsTsAggregationOptions >> bucketTimestampEnd [
+	self bucketTimestamp: RsTsRange end
+]
+
+{ #category : 'shortcuts-bucketTimestamp' }
+RsTsAggregationOptions >> bucketTimestampMid [
+	self bucketTimestamp: RsTsRange mid
+]
+
+{ #category : 'shortcuts-bucketTimestamp' }
+RsTsAggregationOptions >> bucketTimestampStart [
+	self bucketTimestamp: RsTsRange start
+]
+
 { #category : 'converting' }
 RsTsAggregationOptions >> asArray [
 	| opts |

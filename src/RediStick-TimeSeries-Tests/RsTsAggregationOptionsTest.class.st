@@ -69,3 +69,43 @@ RsTsAggregationOptionsTest >> testAllOptionsInOrder [
 	self assertCollection: opts asArray
 		equals: { 'ALIGN'. '-'. 'AGGREGATION'. 'avg'. 1000. 'BUCKETTIMESTAMP'. '~'. 'EMPTY' }
 ]
+
+{ #category : 'tests' }
+RsTsAggregationOptionsTest >> testAlignStart [
+	| opts |
+	opts := RsTsAggregationOptions new.
+	opts aggregation: self avgAggregation; alignStart.
+	self assertCollection: opts asArray equals: { 'ALIGN'. '-'. 'AGGREGATION'. 'avg'. 1000 }
+]
+
+{ #category : 'tests' }
+RsTsAggregationOptionsTest >> testAlignEnd [
+	| opts |
+	opts := RsTsAggregationOptions new.
+	opts aggregation: self avgAggregation; alignEnd.
+	self assertCollection: opts asArray equals: { 'ALIGN'. '+'. 'AGGREGATION'. 'avg'. 1000 }
+]
+
+{ #category : 'tests' }
+RsTsAggregationOptionsTest >> testBucketTimestampStart [
+	| opts |
+	opts := RsTsAggregationOptions new.
+	opts aggregation: self avgAggregation; bucketTimestampStart.
+	self assertCollection: opts asArray equals: { 'AGGREGATION'. 'avg'. 1000. 'BUCKETTIMESTAMP'. '-' }
+]
+
+{ #category : 'tests' }
+RsTsAggregationOptionsTest >> testBucketTimestampEnd [
+	| opts |
+	opts := RsTsAggregationOptions new.
+	opts aggregation: self avgAggregation; bucketTimestampEnd.
+	self assertCollection: opts asArray equals: { 'AGGREGATION'. 'avg'. 1000. 'BUCKETTIMESTAMP'. '+' }
+]
+
+{ #category : 'tests' }
+RsTsAggregationOptionsTest >> testBucketTimestampMid [
+	| opts |
+	opts := RsTsAggregationOptions new.
+	opts aggregation: self avgAggregation; bucketTimestampMid.
+	self assertCollection: opts asArray equals: { 'AGGREGATION'. 'avg'. 1000. 'BUCKETTIMESTAMP'. '~' }
+]
