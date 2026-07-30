@@ -160,10 +160,14 @@ stick endpoint tsMAddWithKeyTimestampValues:
 ## Multi-Series Queries with Filters
 
 Filters select time series by their labels, using an `RsTsFilter`-based builder passed to `filterBy:`.
+Redis requires at least one `label=value` or `label=(v1,v2,...)` filter (built with `label:eq:` or
+`label:in:`) in every filter set; existence-only filters like `hasLabel:`/`noLabel:` must be combined
+with one of those, or Redis rejects the query with `ERR TSDB: please provide at least one matcher`.
 
 ```smalltalk
-"Get the latest sample from every series with label sensor_id"
-values := stick endpoint tsMGetFilterBy: [:filter | filter hasLabel: 'sensor_id'].
+"Get the latest sample from every series with label sensor_id, narrowed to the kitchen area"
+values := stick endpoint tsMGetFilterBy: [:filter |
+    filter hasLabel: 'sensor_id'; label: 'area' eq: 'kitchen'].
 values do: [:v |
     Transcript cr; show: v key, ' @', v timestamp asString, ': ', v value asString].
 
@@ -188,13 +192,13 @@ results do: [:r |
 
 "With aggregation and options"
 results := stick endpoint tsMRangeBy: [:range | range all]
-    filterBy: [:filter | filter hasLabel: 'sensor_id']
+    filterBy: [:filter | filter hasLabel: 'sensor_id'; label: 'area' eq: 'kitchen']
     aggregationBy: [:agg :aggOpts | agg avg; bucketDuration: 60000]
     using: [:opts | opts withLabels].
 
 "With GROUPBY / REDUCE - returns RsTsGroupedRangeValue"
 grouped := stick endpoint tsMRangeBy: [:range | range all]
-    filterBy: [:filter | filter hasLabel: 'area']
+    filterBy: [:filter | filter hasLabel: 'area'; label: 'sensor_id' in: {'2'. '3'}]
     aggregationBy: [:agg :aggOpts | agg avg; bucketDuration: 60000]
     groupBy: [:g | g label: 'area'; reduce: 'avg'].
 grouped first groupByLabel. "'area'->'kitchen'"
@@ -202,7 +206,7 @@ grouped first sourceKeys.   "series keys that contributed to this group"
 
 "Reverse order variant"
 results := stick endpoint tsMRevRangeBy: [:range | range all]
-    filterBy: [:filter | filter hasLabel: 'sensor_id'].
+    filterBy: [:filter | filter hasLabel: 'sensor_id'; label: 'area' eq: 'kitchen'].
 ```
 
 ### Querying Series Keys by Label (QUERYINDEX)
