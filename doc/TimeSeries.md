@@ -112,7 +112,7 @@ values := stick endpoint tsRange: 'temperature:1' rangeBy: [:range | range all].
 
 "Query a specific range - '-'/'+' via `all`, or explicit timestamps association"
 values := stick endpoint tsRange: 'temperature:1'
-    rangeBy: [:range | ts -> DateAndTime now].
+    rangeBy: [:range | ts -> range end].
 
 "Each element is a timestamp -> value Association"
 values do: [:sample | Transcript cr; show: sample key asString, ': ', sample value asString].
@@ -134,7 +134,7 @@ values := stick endpoint tsRange: 'temperature:1'
     rangeBy: [:range | range all]
     aggregationBy: [:agg :aggOpts |
         agg avg; bucketDuration: 60000.
-        aggOpts bucketTimestamp: '+'; empty].
+        aggOpts bucketTimestampEnd; empty].
 ```
 
 ## Batch Adding Samples
