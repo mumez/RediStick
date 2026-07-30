@@ -49,3 +49,32 @@ RsTsFilterBuilderTest >> testNoLabelAndNotIn [
 	self assert: (builder filters collect: [ :f | f asString ])
 		equals: { 'deprecated='. 'region!=(eu,us)' }
 ]
+
+{ #category : 'tests' }
+RsTsFilterBuilderTest >> testValidateSignalsErrorWhenNoFilters [
+	self should: [ RsTsFilterBuilder new validate ] raise: RsError
+]
+
+{ #category : 'tests' }
+RsTsFilterBuilderTest >> testValidateSignalsErrorWhenOnlyExistenceMatchers [
+	| builder |
+	builder := RsTsFilterBuilder new.
+	builder hasLabel: 'sensor_id'; noLabel: 'deprecated'.
+	self should: [ builder validate ] raise: RsError
+]
+
+{ #category : 'tests' }
+RsTsFilterBuilderTest >> testValidatePassesWithEqualityMatcher [
+	| builder |
+	builder := RsTsFilterBuilder new.
+	builder hasLabel: 'sensor_id'; label: 'area' eq: 'kitchen'.
+	builder validate
+]
+
+{ #category : 'tests' }
+RsTsFilterBuilderTest >> testValidatePassesWithInMatcher [
+	| builder |
+	builder := RsTsFilterBuilder new.
+	builder label: 'area' in: { 'kitchen'. 'living_room' }.
+	builder validate
+]

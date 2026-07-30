@@ -59,3 +59,12 @@ RsTsFilterBuilder >> noLabel: aLabel [
 	self filtersCollection add: (RsTsFilter noLabel: aLabel).
 	^ self
 ]
+
+{ #category : 'validation' }
+RsTsFilterBuilder >> validate [
+	self filters ifEmpty: [
+		^ (RsError invalidArguments) signal: 'At least one filter expression is required' ].
+	(self filters anySatisfy: [ :f | f isEqualityMatcher ]) ifFalse: [
+		^ (RsError invalidArguments) signal:
+			'At least one filter expression with a syntax label=value or label=(value1,value2,...) is required.' ]
+]

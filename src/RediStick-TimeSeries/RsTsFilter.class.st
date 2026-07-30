@@ -50,6 +50,11 @@ RsTsFilter >> asString [
 	^ self label , self operator , self value
 ]
 
+{ #category : 'testing' }
+RsTsFilter >> isEqualityMatcher [
+	^ self operator = '=' and: [ self value notEmpty ]
+]
+
 { #category : 'accessing' }
 RsTsFilter >> label [
 	^ label

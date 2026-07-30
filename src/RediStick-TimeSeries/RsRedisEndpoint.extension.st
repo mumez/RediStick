@@ -343,7 +343,7 @@ RsRedisEndpoint >> tsQueryIndexFilterBy: filterBlock [
 	| builder args |
 	builder := RsTsFilterBuilder new.
 	filterBlock value: builder.
-	builder filters ifEmpty: [ Error signal: 'At least one filter expression is required' ].
+	builder validate.
 	args := { 'TS.QUERYINDEX' } asOrderedCollection.
 	args addAll: (builder filters collect: [ :f | f asString ]).
 	^ (self unifiedCommand: args asArray) ifNil: [ #() ] ifNotNil: [ :r | r asArray ]
@@ -359,7 +359,7 @@ RsRedisEndpoint >> tsMGetFilterBy: filterBlock using: optionsBlock [
 	| builder options args result |
 	builder := RsTsFilterBuilder new.
 	filterBlock value: builder.
-	builder filters ifEmpty: [ Error signal: 'At least one filter expression is required' ].
+	builder validate.
 	options := RsTsMGetOptions new.
 	optionsBlock ifNotNil: [ optionsBlock value: options ].
 	args := { 'TS.MGET' } asOrderedCollection.
@@ -491,7 +491,7 @@ RsRedisEndpoint >> tsExecuteMRange: cmdName rangeBy: rangeBlock filterBy: filter
 	range := self tsRangeFrom: (rangeBlock value: RsTsRange).
 	builder := RsTsFilterBuilder new.
 	filterBlock value: builder.
-	builder filters ifEmpty: [ Error signal: 'At least one filter expression is required' ].
+	builder validate.
 	optionsBlock ifNotNil: [
 		options := RsTsMRangeOptions new.
 		optionsBlock value: options ].

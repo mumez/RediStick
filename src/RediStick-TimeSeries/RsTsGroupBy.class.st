@@ -34,7 +34,7 @@ RsTsGroupBy >> reduceBy: aBlock [
 	| r |
 	r := RsTsReducer new.
 	aBlock value: r.
-	r reducerName ifNil: [ Error signal: 'reducer block must set a reducer' ].
+	r reducerName ifNil: [ (RsError invalidArguments) signal: 'reducer block must set a reducer' ].
 	reducer := r reducerName
 ]
 
@@ -105,7 +105,7 @@ RsTsGroupBy >> reduceByVarS [
 
 { #category : 'converting' }
 RsTsGroupBy >> asArray [
-	self label ifNil: [ Error signal: 'label must be set' ].
-	self reducer ifNil: [ Error signal: 'reducer must be set' ].
+	self label ifNil: [ (RsError invalidArguments) signal: 'label must be set' ].
+	self reducer ifNil: [ (RsError invalidArguments) signal: 'reducer must be set' ].
 	^ { 'GROUPBY'. self label. 'REDUCE'. self reducer }
 ]
