@@ -44,7 +44,7 @@ stick endpoint tsCreate: 'temperature:1'.
 "Create with options"
 stick endpoint tsCreate: 'temperature:2' using: [:opts |
     opts retention: 86400000; "keep 1 day of samples (ms)"
-        labels: {'sensor_id'->'2'. 'area'->'kitchen'} asDictionary].
+        labels: {'sensor_id'->'2'. 'area'->'kitchen'}].
 ```
 
 ### Adding Samples
@@ -62,7 +62,7 @@ stick endpoint tsAdd: 'temperature:2' value: 21.0.
 "Add with options - e.g. set retention and labels on auto-create (the series is
 auto-created by TS.ADD even without options)"
 stick endpoint tsAdd: 'temperature:3' value: 22.0 using: [:opts |
-    opts retention: 3600000; labels: {'sensor_id'->'3'} asDictionary].
+    opts retention: 3600000; labels: {'sensor_id'->'3'}].
 ```
 
 ### Getting the Last Sample
@@ -97,7 +97,7 @@ info at: 'retentionTime'.  "0"
 
 ```smalltalk
 stick endpoint tsAlter: 'temperature:1' retention: 604800000.
-stick endpoint tsAlter: 'temperature:1' labels: {'area'->'living_room'} asDictionary.
+stick endpoint tsAlter: 'temperature:1' labels: {'area'->'living_room'}.
 stick endpoint tsAlter: 'temperature:1' using: [:opts |
     opts duplicatePolicy: 'LAST'; chunkSize: 4096].
 ```
