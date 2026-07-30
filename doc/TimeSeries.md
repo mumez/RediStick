@@ -99,7 +99,7 @@ info at: 'retentionTime'.  "0"
 stick endpoint tsAlter: 'temperature:1' retention: 604800000.
 stick endpoint tsAlter: 'temperature:1' labels: {'area'->'living_room'}.
 stick endpoint tsAlter: 'temperature:1' using: [:opts |
-    opts duplicatePolicy: 'LAST'; chunkSize: 4096].
+    opts duplicatePolicyLast; chunkSize: 4096].
 ```
 
 ## Querying a Range
