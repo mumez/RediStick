@@ -219,9 +219,6 @@ keys := stick endpoint tsQueryIndexFilterBy: [:filter | filter label: 'area' eq:
 stick endpoint tsCreate: 'temperature:1:hourly'.
 stick endpoint tsCreateRule: 'temperature:1' dest: 'temperature:1:hourly'
     aggregationBy: [:agg | agg avg; bucketDuration: 3600000].
-
-"Delete the rule"
-stick endpoint tsDeleteRule: 'temperature:1' dest: 'temperature:1:hourly'.
 ```
 
 A destination series with a compaction rule is a *compacted* series: its samples are
@@ -236,6 +233,9 @@ sample := stick endpoint tsGet: 'temperature:1:hourly' latest: true.
 
 values := stick endpoint tsMGetFilterBy: [:filter | filter label: 'area' eq: 'kitchen']
     using: [:opts | opts latest].
+
+"Delete the rule"
+stick endpoint tsDeleteRule: 'temperature:1' dest: 'temperature:1:hourly'.
 ```
 
 ## Deleting Samples and Cleaning Up
