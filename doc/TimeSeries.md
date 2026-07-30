@@ -62,7 +62,7 @@ stick endpoint tsAdd: 'temperature:2' value: 21.0.
 "Add with options - e.g. set retention and labels on auto-create (the series is
 auto-created by TS.ADD even without options)"
 stick endpoint tsAdd: 'temperature:3' value: 22.0 using: [:opts |
-    opts retention: 3600000; labels: {'sensor_id'->'3'}].
+    opts retention: 3600000; labels: {'sensor_id'->'3'. 'area'->'kitchen'}].
 ```
 
 ### Getting the Last Sample
@@ -115,7 +115,7 @@ values := stick endpoint tsRange: 'temperature:1'
     rangeBy: [:range | ts -> range end].
 
 "Each element is a timestamp -> value Association"
-values do: [:sample | Transcript cr; show: sample key asString, ': ', sample value asString].
+values do: [:sample | Transcript crShow: sample key asString, ': ', sample value asString].
 
 "Reverse order"
 values := stick endpoint tsRevRange: 'temperature:1' rangeBy: [:range | range all].
@@ -143,18 +143,18 @@ values := stick endpoint tsRange: 'temperature:1'
 "Using the fluent interface"
 stick endpoint tsMAddUsing: [:multiAdd |
     multiAdd
-        key: 'temperature:1' timestamp: DateAndTime now value: 25.0;
-        key: 'temperature:2' timestamp: DateAndTime now value: 21.5].
+        key: 'temperature:1' timestamp: DateAndTime now value: 20.1;
+        key: 'temperature:2' timestamp: DateAndTime now value: 21.2].
 
 "From a Dictionary of key -> value (auto timestamp)"
-stick endpoint tsMAddWithDictionary: {'temperature:1'->25.0. 'temperature:2'->21.5} asDictionary.
+stick endpoint tsMAddWithDictionary: {'temperature:1'->20.2. 'temperature:2'->22.2} asDictionary.
 
 "From key/value pairs (auto timestamp)"
-stick endpoint tsMAddWithKeyValues: {{'temperature:1'. 25.0}. {'temperature:2'. 21.5}}.
+stick endpoint tsMAddWithKeyValues: {{'temperature:1'. 20.3}. {'temperature:2'. 23.2}}.
 
 "From key/timestamp/value triplets"
 stick endpoint tsMAddWithKeyTimestampValues:
-    {{'temperature:1'. DateAndTime now. 25.0}. {'temperature:2'. DateAndTime now. 21.5}}.
+    {{'temperature:1'. DateAndTime now. 20.4}. {'temperature:3'. DateAndTime now. 30.1}}.
 ```
 
 ## Multi-Series Queries with Filters
@@ -169,7 +169,7 @@ with one of those, or Redis rejects the query with `ERR TSDB: please provide at 
 values := stick endpoint tsMGetFilterBy: [:filter |
     filter hasLabel: 'sensor_id'; label: 'area' eq: 'kitchen'].
 values do: [:v |
-    Transcript cr; show: v key, ' @', v timestamp asString, ': ', v value asString].
+    Transcript crShow: v key, ' @', v timestamp asString, ': ', v value asString].
 
 "With options - WITHLABELS, LATEST, SELECTED_LABELS"
 values := stick endpoint tsMGetFilterBy: [:filter | filter label: 'area' eq: 'kitchen']
@@ -188,7 +188,7 @@ results := stick endpoint tsMRangeBy: [:range | range all]
 
 "Each result is an RsTsRangeValue"
 results do: [:r |
-    Transcript cr; show: r key, ': ', r values size asString, ' samples'].
+    Transcript crShow: r key, ': ', r values size asString, ' samples'].
 
 "With aggregation and options"
 results := stick endpoint tsMRangeBy: [:range | range all]
@@ -219,10 +219,11 @@ keys := stick endpoint tsQueryIndexFilterBy: [:filter | filter label: 'area' eq:
 ## Compaction Rules
 
 ```smalltalk
-"Create a destination series for 1-hour averages, then a compaction rule"
-stick endpoint tsCreate: 'temperature:1:hourly'.
-stick endpoint tsCreateRule: 'temperature:1' dest: 'temperature:1:hourly'
-    aggregationBy: [:agg | agg avg; bucketDuration: 3600000].
+"Create a destination series for 1-second averages, then a compaction rule"
+stick endpoint tsCreate: 'temperature:1:secondary' using: [:opts |
+    opts labels: {'compacted'->'1-second'}].
+stick endpoint tsCreateRule: 'temperature:1' dest: 'temperature:1:secondary'
+    aggregationBy: [:agg | agg avg; bucketDuration: 1000].
 ```
 
 A destination series with a compaction rule is a *compacted* series: its samples are
@@ -232,14 +233,22 @@ so `TS.GET`/`TS.MGET` can return a partial, still-changing value by default. Pas
 `LATEST` to include that last, possibly incomplete, bucket instead of skipping it:
 
 ```smalltalk
-"Use the LATEST flag when reading from a compacted series"
-sample := stick endpoint tsGet: 'temperature:1:hourly' latest: true.
 
-values := stick endpoint tsMGetFilterBy: [:filter | filter label: 'area' eq: 'kitchen']
+"Add sample values for test"
+stick endpoint tsAdd: 'temperature:1' timestamp: (ts := DateAndTime now) value: 25.5.
+stick endpoint tsAdd: 'temperature:1' timestamp: (ts + 300 milliSeconds) value: 25.4.
+stick endpoint tsAdd: 'temperature:1' timestamp: (ts + 300 milliSeconds) value: 25.2.
+stick endpoint tsAdd: 'temperature:1' timestamp: (ts + 300 milliSeconds) value: 25.3.
+stick endpoint tsAdd: 'temperature:1' timestamp: (ts + 300 milliSeconds) value: 25.4.
+
+"Use the LATEST flag when reading from a compacted series"
+sample := stick endpoint tsGet: 'temperature:1:secondary' latest: true.
+
+values := stick endpoint tsMGetFilterBy: [:filter | filter label: 'compacted' eq: '1-second']
     using: [:opts | opts latest].
 
 "Delete the rule"
-stick endpoint tsDeleteRule: 'temperature:1' dest: 'temperature:1:hourly'.
+stick endpoint tsDeleteRule: 'temperature:1' dest: 'temperature:1:secondary'.
 ```
 
 ## Deleting Samples and Cleaning Up
