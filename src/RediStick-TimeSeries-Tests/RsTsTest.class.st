@@ -451,6 +451,18 @@ RsTsTest >> testTsIncrByWithOptions [
 ]
 
 { #category : 'tests' }
+RsTsTest >> testTsIncrByWithEncodingUncompressedOption [
+	| key info |
+	key := 'test:ts:incrby:encoding'.
+	stick endpoint
+		tsIncrBy: key
+		increment: 1
+		using: [ :opts | opts encodingUncompressed ].
+	info := stick endpoint tsInfo: key.
+	self assert: (info at: 'chunkType') equals: 'uncompressed'
+]
+
+{ #category : 'tests' }
 RsTsTest >> testTsDecrByAutoTimestamp [
 	| key result |
 	key := 'test:ts:decrby:auto'.
@@ -493,6 +505,18 @@ RsTsTest >> testTsDecrByWithOptions [
 	labels := self labelsAsDictionary: (info at: 'labels').
 	self assert: (labels at: 'sensor') equals: 'B'.
 	self assert: (labels at: 'unit') equals: 'hpa'
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsDecrByWithEncodingUncompressedOption [
+	| key info |
+	key := 'test:ts:decrby:encoding'.
+	stick endpoint
+		tsDecrBy: key
+		decrement: 1
+		using: [ :opts | opts encodingUncompressed ].
+	info := stick endpoint tsInfo: key.
+	self assert: (info at: 'chunkType') equals: 'uncompressed'
 ]
 
 { #category : 'tests' }

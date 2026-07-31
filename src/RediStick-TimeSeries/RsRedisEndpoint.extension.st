@@ -214,7 +214,7 @@ RsRedisEndpoint >> tsIncrOrDecr: cmdName key: key timestamp: tsMSecsOrDateTimeOr
 	tsMSecsOrDateTimeOrNil ifNotNil: [ :ts |
 		args addAll: { 'TIMESTAMP'. ts asRediStickUnixTimestampMillis } ].
 	optionsBlock ifNotNil: [
-		options := RsTsAlterOptions new.
+		options := RsTsCreateOptions new.
 		optionsBlock value: options.
 		args addAll: options asArray.
 		self tsAppendLabelsFrom: options to: args ].
