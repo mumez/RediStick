@@ -60,6 +60,11 @@ RsTsValue >> value: aValue [
 	value := aValue
 ]
 
+{ #category : 'testing' }
+RsTsValue >> hasValue [
+	^ timestamp notNil
+]
+
 { #category : 'printing' }
 RsTsValue >> printOn: aStream [
 	aStream

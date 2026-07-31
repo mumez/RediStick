@@ -142,3 +142,18 @@ RsTsMGetTest >> testTsMGetNoMatchingSeriesReturnsEmptyArray [
 RsTsMGetTest >> testTsMGetWithoutFiltersSignalsError [
 	self should: [ stick endpoint tsMGetFilterBy: [ :filter | ] ] raise: Error
 ]
+
+{ #category : 'tests' }
+RsTsMGetTest >> testTsMGetOnEmptySeriesReturnsValueWithoutSample [
+	| key result tsValue |
+	key := 'test:ts:mget:empty'.
+	stick endpoint tsCreate: key using: [ :opts | opts labels: { 'type' -> 'empty' } ].
+
+	result := stick endpoint tsMGetFilterBy: [ :filter | filter label: 'type' eq: 'empty' ].
+	self assert: result size equals: 1.
+	tsValue := result first.
+	self assert: tsValue key equals: key.
+	self deny: tsValue hasValue.
+	self assert: tsValue timestamp isNil.
+	self assert: tsValue value isNil
+]

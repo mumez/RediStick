@@ -380,14 +380,17 @@ RsRedisEndpoint >> tsParseMGetResult: rawResult [
 { #category : '*RediStick-TimeSeries-private' }
 RsRedisEndpoint >> tsValueFromMGetRow: row [
 	"private"
-	| key labelsPairs sample |
+	| key labelsPairs sample timestampAndValue |
 	key := row first.
 	labelsPairs := row second.
 	sample := row third.
+	timestampAndValue := sample
+		ifEmpty: [ nil -> nil ]
+		ifNotEmpty: [ sample first -> (self tsParseValue: sample second) ].
 	^ RsTsValue
 		key: key
-		timestamp: sample first
-		value: (self tsParseValue: sample second)
+		timestamp: timestampAndValue key
+		value: timestampAndValue value
 		labels: (self tsLabelsDictionaryFrom: labelsPairs)
 ]
 
