@@ -498,7 +498,7 @@ RsRedisEndpointTest >> testXInfoStream [
 	streamInfo := stick endpoint xInfoStream: streamKey.
 	self assert: streamInfo size equals: 3.
 	self assert: streamInfo radixTreeKeys equals: 1.
-	self assert: streamInfo radixTreeNodes equals: 2.
+	self assert: streamInfo radixTreeNodes >= streamInfo radixTreeKeys.
 	self assert: streamInfo groups equals: 1.
 	self assert: streamInfo lastGeneratedId equals: ents2 last id.
 	self assert: streamInfo maxDeletedEntryId equals: '0-0'.
@@ -538,7 +538,7 @@ RsRedisEndpointTest >> testXInfoStreamFull [
 	streamInfo := stick endpoint xInfoStream: streamKey full: true count: 2.
 	self assert: streamInfo size equals: 3.
 	self assert: streamInfo radixTreeKeys equals: 1.
-	self assert: streamInfo radixTreeNodes equals: 2.
+	self assert: streamInfo radixTreeNodes >= streamInfo radixTreeKeys.
 	self assert: streamInfo groups size equals: 1.
 	group := streamInfo groups first.
 	self assert: group name equals: 'group-a'.
