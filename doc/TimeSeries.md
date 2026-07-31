@@ -107,18 +107,22 @@ stick endpoint tsAlter: 'temperature:1' using: [:opts |
 ```smalltalk
 "Query the whole series"
 values := stick endpoint tsRange: 'temperature:1' rangeBy: [:range | range all].
-"{1785221260286->26.1. 1785221860286->25.5. 1785221992582->26.
-1785221996713->25.8. 1785222002419->26.8}"
+"{1785482516559->26.1. 1785483116559->25.5. 1785483181545->26.
+1785483183019->25.8. 1785483189377->26.8}"
 
 "Query a specific range - '-'/'+' via `all`, or explicit timestamps association"
 values := stick endpoint tsRange: 'temperature:1'
     rangeBy: [:range | ts -> range end].
+"{1785483116559->25.5. 1785483181545->26. 1785483183019->25.8.
+1785483189377->26.8}"
 
 "Each element is a timestamp -> value Association"
 values do: [:sample | Transcript crShow: sample key asString, ': ', sample value asString].
 
 "Reverse order"
 values := stick endpoint tsRevRange: 'temperature:1' rangeBy: [:range | range all].
+"{1785483189377->26.8. 1785483183019->25.8. 1785483181545->26.
+1785483116559->25.5. 1785482516559->26.1}"
 ```
 
 ### Range with Aggregation
@@ -128,6 +132,7 @@ values := stick endpoint tsRevRange: 'temperature:1' rangeBy: [:range | range al
 values := stick endpoint tsRange: 'temperature:1'
     rangeBy: [:range | range all]
     aggregationBy: [:agg :aggOpts | agg avg; bucketDuration: 60000].
+"{1785482460000->26.1. 1785483060000->25.5. 1785483180000->26.2}"
 
 "Additional aggregation options: ALIGN, BUCKETTIMESTAMP, EMPTY"
 values := stick endpoint tsRange: 'temperature:1'
@@ -135,6 +140,11 @@ values := stick endpoint tsRange: 'temperature:1'
     aggregationBy: [:agg :aggOpts |
         agg avg; bucketDuration: 60000.
         aggOpts bucketTimestampEnd; empty].
+"{1785482520000->26.1. 1785482580000->Float nan. 1785482640000->Float nan.
+1785482700000->Float nan. 1785482760000->Float nan. 1785482820000->Float nan.
+1785482880000->Float nan. 1785482940000->Float nan. 1785483000000->Float nan.
+1785483060000->Float nan. 1785483120000->25.5. 1785483180000->Float nan.
+1785483240000->26.2}"
 ```
 
 ## Batch Adding Samples
@@ -159,10 +169,7 @@ stick endpoint tsMAddWithKeyTimestampValues:
 
 ## Multi-Series Queries with Filters
 
-Filters select time series by their labels, using an `RsTsFilter`-based builder passed to `filterBy:`.
-Redis requires at least one `label=value` or `label=(v1,v2,...)` filter (built with `label:eq:` or
-`label:in:`) in every filter set; existence-only filters like `hasLabel:`/`noLabel:` must be combined
-with one of those, or Redis rejects the query with `ERR TSDB: please provide at least one matcher`.
+Filters select time series by their labels. Redis requires at least one `label=value` or `label=(v1,v2,...)` filter (built with `label:eq:` or `label:in:`) in every filter set; existence-only filters like `hasLabel:`/`noLabel:` must be combined with one of those, or Redis rejects the query with `ERR TSDB: please provide at least one matcher`.
 
 ```smalltalk
 "Get the latest sample from every series with label sensor_id, narrowed to the kitchen area"
@@ -170,6 +177,8 @@ values := stick endpoint tsMGetFilterBy: [:filter |
     filter hasLabel: 'sensor_id'; label: 'area' eq: 'kitchen'].
 values do: [:v |
     Transcript crShow: v key, ' @', v timestamp asString, ': ', v value asString].
+"temperature:2 @1785483659810: 23.2
+temperature:3 @1785483659810: 30.1"
 
 "With options - WITHLABELS, LATEST, SELECTED_LABELS"
 values := stick endpoint tsMGetFilterBy: [:filter | filter label: 'area' eq: 'kitchen']
@@ -177,7 +186,9 @@ values := stick endpoint tsMGetFilterBy: [:filter | filter label: 'area' eq: 'ki
 
 "RsTsValue holds key, timestamp, value and labels"
 values first labels. "a Dictionary with the series' labels"
+"a Dictionary('area'->'kitchen' 'sensor_id'->'2' )"
 ```
+
 
 ### MRANGE / MREVRANGE
 
@@ -189,12 +200,19 @@ results := stick endpoint tsMRangeBy: [:range | range all]
 "Each result is an RsTsRangeValue"
 results do: [:r |
     Transcript crShow: r key, ': ', r values size asString, ' samples'].
+"temperature:2: 4 samples
+temperature:3: 2 samples"
 
 "With aggregation and options"
 results := stick endpoint tsMRangeBy: [:range | range all]
     filterBy: [:filter | filter hasLabel: 'sensor_id'; label: 'area' eq: 'kitchen']
     aggregationBy: [:agg :aggOpts | agg avg; bucketDuration: 60000]
     using: [:opts | opts withLabels].
+"an Array(RsTsRangeValue(key: 'temperature:2' labels: a
+Dictionary('area'->'kitchen' 'sensor_id'->'2' ) values: {1785483120000->21.
+1785483600000->22.2}) RsTsRangeValue(key: 'temperature:3' labels: a
+Dictionary('area'->'kitchen' 'sensor_id'->'3' ) values: {1785483120000->22.
+1785483600000->30.1}))"
 
 "With GROUPBY / REDUCE - returns RsTsGroupedRangeValue"
 grouped := stick endpoint tsMRangeBy: [:range | range all]
@@ -202,11 +220,15 @@ grouped := stick endpoint tsMRangeBy: [:range | range all]
     aggregationBy: [:agg :aggOpts | agg avg; bucketDuration: 60000]
     groupBy: [:g | g label: 'area'; reduce: 'avg'].
 grouped first groupByLabel. "'area'->'kitchen'"
-grouped first sourceKeys.   "series keys that contributed to this group"
+grouped first sourceKeys.  "#('temperature:2' 'temperature:3') - series keys that contributed to this group"
 
 "Reverse order variant"
 results := stick endpoint tsMRevRangeBy: [:range | range all]
     filterBy: [:filter | filter hasLabel: 'sensor_id'; label: 'area' eq: 'kitchen'].
+"an Array(RsTsRangeValue(key: 'temperature:2' labels: a Dictionary() values:
+{1785483659810->23.2. 1785483659809->22.2. 1785483659808->21.2.
+1785483124302->21}) RsTsRangeValue(key: 'temperature:3' labels: a Dictionary()
+values: {1785483659810->30.1. 1785483128976->22}))"
 ```
 
 ### Querying Series Keys by Label (QUERYINDEX)
@@ -237,15 +259,19 @@ so `TS.GET`/`TS.MGET` can return a partial, still-changing value by default. Pas
 "Add sample values for test"
 stick endpoint tsAdd: 'temperature:1' timestamp: (ts := DateAndTime now) value: 25.5.
 stick endpoint tsAdd: 'temperature:1' timestamp: (ts + 300 milliSeconds) value: 25.4.
-stick endpoint tsAdd: 'temperature:1' timestamp: (ts + 300 milliSeconds) value: 25.2.
-stick endpoint tsAdd: 'temperature:1' timestamp: (ts + 300 milliSeconds) value: 25.3.
-stick endpoint tsAdd: 'temperature:1' timestamp: (ts + 300 milliSeconds) value: 25.4.
+stick endpoint tsAdd: 'temperature:1' timestamp: (ts + 600 milliSeconds) value: 25.2.
+stick endpoint tsAdd: 'temperature:1' timestamp: (ts + 900 milliSeconds) value: 25.5.
 
 "Use the LATEST flag when reading from a compacted series"
 sample := stick endpoint tsGet: 'temperature:1:secondary' latest: true.
+"1785485891000->25.3"
+sample := stick endpoint tsGet: 'temperature:1:secondary' latest: false.
+"1785485890000->25.45"
 
 values := stick endpoint tsMGetFilterBy: [:filter | filter label: 'compacted' eq: '1-second']
     using: [:opts | opts latest].
+"an Array(RsTsValue(key: 'temperature:1:secondary' timestamp: 1785485891000
+    value: 25.3 labels: a Dictionary()))"
 
 "Delete the rule"
 stick endpoint tsDeleteRule: 'temperature:1' dest: 'temperature:1:secondary'.
