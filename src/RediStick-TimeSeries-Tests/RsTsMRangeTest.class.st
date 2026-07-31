@@ -93,6 +93,32 @@ RsTsMRangeTest >> testTsMRangeWithGroupBy [
 ]
 
 { #category : 'tests' }
+RsTsMRangeTest >> testTsMRangeWithGroupByAndSelectedLabelsExcludingGroupLabel [
+	| key1 key2 result groupedValue |
+	key1 := 'test:ts:mrange:group:sel:1'.
+	key2 := 'test:ts:mrange:group:sel:2'.
+	stick endpoint tsCreate: key1 using: [ :opts | opts labels: { 'type' -> 'mrgroupsel'. 'region' -> 'east'. 'other' -> 'a' } ].
+	stick endpoint tsCreate: key2 using: [ :opts | opts labels: { 'type' -> 'mrgroupsel'. 'region' -> 'east'. 'other' -> 'b' } ].
+	stick endpoint tsAdd: key1 timestamp: 1000 value: 10.
+	stick endpoint tsAdd: key2 timestamp: 1000 value: 20.
+
+	result := stick endpoint
+		tsMRangeBy: [ :r | r all ]
+		filterBy: [ :f | f label: 'type' eq: 'mrgroupsel' ]
+		aggregationBy: [ :agg | agg sum; bucketDuration: 1000 ]
+		groupBy: [ :g | g label: 'region'; reduce: 'sum' ]
+		using: [ :opts | opts selectedLabels: { 'other' } ].
+
+	self assert: result size equals: 1.
+	groupedValue := result first.
+	self assert: groupedValue isRsTsGroupedRangeValue.
+	self assert: groupedValue groupByLabel key equals: 'region'.
+	self assert: groupedValue groupByLabel value equals: 'east'.
+	self assert: groupedValue reducer equals: 'sum'.
+	self assert: groupedValue sourceKeys size equals: 2
+]
+
+{ #category : 'tests' }
 RsTsMRangeTest >> testTsMRangeWithoutFiltersSignalsError [
 	self should: [
 		stick endpoint

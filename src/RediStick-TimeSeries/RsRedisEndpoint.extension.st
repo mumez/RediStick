@@ -504,12 +504,25 @@ RsRedisEndpoint >> tsExecuteMRange: cmdName rangeBy: rangeBlock filterBy: filter
 	groupingBlock ifNotNil: [
 		groupBy := RsTsGroupBy new.
 		groupingBlock value: groupBy ].
+	(groupBy notNil and: [ options notNil and: [ options selectedLabels notNil ] ])
+		ifTrue: [
+			options selectedLabels:
+				(self tsSelectedLabels: options selectedLabels withGroupMetadataFor: groupBy) ].
 	^ self
 		tsParseMRangeResult: (self unifiedCommand: (self
 			tsMRangeArgsFor: cmdName range: range options: options
 			aggOptions: aggOptions
 			filterBuilder: builder groupBy: groupBy))
 		groupBy: groupBy
+]
+
+{ #category : '*RediStick-TimeSeries-private' }
+RsRedisEndpoint >> tsSelectedLabels: selectedLabels withGroupMetadataFor: groupBy [
+	"private"
+	| requiredLabels missingLabels |
+	requiredLabels := { groupBy label. '__reducer__'. '__source__' }.
+	missingLabels := requiredLabels reject: [ :label | selectedLabels includes: label ].
+	^ selectedLabels , missingLabels
 ]
 
 { #category : '*RediStick-TimeSeries-private' }
