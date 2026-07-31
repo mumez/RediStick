@@ -48,6 +48,18 @@ RsTsRangeValue >> values: aValuesArray [
 	values := aValuesArray
 ]
 
+{ #category : 'printing' }
+RsTsRangeValue >> printOn: aStream [
+	aStream
+		nextPutAll: 'RsTsRangeValue(key: ';
+		print: self key;
+		nextPutAll: ' labels: ';
+		print: self labels;
+		nextPutAll: ' values: ';
+		print: self values;
+		nextPut: $)
+]
+
 { #category : 'testing' }
 RsTsRangeValue >> isRsTsRangeValue [
 	^ true

@@ -84,6 +84,22 @@ RsTsGroupedRangeValue >> values: aValuesArray [
 	values := aValuesArray
 ]
 
+{ #category : 'printing' }
+RsTsGroupedRangeValue >> printOn: aStream [
+	aStream
+		nextPutAll: 'RsTsGroupedRangeValue(key: ';
+		print: self key;
+		nextPutAll: ' groupByLabel: ';
+		print: self groupByLabel;
+		nextPutAll: ' reducer: ';
+		print: self reducer;
+		nextPutAll: ' sourceKeys: ';
+		print: self sourceKeys;
+		nextPutAll: ' values: ';
+		print: self values;
+		nextPut: $)
+]
+
 { #category : 'testing' }
 RsTsGroupedRangeValue >> isRsTsGroupedRangeValue [
 	^ true

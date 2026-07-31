@@ -60,6 +60,20 @@ RsTsValue >> value: aValue [
 	value := aValue
 ]
 
+{ #category : 'printing' }
+RsTsValue >> printOn: aStream [
+	aStream
+		nextPutAll: 'RsTsValue(key: ';
+		print: self key;
+		nextPutAll: ' timestamp: ';
+		print: self timestamp;
+		nextPutAll: ' value: ';
+		print: self value;
+		nextPutAll: ' labels: ';
+		print: self labels;
+		nextPut: $)
+]
+
 { #category : 'private' }
 RsTsValue >> setKey: aKey timestamp: aTimestamp value: aValue labels: aLabelsDictionary [
 	self key: aKey.
