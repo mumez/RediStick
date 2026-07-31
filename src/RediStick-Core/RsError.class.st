@@ -11,6 +11,11 @@ RsError class >> canNotGetReply [
 ]
 
 { #category : 'instance creation' }
+RsError class >> invalidArguments [
+	^self kind: #InvalidArguments
+]
+
+{ #category : 'instance creation' }
 RsError class >> invalidReplyToken [
 	^self kind: #InvalidReplyToken
 ]

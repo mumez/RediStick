@@ -78,6 +78,15 @@ Metacello new
   load: #('Core' 'Json').
 ```
 
+### With TimeSeries package
+
+```smalltalk
+Metacello new
+  baseline: 'RediStick';
+  repository: 'github://mumez/RediStick/src';
+  load: #('Core' 'TimeSeries').
+```
+
 ## Sample Code
 
 ### Basic usage
@@ -120,7 +129,7 @@ Please read [Stream.md](./doc/Stream.md).
 
 ### Using Search
 
-RediStick supports [RediSearch](https://redis.io/docs/stack/search/) - a full-text search extension for Redis.
+RediStick supports [RediSearch](https://redis.io/docs/latest/develop/ai/search-and-query/) - a full-text search extension for Redis.
 
 Please read [Search.md](./doc/Search.md).
 
@@ -129,3 +138,9 @@ Please read [Search.md](./doc/Search.md).
 RediStick supports [RedisJSON](https://redis.io/docs/latest/develop/data-types/json/) - a JSON data type for Redis.
 
 Please read [Json.md](./doc/Json.md).
+
+### Using TimeSeries
+
+RediStick supports [Redis TimeSeries](https://redis.io/docs/latest/develop/data-types/timeseries/) - a time series data type for Redis.
+
+Please read [TimeSeries.md](./doc/TimeSeries.md).
