@@ -264,14 +264,14 @@ stick endpoint tsAdd: 'temperature:1' timestamp: (ts + 900 milliSeconds) value: 
 
 "Use the LATEST flag when reading from a compacted series"
 sample := stick endpoint tsGet: 'temperature:1:secondary' latest: true.
-"1785485891000->25.3"
+"1785485891000->25.5"
 sample := stick endpoint tsGet: 'temperature:1:secondary' latest: false.
-"1785485890000->25.45"
+"1785485890000->25.366666666666664
 
 values := stick endpoint tsMGetFilterBy: [:filter | filter label: 'compacted' eq: '1-second']
     using: [:opts | opts latest].
 "an Array(RsTsValue(key: 'temperature:1:secondary' timestamp: 1785485891000
-    value: 25.3 labels: a Dictionary()))"
+    value: 25.5 labels: a Dictionary()))"
 
 "Delete the rule"
 stick endpoint tsDeleteRule: 'temperature:1' dest: 'temperature:1:secondary'.
@@ -284,7 +284,7 @@ stick endpoint tsDeleteRule: 'temperature:1' dest: 'temperature:1:secondary'.
 stick endpoint tsDel: 'temperature:1' from: (DateAndTime now - 1 hour) to: DateAndTime now.
 
 "Remove the demo keys entirely"
-stick endpoint del: #('temperature:1' 'temperature:2' 'temperature:3' 'temperature:1:hourly').
+stick endpoint del: #('temperature:1' 'temperature:2' 'temperature:3' 'temperature:1:secondary').
 ```
 
 ## References
