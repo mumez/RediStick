@@ -110,6 +110,46 @@ RsRedisEndpoint >> vSimArgs: key query: query options: options [
 	^ args
 ]
 
+{ #category : '*RediStick-VectorSet' }
+RsRedisEndpoint >> vLinks: key element: element [
+	| result |
+	result := self unifiedCommand: { 'VLINKS'. key. element }.
+	result ifNil: [ ^ nil ].
+	^ (self vLinksFlatten: result) asArray
+]
+
+{ #category : '*RediStick-VectorSet' }
+RsRedisEndpoint >> vLinks: key element: element withScores: aBoolean [
+	| result flat |
+	aBoolean ifFalse: [ ^ self vLinks: key element: element ].
+	result := self unifiedCommand: { 'VLINKS'. key. element. 'WITHSCORES' }.
+	result ifNil: [ ^ nil ].
+	flat := self vLinksFlatten: result.
+	^ ((1 to: flat size by: 2) collect: [ :i |
+		(flat at: i) -> (flat at: i + 1) asNumber ]) asArray
+]
+
+{ #category : '*RediStick-VectorSet-private' }
+RsRedisEndpoint >> vLinksFlatten: layeredResult [
+	"private - VLINKS replies with one sub-array of neighbor entries per HNSW layer"
+	| flat |
+	flat := OrderedCollection new.
+	layeredResult do: [ :layer | flat addAll: layer ].
+	^ flat
+]
+
+{ #category : '*RediStick-VectorSet' }
+RsRedisEndpoint >> vRandMember: key [
+	^ self unifiedCommand: { 'VRANDMEMBER'. key }
+]
+
+{ #category : '*RediStick-VectorSet' }
+RsRedisEndpoint >> vRandMember: key count: n [
+	"n follows Redis VRANDMEMBER semantics as-is: positive = up to n distinct
+	elements, negative = n elements with possible repeats"
+	^ (self unifiedCommand: { 'VRANDMEMBER'. key. n }) asArray
+]
+
 { #category : '*RediStick-VectorSet-private' }
 RsRedisEndpoint >> vSimParseResult: rawResult withScores: withScores withAttribs: withAttribs [
 	"private"

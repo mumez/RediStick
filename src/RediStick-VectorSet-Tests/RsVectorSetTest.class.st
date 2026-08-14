@@ -340,3 +340,71 @@ RsVectorSetTest >> testVSimWithNeitherElementNorValuesRaisesError [
 RsVectorSetTest >> testVectorSetSimQueryValidateSignalsErrorWhenNeitherSet [
 	self should: [ RsVectorSetSimQuery new validate ] raise: RsError
 ]
+
+{ #category : 'tests' }
+RsVectorSetTest >> testVLinksWithoutScores [
+	"HNSW layer assignment is randomized at VADD time, so neighbor order
+	is not guaranteed across runs - check membership rather than order."
+	| links |
+	self setUpSimTestSet: 'vs:links'.
+	links := stick endpoint vLinks: 'vs:links' element: 'elemA'.
+	self assert: links asSet equals: #('elemB' 'elemC') asSet
+]
+
+{ #category : 'tests' }
+RsVectorSetTest >> testVLinksWithScores [
+	"HNSW layer assignment is randomized at VADD time, so neighbor order
+	between elemB/elemC is not guaranteed across runs - check membership
+	and score values rather than a fixed order."
+	| links byElement |
+	self setUpSimTestSet: 'vs:linksScores'.
+	links := stick endpoint vLinks: 'vs:linksScores' element: 'elemA' withScores: true.
+	self assert: links size equals: 2.
+	byElement := Dictionary new.
+	links do: [ :each | byElement at: each key put: each value ].
+	self assert: byElement keys asSet equals: #('elemB' 'elemC') asSet.
+	self assert: ((byElement at: 'elemB') - 1) abs < 0.01.
+	self assert: (byElement at: 'elemB') > (byElement at: 'elemC')
+]
+
+{ #category : 'tests' }
+RsVectorSetTest >> testVLinksWithScoresFalseSameAsWithoutScores [
+	self setUpSimTestSet: 'vs:linksNoScoresFlag'.
+	self assertCollection:
+		(stick endpoint vLinks: 'vs:linksNoScoresFlag' element: 'elemA' withScores: false)
+		equals: (stick endpoint vLinks: 'vs:linksNoScoresFlag' element: 'elemA')
+]
+
+{ #category : 'tests' }
+RsVectorSetTest >> testVRandMemberSingleElement [
+	| member |
+	self setUpSimTestSet: 'vs:rand'.
+	member := stick endpoint vRandMember: 'vs:rand'.
+	self assert: (#('elemA' 'elemB' 'elemC') includes: member)
+]
+
+{ #category : 'tests' }
+RsVectorSetTest >> testVRandMemberWithPositiveCount [
+	| members |
+	self setUpSimTestSet: 'vs:randPos'.
+	members := stick endpoint vRandMember: 'vs:randPos' count: 2.
+	self assert: members size equals: 2.
+	members do: [ :each | self assert: (#('elemA' 'elemB' 'elemC') includes: each) ]
+]
+
+{ #category : 'tests' }
+RsVectorSetTest >> testVRandMemberWithNegativeCount [
+	| members |
+	self setUpSimTestSet: 'vs:randNeg'.
+	members := stick endpoint vRandMember: 'vs:randNeg' count: -5.
+	self assert: members size equals: 5.
+	members do: [ :each | self assert: (#('elemA' 'elemB' 'elemC') includes: each) ]
+]
+
+{ #category : 'tests' }
+RsVectorSetTest >> testVLinksAndVRandMemberOnMissingKey [
+	self assert: (stick endpoint vLinks: 'vs:doesNotExist' element: 'elemA') equals: nil.
+	self assert: (stick endpoint vLinks: 'vs:doesNotExist' element: 'elemA' withScores: true) equals: nil.
+	self assert: (stick endpoint vRandMember: 'vs:doesNotExist') equals: nil.
+	self assertCollection: (stick endpoint vRandMember: 'vs:doesNotExist' count: 3) equals: #()
+]
