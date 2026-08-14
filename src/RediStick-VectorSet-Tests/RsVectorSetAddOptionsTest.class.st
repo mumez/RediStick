@@ -22,7 +22,7 @@ RsVectorSetAddOptionsTest >> testCasFlag [
 RsVectorSetAddOptionsTest >> testQuantizationNoQuant [
 	| opts |
 	opts := RsVectorSetAddOptions new.
-	opts quantization: #noQuant.
+	opts noQuantization.
 	self assertCollection: opts asArray equals: { 'NOQUANT' }
 ]
 
@@ -30,7 +30,7 @@ RsVectorSetAddOptionsTest >> testQuantizationNoQuant [
 RsVectorSetAddOptionsTest >> testQuantizationQ8 [
 	| opts |
 	opts := RsVectorSetAddOptions new.
-	opts quantization: #q8.
+	opts quantizationQ8.
 	self assertCollection: opts asArray equals: { 'Q8' }
 ]
 
@@ -38,7 +38,7 @@ RsVectorSetAddOptionsTest >> testQuantizationQ8 [
 RsVectorSetAddOptionsTest >> testQuantizationBin [
 	| opts |
 	opts := RsVectorSetAddOptions new.
-	opts quantization: #bin.
+	opts quantizationBin.
 	self assertCollection: opts asArray equals: { 'BIN' }
 ]
 
@@ -46,7 +46,7 @@ RsVectorSetAddOptionsTest >> testQuantizationBin [
 RsVectorSetAddOptionsTest >> testEf [
 	| opts |
 	opts := RsVectorSetAddOptions new.
-	opts ef: 100.
+	opts explorationFactor: 100.
 	self assertCollection: opts asArray equals: { 'EF'. 100 }
 ]
 
@@ -54,7 +54,7 @@ RsVectorSetAddOptionsTest >> testEf [
 RsVectorSetAddOptionsTest >> testM [
 	| opts |
 	opts := RsVectorSetAddOptions new.
-	opts m: 8.
+	opts maxConnections: 8.
 	self assertCollection: opts asArray equals: { 'M'. 8 }
 ]
 
@@ -91,10 +91,10 @@ RsVectorSetAddOptionsTest >> testAllOptionsCombinedInRedisOrder [
 	opts := RsVectorSetAddOptions new.
 	opts
 		cas;
-		quantization: #q8;
-		ef: 100;
+		quantizationQ8;
+		explorationFactor: 100;
 		setAttr: '{"foo":"bar"}';
-		m: 8.
+		maxConnections: 8.
 	self assertCollection: opts asArray
 		equals: { 'CAS'. 'Q8'. 'EF'. 100. 'SETATTR'. '{"foo":"bar"}'. 'M'. 8 }
 ]

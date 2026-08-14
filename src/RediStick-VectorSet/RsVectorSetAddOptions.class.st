@@ -15,7 +15,10 @@ Collaborators:
 Public API and Key Messages:
 - #cas - marks the add as check-and-set (adds the CAS token).
 - #quantization: - sets #noQuant, #q8, or #bin.
+- #noQuantization, #quantizationQ8, #quantizationBin - shortcuts for
+  #quantization:.
 - #ef:, #m:, #setAttr:, #reduceDim: - set the corresponding options.
+- #explorationFactor:, #maxConnections: - aliases for #ef: and #m:.
 - #asArray - answers the ordered tokens for CAS/quantization/EF/SETATTR/M.
 
 Internal Representation:
@@ -78,9 +81,19 @@ RsVectorSetAddOptions >> ef: anInteger [
 	ef := anInteger
 ]
 
+{ #category : 'actions' }
+RsVectorSetAddOptions >> explorationFactor: anInteger [
+	self ef: anInteger
+]
+
 { #category : 'testing' }
 RsVectorSetAddOptions >> isCas [
 	^ cas
+]
+
+{ #category : 'actions' }
+RsVectorSetAddOptions >> noQuantization [
+	self quantization: #noQuant
 ]
 
 { #category : 'accessing' }
@@ -93,6 +106,11 @@ RsVectorSetAddOptions >> m: anInteger [
 	m := anInteger
 ]
 
+{ #category : 'actions' }
+RsVectorSetAddOptions >> maxConnections: anInteger [
+	self m: anInteger
+]
+
 { #category : 'accessing' }
 RsVectorSetAddOptions >> quantization [
 	^ quantization
@@ -102,6 +120,16 @@ RsVectorSetAddOptions >> quantization [
 RsVectorSetAddOptions >> quantization: aSymbol [
 	"One of #noQuant, #q8, #bin, or nil."
 	quantization := aSymbol
+]
+
+{ #category : 'actions' }
+RsVectorSetAddOptions >> quantizationBin [
+	self quantization: #bin
+]
+
+{ #category : 'actions' }
+RsVectorSetAddOptions >> quantizationQ8 [
+	self quantization: #q8
 ]
 
 { #category : 'private' }
@@ -138,5 +166,5 @@ RsVectorSetAddOptions >> setAttr: aJsonStringOrObject [
 RsVectorSetAddOptions >> setAttrAsJsonString [
 	^ (self setAttr isString or: [ self setAttr isSymbol ])
 		ifTrue: [ self setAttr asString ]
-		ifFalse: [ NeoJSONWriter toString: self setAttr ]
+		ifFalse: [ STON toJsonString: self setAttr ]
 ]
