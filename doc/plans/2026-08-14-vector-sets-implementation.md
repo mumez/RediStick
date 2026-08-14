@@ -223,9 +223,9 @@ VSIM key (ELE element | FP32 blob | VALUES num val1 val2 ...)
 
 **Endpoint method:**
 ```
-vSim: key by: [:query | query element: 'foo'] using: optionsBlock
+vSim: key queryBy: [:query | query element: 'foo'] using: optionsBlock
 ```
-(or `vSim: key by: [:query | query values: #(...)] using: optionsBlock` — the block
+(or `vSim: key queryBy: [:query | query values: #(...)] using: optionsBlock` — the block
 receives the query-subject value object, matching the `rangeBy:` idiom from
 TimeSeries). Returns an `Array` of `RsVectorSetSimResult` when `WITHSCORES`/
 `WITHATTRIBS` requested, or a plain `Array` of element-name Strings for the bare case
