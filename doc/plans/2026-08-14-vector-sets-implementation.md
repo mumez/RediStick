@@ -114,8 +114,8 @@ VADD key [REDUCE dim] (FP32 blob | VALUES num val1 val2 ...) element
 **Classes:**
 - `RsVectorSetAddOptions` — instance vars for `reduceDim`, `cas` (flag), `quantization`
   (`#noQuant`/`#q8`/`#bin`/nil), `ef`, `setAttr` (JSON string or Smalltalk
-  object auto-converted, reusing the JSON-conversion helper pattern from
-  `RediStick-Json` if available, else `NeoJSONWriter`), `m` (numlinks). `asArray`
+  object auto-converted via `STON toJsonString:`, avoiding any dependency on
+  NeoJSON), `m` (numlinks). `asArray`
   emits tokens in the order Redis expects, empty array when nothing is set.
 
 **Endpoint methods (`RsRedisEndpoint.extension.st` in `RediStick-VectorSet`):**
@@ -181,13 +181,13 @@ VGETATTR key element
 VSETATTR key element json
 ```
 
-**Design:** Attributes are arbitrary JSON. Reuse the same Smalltalk-object <->
-JSON conversion approach used by `RediStick-Json` (`jsonSet:`/parsing helpers) if it
-can be referenced without introducing a hard dependency on `RediStick-Json`; otherwise
-use `NeoJSONWriter`/`NeoJSONReader` directly (already a transitive dependency via
-existing packages) so `RediStick-VectorSet` stays independent of the JSON module.
-`vGetAttr:element:` returns a parsed Smalltalk object (Dictionary/Array/etc.) or `nil`
-if unset; `vSetAttr:element:value:` accepts a Smalltalk object or raw JSON string.
+**Design:** Attributes are arbitrary JSON. Use `STON toJsonString:`/`STON
+fromJsonString:` for the Smalltalk-object <-> JSON conversion (STON is a core Pharo
+class, already used by `RsVectorSetAddOptions#setAttr`), so `RediStick-VectorSet`
+has no dependency on `RediStick-Json` or NeoJSON (which merely happens to be present
+in the dev image). `vGetAttr:element:` returns a parsed Smalltalk object
+(Dictionary/Array/etc.) or `nil` if unset; `vSetAttr:element:value:` accepts a
+Smalltalk object or raw JSON string.
 
 **Endpoint methods:**
 ```
