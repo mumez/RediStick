@@ -221,3 +221,110 @@ RsVectorSetTest >> testVAddSetAttrThenVGetAttrSeesIt [
 		((stick endpoint vGetAttr: 'vs:addsetattr' element: 'elem1') at: 'foo')
 		equals: 'bar'
 ]
+
+{ #category : 'helpers' }
+RsVectorSetTest >> setUpSimTestSet: key [
+	stick endpoint vAdd: key element: 'elemA' vector: self class sampleVectorA using: nil.
+	stick endpoint vAdd: key element: 'elemB' vector: self class sampleVectorB using: nil.
+	stick endpoint vAdd: key element: 'elemC' vector: self class sampleVectorC using: nil
+]
+
+{ #category : 'tests' }
+RsVectorSetTest >> testVSimByElement [
+	| results |
+	self setUpSimTestSet: 'vs:sim:ele'.
+	results := stick endpoint vSim: 'vs:sim:ele' queryBy: [ :q | q element: 'elemA' ].
+	self assert: (results collect: [ :each | each element ]) asArray
+		equals: #('elemA' 'elemB' 'elemC').
+	results do: [ :each |
+		self assert: each score equals: nil.
+		self assert: each attribs equals: nil ]
+]
+
+{ #category : 'tests' }
+RsVectorSetTest >> testVSimByValues [
+	"Uses TRUTH (exact linear search) since the raw query vector ties in
+	similarity with elemA/elemB under approximate HNSW search against
+	int8-quantized stored vectors, making the plain approximate order
+	non-deterministic between them."
+	| results |
+	self setUpSimTestSet: 'vs:sim:values'.
+	results := stick endpoint
+		vSim: 'vs:sim:values'
+		queryBy: [ :q | q values: self class sampleVectorA ]
+		using: [ :opts | opts truth ].
+	self assert: (results collect: [ :each | each element ]) asArray
+		equals: #('elemA' 'elemB' 'elemC')
+]
+
+{ #category : 'tests' }
+RsVectorSetTest >> testVSimWithCount [
+	| results |
+	self setUpSimTestSet: 'vs:sim:count'.
+	results := stick endpoint
+		vSim: 'vs:sim:count'
+		queryBy: [ :q | q element: 'elemA' ]
+		using: [ :opts | opts count: 2 ].
+	self assert: results size equals: 2.
+	self assert: (results collect: [ :each | each element ]) asArray
+		equals: #('elemA' 'elemB')
+]
+
+{ #category : 'tests' }
+RsVectorSetTest >> testVSimWithScores [
+	| results |
+	self setUpSimTestSet: 'vs:sim:scores'.
+	results := stick endpoint
+		vSim: 'vs:sim:scores'
+		queryBy: [ :q | q element: 'elemA' ]
+		using: [ :opts | opts withScores ].
+	self assert: (results first) element equals: 'elemA'.
+	self assert: (results first) score equals: 1.
+	self assert: (results first) attribs equals: nil.
+	self assert: (results at: 2) score > (results at: 3) score
+]
+
+{ #category : 'tests' }
+RsVectorSetTest >> testVSimWithAttribs [
+	| results |
+	self setUpSimTestSet: 'vs:sim:attribs'.
+	stick endpoint vSetAttr: 'vs:sim:attribs' element: 'elemA' value: ({ 'foo' -> 'bar' } asDictionary).
+	results := stick endpoint
+		vSim: 'vs:sim:attribs'
+		queryBy: [ :q | q element: 'elemA' ]
+		using: [ :opts | opts withAttribs ].
+	self assert: (results first attribs at: 'foo') equals: 'bar'.
+	self assert: (results at: 2) score equals: nil.
+	self assert: (results at: 2) attribs equals: nil
+]
+
+{ #category : 'tests' }
+RsVectorSetTest >> testVSimWithFilter [
+	| results |
+	self setUpSimTestSet: 'vs:sim:filter'.
+	stick endpoint vSetAttr: 'vs:sim:filter' element: 'elemA' value: ({ 'foo' -> 'bar' } asDictionary).
+	results := stick endpoint
+		vSim: 'vs:sim:filter'
+		queryBy: [ :q | q element: 'elemA' ]
+		using: [ :opts | opts filter: '.foo == "bar"' ].
+	self assert: (results collect: [ :each | each element ]) asArray equals: #('elemA')
+]
+
+{ #category : 'tests' }
+RsVectorSetTest >> testVSimWithCombinedOptions [
+	| results |
+	self setUpSimTestSet: 'vs:sim:combined'.
+	stick endpoint vSetAttr: 'vs:sim:combined' element: 'elemA' value: ({ 'foo' -> 'bar' } asDictionary).
+	results := stick endpoint
+		vSim: 'vs:sim:combined'
+		queryBy: [ :q | q element: 'elemA' ]
+		using: [ :opts |
+			opts withScores.
+			opts withAttribs.
+			opts count: 2 ].
+	self assert: results size equals: 2.
+	self assert: results first element equals: 'elemA'.
+	self assert: results first score equals: 1.
+	self assert: (results first attribs at: 'foo') equals: 'bar'.
+	self assert: (results at: 2) attribs equals: nil
+]

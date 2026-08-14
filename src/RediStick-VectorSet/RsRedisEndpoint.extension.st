@@ -72,3 +72,50 @@ RsRedisEndpoint >> vSetAttr: key element: element value: aJsonableObject [
 		ifFalse: [ STON toJsonString: aJsonableObject ].
 	^ (self unifiedCommand: { 'VSETATTR'. key. element. json }) = 1
 ]
+
+{ #category : '*RediStick-VectorSet' }
+RsRedisEndpoint >> vSim: key queryBy: queryBlock [
+	^ self vSim: key queryBy: queryBlock using: nil
+]
+
+{ #category : '*RediStick-VectorSet' }
+RsRedisEndpoint >> vSim: key queryBy: queryBlock using: optionsBlock [
+	| query options args result |
+	query := RsVectorSetSimQuery new.
+	queryBlock value: query.
+	args := { 'VSIM'. key } asOrderedCollection.
+	query element
+		ifNotNil: [ :element | args addAll: { 'ELE'. element } ]
+		ifNil: [
+			args addAll: { 'VALUES'. query values size }.
+			args addAll: query values ].
+	optionsBlock ifNotNil: [
+		options := RsVectorSetSimOptions new.
+		optionsBlock value: options.
+		args addAll: options asArray ].
+	result := self unifiedCommand: args.
+	^ self
+		vSimParseResult: result
+		withScores: (options notNil and: [ options isWithScores ])
+		withAttribs: (options notNil and: [ options isWithAttribs ])
+]
+
+{ #category : '*RediStick-VectorSet-private' }
+RsRedisEndpoint >> vSimParseResult: rawResult withScores: withScores withAttribs: withAttribs [
+	"private"
+	| rowSize |
+	rawResult ifNil: [ ^ #() ].
+	rowSize := 1 + (withScores ifTrue: [ 1 ] ifFalse: [ 0 ]) + (withAttribs ifTrue: [ 1 ] ifFalse: [ 0 ]).
+	^ ((1 to: rawResult size by: rowSize) collect: [ :i |
+		| element score attribs next |
+		element := rawResult at: i.
+		next := i + 1.
+		score := withScores
+			ifTrue: [ (rawResult at: next) ifNotNil: [ :s | s asNumber ] ]
+			ifFalse: [ nil ].
+		withScores ifTrue: [ next := next + 1 ].
+		attribs := withAttribs
+			ifTrue: [ (rawResult at: next) ifNotNil: [ :a | STON fromString: a ] ]
+			ifFalse: [ nil ].
+		RsVectorSetSimResult element: element score: score attribs: attribs ]) asArray
+]
