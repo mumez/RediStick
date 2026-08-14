@@ -328,3 +328,15 @@ RsVectorSetTest >> testVSimWithCombinedOptions [
 	self assert: (results first attribs at: 'foo') equals: 'bar'.
 	self assert: results second attribs equals: nil
 ]
+
+{ #category : 'tests' }
+RsVectorSetTest >> testVSimWithNeitherElementNorValuesRaisesError [
+	self setUpSimTestSet: 'vs:sim:neither'.
+	self should: [ stick endpoint vSim: 'vs:sim:neither' queryBy: [ :q | ] ]
+		raise: RsError
+]
+
+{ #category : 'tests' }
+RsVectorSetTest >> testVectorSetSimQueryValidateSignalsErrorWhenNeitherSet [
+	self should: [ RsVectorSetSimQuery new validate ] raise: RsError
+]

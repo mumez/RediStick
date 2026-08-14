@@ -99,6 +99,7 @@ RsRedisEndpoint >> vSim: key queryBy: queryBlock using: optionsBlock [
 RsRedisEndpoint >> vSimArgs: key query: query options: options [
 	"private"
 	| args |
+	query validate.
 	args := { 'VSIM'. key } asOrderedCollection.
 	query element
 		ifNotNil: [ :element | args addAll: { 'ELE'. element } ]

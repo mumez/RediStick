@@ -14,6 +14,8 @@ Public API and Key Messages:
 - #element: - sets the element name to search by (ELE form).
 - #values: - sets the raw vector (Collection of numbers) to search by
   (VALUES form).
+- #validate - raises RsError invalidArguments when neither element nor
+  values has been set.
 
 Internal Representation:
 - element - element name for the ELE form, or nil.
@@ -48,4 +50,12 @@ RsVectorSetSimQuery >> values [
 { #category : 'accessing' }
 RsVectorSetSimQuery >> values: aNumberCollection [
 	values := aNumberCollection
+]
+
+{ #category : 'validation' }
+RsVectorSetSimQuery >> validate [
+	(self element isNil and: [ self values isNil ])
+		ifTrue: [
+			^ (RsError invalidArguments) signal:
+				'VSIM requires either element: or values: to be set' ]
 ]
