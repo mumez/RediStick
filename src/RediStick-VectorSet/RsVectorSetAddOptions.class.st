@@ -1,3 +1,32 @@
+"
+I represent the optional parameters for Redis's VADD command.
+
+Responsibility:
+- I build the token array (CAS, NOQUANT|Q8|BIN, EF, SETATTR, M) appended
+  after the vector/element in VADD's wire format.
+- I hold REDUCE separately via reduceDim, since the caller reads it
+  directly rather than through #asArray (it precedes the vector, not
+  the options that follow it).
+
+Collaborators:
+- RsRedisEndpoint: sends #vAdd:element:vector:using: with an instance of
+  me, then reads #reduceDim and #asArray to assemble the VADD command.
+
+Public API and Key Messages:
+- #cas - marks the add as check-and-set (adds the CAS token).
+- #quantization: - sets #noQuant, #q8, or #bin.
+- #ef:, #m:, #setAttr:, #reduceDim: - set the corresponding options.
+- #asArray - answers the ordered tokens for CAS/quantization/EF/SETATTR/M.
+
+Internal Representation:
+- reduceDim - target dimension for random projection (read by the caller,
+  not included in #asArray).
+- cas - Boolean; true once #cas has been sent.
+- quantization - one of #noQuant, #q8, #bin, or nil.
+- ef - exploration factor for the build-time search.
+- setAttr - raw JSON String or Smalltalk object attached via SETATTR.
+- m - max number of connections per graph node.
+"
 Class {
 	#name : 'RsVectorSetAddOptions',
 	#superclass : 'Object',
@@ -34,7 +63,7 @@ RsVectorSetAddOptions >> asArray [
 	^ opts asArray
 ]
 
-{ #category : 'accessing' }
+{ #category : 'actions' }
 RsVectorSetAddOptions >> cas [
 	cas := true
 ]
