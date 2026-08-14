@@ -55,3 +55,20 @@ RsRedisEndpoint >> vInfo: key [
 		info at: (result at: i) put: (result at: i + 1) ].
 	^ info
 ]
+
+{ #category : '*RediStick-VectorSet' }
+RsRedisEndpoint >> vGetAttr: key element: element [
+	| result |
+	result := self unifiedCommand: { 'VGETATTR'. key. element }.
+	result ifNil: [ ^ nil ].
+	^ STON fromString: result
+]
+
+{ #category : '*RediStick-VectorSet' }
+RsRedisEndpoint >> vSetAttr: key element: element value: aJsonableObject [
+	| json |
+	json := (aJsonableObject isString or: [ aJsonableObject isSymbol ])
+		ifTrue: [ aJsonableObject asString ]
+		ifFalse: [ STON toJsonString: aJsonableObject ].
+	^ (self unifiedCommand: { 'VSETATTR'. key. element. json }) = 1
+]

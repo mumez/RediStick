@@ -171,3 +171,53 @@ RsVectorSetTest >> testVInfo [
 RsVectorSetTest >> testVInfoOnMissingKey [
 	self assert: (stick endpoint vInfo: 'vs:doesNotExist') equals: nil
 ]
+
+{ #category : 'tests' }
+RsVectorSetTest >> testVGetAttrWithNoAttributesReturnsNil [
+	stick endpoint vAdd: 'vs:getattr' element: 'elem1' vector: self class sampleVectorA using: nil.
+	self assert: (stick endpoint vGetAttr: 'vs:getattr' element: 'elem1') equals: nil
+]
+
+{ #category : 'tests' }
+RsVectorSetTest >> testVSetAttrThenVGetAttrRoundTrip [
+	| attr |
+	stick endpoint vAdd: 'vs:setgetattr' element: 'elem1' vector: self class sampleVectorA using: nil.
+	self assert:
+		(stick endpoint vSetAttr: 'vs:setgetattr' element: 'elem1' value: ({ 'foo' -> 'bar' } asDictionary))
+		equals: true.
+	attr := stick endpoint vGetAttr: 'vs:setgetattr' element: 'elem1'.
+	self assert: (attr at: 'foo') equals: 'bar'
+]
+
+{ #category : 'tests' }
+RsVectorSetTest >> testVSetAttrWithJsonStringOverwritesExisting [
+	stick endpoint vAdd: 'vs:overwriteattr' element: 'elem1' vector: self class sampleVectorA using: nil.
+	stick endpoint vSetAttr: 'vs:overwriteattr' element: 'elem1' value: ({ 'foo' -> 'bar' } asDictionary).
+	stick endpoint vSetAttr: 'vs:overwriteattr' element: 'elem1' value: '{"baz":42}'.
+	self assert: (stick endpoint vGetAttr: 'vs:overwriteattr' element: 'elem1') equals: ({ 'baz' -> 42 } asDictionary)
+]
+
+{ #category : 'tests' }
+RsVectorSetTest >> testVSetAttrOnMissingElementReturnsFalse [
+	stick endpoint vAdd: 'vs:missingattr' element: 'elem1' vector: self class sampleVectorA using: nil.
+	self assert:
+		(stick endpoint vSetAttr: 'vs:missingattr' element: 'noSuchElem' value: '{"a":1}')
+		equals: false
+]
+
+{ #category : 'tests' }
+RsVectorSetTest >> testVGetAttrOnMissingKeyReturnsNil [
+	self assert: (stick endpoint vGetAttr: 'vs:doesNotExist' element: 'elem1') equals: nil
+]
+
+{ #category : 'tests' }
+RsVectorSetTest >> testVAddSetAttrThenVGetAttrSeesIt [
+	stick endpoint
+		vAdd: 'vs:addsetattr'
+		element: 'elem1'
+		vector: self class sampleVectorA
+		using: [ :opts | opts setAttr: ({ 'foo' -> 'bar' } asDictionary) ].
+	self assert:
+		((stick endpoint vGetAttr: 'vs:addsetattr' element: 'elem1') at: 'foo')
+		equals: 'bar'
+]
