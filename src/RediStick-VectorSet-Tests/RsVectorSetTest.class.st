@@ -281,7 +281,7 @@ RsVectorSetTest >> testVSimWithScores [
 	self assert: (results first) element equals: 'elemA'.
 	self assert: (results first) score equals: 1.
 	self assert: (results first) attribs equals: nil.
-	self assert: (results at: 2) score > (results at: 3) score
+	self assert: results second score > results third score
 ]
 
 { #category : 'tests' }
@@ -294,8 +294,8 @@ RsVectorSetTest >> testVSimWithAttribs [
 		queryBy: [ :q | q element: 'elemA' ]
 		using: [ :opts | opts withAttribs ].
 	self assert: (results first attribs at: 'foo') equals: 'bar'.
-	self assert: (results at: 2) score equals: nil.
-	self assert: (results at: 2) attribs equals: nil
+	self assert: results second score equals: nil.
+	self assert: results second attribs equals: nil
 ]
 
 { #category : 'tests' }
@@ -326,5 +326,5 @@ RsVectorSetTest >> testVSimWithCombinedOptions [
 	self assert: results first element equals: 'elemA'.
 	self assert: results first score equals: 1.
 	self assert: (results first attribs at: 'foo') equals: 'bar'.
-	self assert: (results at: 2) attribs equals: nil
+	self assert: results second attribs equals: nil
 ]

@@ -83,21 +83,30 @@ RsRedisEndpoint >> vSim: key queryBy: queryBlock using: optionsBlock [
 	| query options args result |
 	query := RsVectorSetSimQuery new.
 	queryBlock value: query.
+	options := optionsBlock ifNotNil: [
+		| opts | opts := RsVectorSetSimOptions new.
+		optionsBlock value: opts.
+		opts ].
+	args := self vSimArgs: key query: query options: options.
+	result := self unifiedCommand: args.
+	^ self
+		vSimParseResult: result
+		withScores: (options notNil and: [ options isWithScores ])
+		withAttribs: (options notNil and: [ options isWithAttribs ])
+]
+
+{ #category : '*RediStick-VectorSet-private' }
+RsRedisEndpoint >> vSimArgs: key query: query options: options [
+	"private"
+	| args |
 	args := { 'VSIM'. key } asOrderedCollection.
 	query element
 		ifNotNil: [ :element | args addAll: { 'ELE'. element } ]
 		ifNil: [
 			args addAll: { 'VALUES'. query values size }.
 			args addAll: query values ].
-	optionsBlock ifNotNil: [
-		options := RsVectorSetSimOptions new.
-		optionsBlock value: options.
-		args addAll: options asArray ].
-	result := self unifiedCommand: args.
-	^ self
-		vSimParseResult: result
-		withScores: (options notNil and: [ options isWithScores ])
-		withAttribs: (options notNil and: [ options isWithAttribs ])
+	options ifNotNil: [ args addAll: options asArray ].
+	^ args
 ]
 
 { #category : '*RediStick-VectorSet-private' }
