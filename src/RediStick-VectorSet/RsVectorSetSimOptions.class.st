@@ -84,6 +84,11 @@ RsVectorSetSimOptions >> ef: anInteger [
 	ef := anInteger
 ]
 
+{ #category : 'actions' }
+RsVectorSetSimOptions >> explorationFactor: anInteger [
+	self ef: anInteger
+]
+
 { #category : 'accessing' }
 RsVectorSetSimOptions >> filter [
 	^ filter
@@ -102,6 +107,11 @@ RsVectorSetSimOptions >> filterEf [
 { #category : 'accessing' }
 RsVectorSetSimOptions >> filterEf: anInteger [
 	filterEf := anInteger
+]
+
+{ #category : 'actions' }
+RsVectorSetSimOptions >> maxFilteringEffort: anInteger [
+	self filterEf: anInteger
 ]
 
 { #category : 'testing' }

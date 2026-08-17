@@ -87,6 +87,15 @@ Metacello new
   load: #('Core' 'TimeSeries').
 ```
 
+### With VectorSet package
+
+```smalltalk
+Metacello new
+  baseline: 'RediStick';
+  repository: 'github://mumez/RediStick/src';
+  load: #('Core' 'VectorSet').
+```
+
 ## Sample Code
 
 ### Basic usage
@@ -144,3 +153,9 @@ Please read [Json.md](./doc/Json.md).
 RediStick supports [Redis TimeSeries](https://redis.io/docs/latest/develop/data-types/timeseries/) - a time series data type for Redis.
 
 Please read [TimeSeries.md](./doc/TimeSeries.md).
+
+### Using VectorSet
+
+RediStick supports [Redis Vector Sets](https://redis.io/docs/latest/develop/data-types/vector-sets/) - an approximate nearest-neighbor vector data type built into Redis 8.0+.
+
+Please read [VectorSet.md](./doc/VectorSet.md).
