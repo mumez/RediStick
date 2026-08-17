@@ -40,6 +40,10 @@ stick connect.
 false if only attributes/vector of an existing element were updated"
 stick endpoint vAdd: 'vs:articles' element: 'article1' vector: #(0.12 -0.45 0.33 0.81) using: nil.
 
+"FP32 form - a ByteArray holding the vector as 32-bit floats in
+little-endian byte order, as an alternative to the plain VALUES form"
+stick endpoint vAdd: 'vs:articles' element: 'article1' vectorFp32: someLittleEndianFloatBytes using: nil.
+
 "With options - REDUCE, CAS, quantization, EF, SETATTR, M"
 stick endpoint
     vAdd: 'vs:articles' element: 'article2' vector: #(0.10 -0.40 0.30 0.75)
@@ -105,6 +109,10 @@ results := stick endpoint vSim: 'vs:articles' queryBy: [ :q | q element: 'articl
 "Search by a raw vector (VALUES form)"
 results := stick endpoint vSim: 'vs:articles' queryBy: [ :q | q values: #(0.1 -0.4 0.3 0.8) ].
 
+"Search by a raw vector, FP32 form - a ByteArray holding the vector as
+32-bit floats in little-endian byte order"
+results := stick endpoint vSim: 'vs:articles' queryBy: [ :q | q valuesFp32: someLittleEndianFloatBytes ].
+
 "Each result is an RsVectorSetSimResult"
 results first element. "matched element name"
 results first score.   "nil unless WITHSCORES requested"
@@ -155,11 +163,6 @@ stick endpoint vRandMember: 'vs:articles' count: -5.
 ```smalltalk
 stick endpoint del: #('vs:articles').
 ```
-
-## Notes
-
-- `FP32` binary vector input for `VADD`/`VSIM` is not yet supported; only the
-  `VALUES` (plain numeric collection) form is implemented.
 
 ## References
 

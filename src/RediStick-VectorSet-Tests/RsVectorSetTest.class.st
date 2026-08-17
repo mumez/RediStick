@@ -283,6 +283,22 @@ RsVectorSetTest >> testVSimByValues [
 ]
 
 { #category : 'tests' }
+RsVectorSetTest >> testVSimByValuesFp32 [
+	"Uses TRUTH (exact linear search) since the raw query vector ties in
+	similarity with elemA/elemB under approximate HNSW search against
+	int8-quantized stored vectors, making the plain approximate order
+	non-deterministic between them."
+	| results |
+	self setUpSimTestSet: 'vs:sim:valuesfp32'.
+	results := stick endpoint
+		vSim: 'vs:sim:valuesfp32'
+		queryBy: [ :q | q valuesFp32: (self class fp32BytesFor: self class sampleVectorA) ]
+		using: [ :opts | opts truth ].
+	self assert: (results collect: [ :each | each element ]) asArray
+		equals: #('elemA' 'elemB' 'elemC')
+]
+
+{ #category : 'tests' }
 RsVectorSetTest >> testVSimWithCount [
 	| results |
 	self setUpSimTestSet: 'vs:sim:count'.

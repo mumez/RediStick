@@ -123,8 +123,11 @@ RsRedisEndpoint >> vSimArgs: key query: query options: options [
 	query element
 		ifNotNil: [ :element | args addAll: { 'ELE'. element } ]
 		ifNil: [
-			args addAll: { 'VALUES'. query values size }.
-			args addAll: query values ].
+			query values
+				ifNotNil: [ :values |
+					args addAll: { 'VALUES'. values size }.
+					args addAll: values ]
+				ifNil: [ args addAll: { 'FP32'. query valuesFp32 } ] ].
 	options ifNotNil: [ args addAll: options asArray ].
 	^ args
 ]
