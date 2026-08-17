@@ -1228,9 +1228,9 @@ RsRedisEndpoint >> writeUnifiedCommand: args [
 	strm nextPut: $* asInteger.
 	self writeBytes: args size asString asByteArray to: strm.
 	args
-		do: [ :ea | 
+		do: [ :ea |
 			| bytes |
-			bytes := (self utf8BytesFromString: ea asString).
+			bytes := ea asRediStickBytesUsing: self.
 			strm nextPut: $$ asInteger.
 			self writeBytes: bytes size asString asByteArray to: strm.
 			self writeBytes: bytes to: strm].

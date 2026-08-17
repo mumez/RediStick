@@ -25,6 +25,31 @@ RsVectorSetTest >> testVAddReAddingSameElementReturnsFalse [
 ]
 
 { #category : 'tests' }
+RsVectorSetTest >> testVAddWithFp32VectorReturnsTrueForNewElement [
+	| result |
+	result := stick endpoint
+		vAdd: 'vs:test:fp32'
+		element: 'elem1'
+		vectorFp32: (self class fp32BytesFor: self class sampleVectorA)
+		using: nil.
+	self assert: result equals: true
+]
+
+{ #category : 'tests' }
+RsVectorSetTest >> testVAddWithFp32VectorMatchesValuesVector [
+	| emb |
+	stick endpoint
+		vAdd: 'vs:test:fp32match'
+		element: 'elem1'
+		vectorFp32: (self class fp32BytesFor: self class sampleVectorA)
+		using: nil.
+	emb := stick endpoint vEmb: 'vs:test:fp32match' element: 'elem1'.
+	self assert: emb size equals: self class sampleVectorA size.
+	emb with: self class sampleVectorA do: [ :actual :expected |
+		self assert: (actual - expected) abs < 0.01 ]
+]
+
+{ #category : 'tests' }
 RsVectorSetTest >> testVAddWithReduce [
 	| result |
 	result := stick endpoint

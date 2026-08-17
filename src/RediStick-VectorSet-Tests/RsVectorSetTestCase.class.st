@@ -27,3 +27,17 @@ RsVectorSetTestCase class >> sampleVectorC [
 
 	^ #(-0.4 -0.3 -0.2 -0.1)
 ]
+
+{ #category : 'fixtures' }
+RsVectorSetTestCase class >> fp32BytesFor: aNumberCollection [
+	"Encodes a numeric vector as 32-bit floats in little-endian byte order,
+	as required by Redis's FP32 blob format for VADD/VSIM."
+	| bytes |
+	bytes := ByteArray new: aNumberCollection size * 4.
+	aNumberCollection doWithIndex: [ :each :index |
+		| word offset |
+		word := each asFloat asIEEE32BitWord.
+		offset := (index - 1) * 4.
+		1 to: 4 do: [ :i | bytes at: offset + i put: ((word >> ((i - 1) * 8)) bitAnd: 255) ] ].
+	^ bytes
+]

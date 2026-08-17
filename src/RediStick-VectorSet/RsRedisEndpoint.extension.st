@@ -2,14 +2,33 @@ Extension { #name : 'RsRedisEndpoint' }
 
 { #category : '*RediStick-VectorSet' }
 RsRedisEndpoint >> vAdd: key element: element vector: aNumberCollection using: optionsBlock [
+	^ self
+		vAdd: key
+		element: element
+		vectorArgs: { 'VALUES'. aNumberCollection size }, aNumberCollection asArray
+		using: optionsBlock
+]
+
+{ #category : '*RediStick-VectorSet' }
+RsRedisEndpoint >> vAdd: key element: element vectorFp32: aByteArray using: optionsBlock [
+	"aByteArray must hold the vector as 32-bit floats in little-endian byte order"
+	^ self
+		vAdd: key
+		element: element
+		vectorArgs: { 'FP32'. aByteArray }
+		using: optionsBlock
+]
+
+{ #category : '*RediStick-VectorSet-private' }
+RsRedisEndpoint >> vAdd: key element: element vectorArgs: vectorArgs using: optionsBlock [
+	"private - shared by the VALUES and FP32 forms of VADD"
 	| args options result |
 	args := { 'VADD'. key } asOrderedCollection.
 	optionsBlock ifNotNil: [
 		options := RsVectorSetAddOptions new.
 		optionsBlock value: options.
 		options reduceDim ifNotNil: [ :dim | args addAll: { 'REDUCE'. dim } ] ].
-	args addAll: { 'VALUES'. aNumberCollection size }.
-	args addAll: aNumberCollection.
+	args addAll: vectorArgs.
 	args add: element.
 	options ifNotNil: [ args addAll: options asArray ].
 	result := self unifiedCommand: args.
