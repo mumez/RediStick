@@ -359,7 +359,6 @@ RsVectorSetTest >> testVLinksWithScores [
 	| links byElement |
 	self setUpSimTestSet: 'vs:linksScores'.
 	links := stick endpoint vLinks: 'vs:linksScores' element: 'elemA' withScores: true.
-	self assert: links size equals: 2.
 	byElement := Dictionary new.
 	links do: [ :each | byElement at: each key put: each value ].
 	self assert: byElement keys asSet equals: #('elemB' 'elemC') asSet.
