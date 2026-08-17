@@ -115,7 +115,7 @@ RsRedisEndpoint >> vLinks: key element: element [
 	| result |
 	result := self unifiedCommand: { 'VLINKS'. key. element }.
 	result ifNil: [ ^ nil ].
-	^ (self vLinksFlatten: result) asArray
+	^ result flattened
 ]
 
 { #category : '*RediStick-VectorSet' }
@@ -124,18 +124,9 @@ RsRedisEndpoint >> vLinks: key element: element withScores: aBoolean [
 	aBoolean ifFalse: [ ^ self vLinks: key element: element ].
 	result := self unifiedCommand: { 'VLINKS'. key. element. 'WITHSCORES' }.
 	result ifNil: [ ^ nil ].
-	flat := self vLinksFlatten: result.
+	flat := result flattened.
 	^ ((1 to: flat size by: 2) collect: [ :i |
 		(flat at: i) -> (flat at: i + 1) asNumber ]) asArray
-]
-
-{ #category : '*RediStick-VectorSet-private' }
-RsRedisEndpoint >> vLinksFlatten: layeredResult [
-	"private - VLINKS replies with one sub-array of neighbor entries per HNSW layer"
-	| flat |
-	flat := OrderedCollection new.
-	layeredResult do: [ :layer | flat addAll: layer ].
-	^ flat
 ]
 
 { #category : '*RediStick-VectorSet' }
