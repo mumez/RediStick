@@ -99,6 +99,14 @@ RsVectorSetSimOptions >> filter: aFilterExpressionString [
 	filter := aFilterExpressionString
 ]
 
+{ #category : 'actions' }
+RsVectorSetSimOptions >> filterBy: aBlock [
+	"Fluent sugar over #filter:. Evaluates aBlock with an
+	RsVectorSetFilterElement, then converts the resulting expression to a
+	FILTER string via #asFilterString."
+	self filter: (aBlock value: RsVectorSetFilterElement new) asFilterString
+]
+
 { #category : 'accessing' }
 RsVectorSetSimOptions >> filterEf [
 	^ filterEf

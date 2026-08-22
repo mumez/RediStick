@@ -352,6 +352,18 @@ RsVectorSetTest >> testVSimWithFilter [
 ]
 
 { #category : 'tests' }
+RsVectorSetTest >> testVSimWithFilterBy [
+	| results |
+	self setUpSimTestSet: 'vs:sim:filterby'.
+	stick endpoint vSetAttr: 'vs:sim:filterby' element: 'elemA' value: ({ 'foo' -> 'bar' } asDictionary).
+	results := stick endpoint
+		vSim: 'vs:sim:filterby'
+		queryBy: [ :q | q element: 'elemA' ]
+		using: [ :opts | opts filterBy: [ :elem | (elem @ 'foo') = 'bar' ] ].
+	self assert: (results collect: [ :each | each element ]) asArray equals: #('elemA')
+]
+
+{ #category : 'tests' }
 RsVectorSetTest >> testVSimWithCombinedOptions [
 	| results |
 	self setUpSimTestSet: 'vs:sim:combined'.
