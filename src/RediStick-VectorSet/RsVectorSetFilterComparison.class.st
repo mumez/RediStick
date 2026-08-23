@@ -75,8 +75,6 @@ RsVectorSetFilterComparison >> precedence [
 RsVectorSetFilterComparison >> renderLiteral: aValue [
 	aValue isString ifTrue: [ ^ '"', aValue, '"' ].
 	aValue isCollection ifTrue: [
-		^ '[{1}]' format: {
-			(aValue collect: [ :each | self renderLiteral: each ])
-				fold: [ :a :b | a, ', ', b ] } ].
+		^ '[{1}]' format: { ', ' join: (aValue collect: [ :each | self renderLiteral: each ]) } ].
 	^ aValue printString
 ]
