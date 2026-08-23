@@ -73,7 +73,7 @@ RsVectorSetFilterComparison >> precedence [
 
 { #category : 'private' }
 RsVectorSetFilterComparison >> renderLiteral: aValue [
-	aValue isString ifTrue: [ ^ '"', aValue, '"' ].
+	aValue isString ifTrue: [ ^ '"{1}"' format: { aValue } ].
 	aValue isCollection ifTrue: [
 		^ '[{1}]' format: { ', ' join: (aValue collect: [ :each | self renderLiteral: each ]) } ].
 	^ aValue printString
