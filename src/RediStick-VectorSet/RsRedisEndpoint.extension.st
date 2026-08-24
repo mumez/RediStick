@@ -1,12 +1,23 @@
 Extension { #name : 'RsRedisEndpoint' }
 
 { #category : '*RediStick-VectorSet' }
+RsRedisEndpoint >> vAdd: key element: element vector: aNumberCollection [
+	^ self vAdd: key element: element vector: aNumberCollection using: nil
+]
+
+{ #category : '*RediStick-VectorSet' }
 RsRedisEndpoint >> vAdd: key element: element vector: aNumberCollection using: optionsBlock [
 	^ self
 		vAdd: key
 		element: element
 		vectorArgs: { 'VALUES'. aNumberCollection size }, aNumberCollection asArray
 		using: optionsBlock
+]
+
+{ #category : '*RediStick-VectorSet' }
+RsRedisEndpoint >> vAdd: key element: element vectorFp32: aByteArray [
+	"aByteArray must hold the vector as 32-bit floats in little-endian byte order"
+	^ self vAdd: key element: element vectorFp32: aByteArray using: nil
 ]
 
 { #category : '*RediStick-VectorSet' }

@@ -38,11 +38,11 @@ stick connect.
 ```smalltalk
 "Add an element with its vector - answers true if newly added,
 false if only attributes/vector of an existing element were updated"
-stick endpoint vAdd: 'vs:articles' element: 'article1' vector: #(0.12 -0.45 0.33 0.81) using: nil.
+stick endpoint vAdd: 'vs:articles' element: 'article1' vector: #(0.12 -0.45 0.33 0.81).
 
 "FP32 form - a ByteArray holding the vector as 32-bit floats in
 little-endian byte order, as an alternative to the plain VALUES form"
-stick endpoint vAdd: 'vs:articles' element: 'article1' vectorFp32: someLittleEndianFloatBytes using: nil.
+stick endpoint vAdd: 'vs:articles' element: 'article1' vectorFp32: someLittleEndianFloatBytes.
 
 "With options - REDUCE, CAS, quantization, EF, SETATTR, M"
 stick endpoint
