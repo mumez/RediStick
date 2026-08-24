@@ -677,21 +677,14 @@ RsRedisEndpoint >> onRedisGenericErrorSignaled: aRsGenericError [
 
 { #category : 'private replies' }
 RsRedisEndpoint >> parseBulkReply [
-	| length reply |
-	length := self parseInteger.
-	length = -1
-		ifTrue: [ reply := nil ]
-		ifFalse: [ 
-			reply := self socketStream next: length.
-			self socketStream next: 2 "skip separators"].
-	^ self stringFromUtf8Bytes: reply
+	^ self stringFromUtf8Bytes: self parseBulkReplyRaw
 ]
 
 { #category : 'private replies' }
 RsRedisEndpoint >> parseBulkReplyRaw [
-	"like #parseBulkReply, but skips UTF-8 decoding and answers the raw
-	ByteArray bytes as read off the socket. Used for replies that may
-	contain binary (non-UTF-8) data, e.g. VEMB ... RAW."
+	"Answer the raw ByteArray bytes of a bulk-string reply as read off the
+	socket, without UTF-8 decoding. Used for replies that may contain
+	binary (non-UTF-8) data, e.g. VEMB ... RAW."
 	| length reply |
 	length := self parseInteger.
 	length = -1
@@ -717,54 +710,38 @@ RsRedisEndpoint >> parseInteger [
 
 { #category : 'private replies' }
 RsRedisEndpoint >> parseMultiBulkReply [
-	| count reply |
-	count := self parseInteger.
-	count = -1
-		ifTrue: [^ nil].
-	reply := OrderedCollection new.
-	count
-		timesRepeat: [reply add: self parseReply].
-	^ reply
+	^ self parseMultiBulkReplyWithRaw: false
 ]
 
 { #category : 'private replies' }
 RsRedisEndpoint >> parseMultiBulkReplyRaw [
-	"like #parseMultiBulkReply, but recurses through #parseReplyRaw so
-	nested bulk strings are left as raw ByteArray bytes."
+	^ self parseMultiBulkReplyWithRaw: true
+]
+
+{ #category : 'private replies' }
+RsRedisEndpoint >> parseMultiBulkReplyWithRaw: aBoolean [
 	| count reply |
 	count := self parseInteger.
 	count = -1
 		ifTrue: [^ nil].
 	reply := OrderedCollection new.
 	count
-		timesRepeat: [reply add: self parseReplyRaw].
+		timesRepeat: [reply add: (self parseReplyWithRaw: aBoolean)].
 	^ reply
 ]
 
 { #category : 'private replies' }
 RsRedisEndpoint >> parseReply [
-	| strm replyToken |
-	strm := self socketStream ifNil: [ ^nil ].
-	replyToken := [strm next] on: Error do: [:ex | (RsError canNotGetReply) signal].
-	replyToken = 43 "$+ asInteger"
-		ifTrue: [^ self parseSingleLine].
-	replyToken = 58 "$: asInteger"
-		ifTrue: [^ self parseInteger].
-	replyToken = 36 "$$ asInteger"
-		ifTrue: [^ self parseBulkReply].
-	replyToken = 42 "$* asInteger"
-		ifTrue: [^ self parseMultiBulkReply].
-	replyToken = 45 "$- asInteger"
-		ifTrue: [^ self parseError].
-		
-	(RsError invalidReplyToken) signal
+	^ self parseReplyWithRaw: false
 ]
 
 { #category : 'private replies' }
 RsRedisEndpoint >> parseReplyRaw [
-	"like #parseReply, but bulk strings (and nested bulk strings within
-	multi-bulk replies) are answered as raw ByteArray bytes rather than
-	being UTF-8 decoded."
+	^ self parseReplyWithRaw: true
+]
+
+{ #category : 'private replies' }
+RsRedisEndpoint >> parseReplyWithRaw: aBoolean [
 	| strm replyToken |
 	strm := self socketStream ifNil: [ ^nil ].
 	replyToken := [strm next] on: Error do: [:ex | (RsError canNotGetReply) signal].
@@ -773,9 +750,11 @@ RsRedisEndpoint >> parseReplyRaw [
 	replyToken = 58 "$: asInteger"
 		ifTrue: [^ self parseInteger].
 	replyToken = 36 "$$ asInteger"
-		ifTrue: [^ self parseBulkReplyRaw].
+		ifTrue: [^ aBoolean
+			ifTrue: [ self parseBulkReplyRaw ]
+			ifFalse: [ self parseBulkReply ]].
 	replyToken = 42 "$* asInteger"
-		ifTrue: [^ self parseMultiBulkReplyRaw].
+		ifTrue: [^ self parseMultiBulkReplyWithRaw: aBoolean].
 	replyToken = 45 "$- asInteger"
 		ifTrue: [^ self parseError].
 
@@ -913,14 +892,7 @@ RsRedisEndpoint >> rawUnifiedCommand: args [
 	bulk-string elements are answered as raw ByteArray bytes instead of
 	being UTF-8 decoded. Use for commands whose reply may carry binary
 	data, e.g. VEMB ... RAW."
-	| received |
-	received := nil.
-	self sendMutex
-		critical: [ self
-				errorHandlingDo: [ self writeUnifiedCommand: args.
-					pubsub ifFalse: [ received := self parseReplyRaw ] ].
-			received ifNotNil: [ self onDataReceived: received ] ].
-	^ received
+	^ self sendUnifiedCommand: args parseWithRaw: true
 ]
 
 { #category : 'private replies' }
@@ -1223,15 +1195,22 @@ RsRedisEndpoint >> type: aKey [
 ]
 
 { #category : 'private commands' }
-RsRedisEndpoint >> unifiedCommand: args [
+RsRedisEndpoint >> sendUnifiedCommand: args parseWithRaw: aBoolean [
 	| received |
 	received := nil.
 	self sendMutex
 		critical: [ self
 				errorHandlingDo: [ self writeUnifiedCommand: args.
-					pubsub ifFalse: [ received := self parseReply ] ].
+					pubsub ifFalse: [ received := aBoolean
+						ifTrue: [ self parseReplyRaw ]
+						ifFalse: [ self parseReply ] ] ].
 			received ifNotNil: [ self onDataReceived: received ] ].
 	^ received
+]
+
+{ #category : 'private commands' }
+RsRedisEndpoint >> unifiedCommand: args [
+	^ self sendUnifiedCommand: args parseWithRaw: false
 ]
 
 { #category : 'private' }
