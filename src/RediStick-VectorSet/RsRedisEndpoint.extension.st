@@ -67,7 +67,36 @@ RsRedisEndpoint >> vEmb: key element: element [
 { #category : '*RediStick-VectorSet' }
 RsRedisEndpoint >> vEmb: key element: element raw: aBoolean [
 	aBoolean ifFalse: [ ^ self vEmb: key element: element ].
-	^ self unifiedCommand: { 'VEMB'. key. element. 'RAW' }
+	^ self vEmbRaw: key element: element
+]
+
+{ #category : '*RediStick-VectorSet-private' }
+RsRedisEndpoint >> vEmbRaw: key element: element [
+	"private - parses the VEMB ... RAW reply into a RsVectorSetRawEmbedding.
+	Uses #rawUnifiedCommand: instead of #unifiedCommand: because the
+	vector-bytes element (2nd) is a binary bulk string that must not be
+	forced through UTF-8 decoding; the other elements arrive as RESP
+	simple strings and are already decoded Strings."
+	| result |
+	result := self rawUnifiedCommand: { 'VEMB'. key. element. 'RAW' }.
+	result ifNil: [ ^ nil ].
+	^ RsVectorSetRawEmbedding
+		quantType: (self vEmbRawElementAsString: (result at: 1))
+		bytes: (result at: 2)
+		l2Norm: (self vEmbRawElementAsString: (result at: 3)) asNumber
+		quantRange: (result size >= 4
+			ifTrue: [ (self vEmbRawElementAsString: (result at: 4)) asNumber ]
+			ifFalse: [ nil ])
+]
+
+{ #category : '*RediStick-VectorSet-private' }
+RsRedisEndpoint >> vEmbRawElementAsString: aStringOrByteArray [
+	"private - VEMB ... RAW's non-blob elements arrive as RESP simple
+	strings (already decoded Strings via #parseSingleLine), but tolerate a
+	bulk-string encoding too by decoding ByteArray instances."
+	^ aStringOrByteArray isString
+		ifTrue: [ aStringOrByteArray ]
+		ifFalse: [ self stringFromUtf8Bytes: aStringOrByteArray ]
 ]
 
 { #category : '*RediStick-VectorSet' }

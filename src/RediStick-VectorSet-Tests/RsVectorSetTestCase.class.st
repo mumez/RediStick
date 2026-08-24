@@ -41,3 +41,19 @@ RsVectorSetTestCase class >> fp32BytesFor: aNumberCollection [
 		1 to: 4 do: [ :i | bytes at: offset + i put: ((word >> ((i - 1) * 8)) bitAnd: 255) ] ].
 	^ bytes
 ]
+
+{ #category : 'fixtures' }
+RsVectorSetTestCase class >> floatsFromFp32Bytes: aByteArray [
+	"Inverse of #fp32BytesFor: - decodes 32-bit little-endian float bytes
+	(as answered by VEMB ... RAW for fp32/NOQUANT vectors) back into Floats."
+	| count floats |
+	count := aByteArray size // 4.
+	floats := Array new: count.
+	1 to: count do: [ :index |
+		| word offset |
+		offset := (index - 1) * 4.
+		word := 0.
+		4 to: 1 by: -1 do: [ :i | word := (word << 8) bitOr: (aByteArray at: offset + i) ].
+		floats at: index put: (Float fromIEEE32Bit: word) ].
+	^ floats
+]
