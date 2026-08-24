@@ -42,11 +42,12 @@ stick endpoint vAdd: 'vs:articles' element: 'article1' vector: #(0.12 -0.45 0.33
 
 "FP32 form - a ByteArray holding the vector as 32-bit floats in
 little-endian byte order, as an alternative to the plain VALUES form"
-stick endpoint vAdd: 'vs:articles' element: 'article1' vectorFp32: someLittleEndianFloatBytes.
+someLittleEndianFloatBytes := RsVectorSetTestCase fp32BytesFor: #(0.12 -0.45 0.33 0.81).
+stick endpoint vAdd: 'vs:articles' element: 'article2' vectorFp32: someLittleEndianFloatBytes.
 
 "With options - REDUCE, CAS, quantization, EF, SETATTR, M"
 stick endpoint
-    vAdd: 'vs:articles' element: 'article2' vector: #(0.10 -0.40 0.30 0.75)
+    vAdd: 'vs:articles' element: 'article3' vector: #(0.10 -0.40 0.30 0.75)
     using: [ :opts |
         opts reduceDim: 2.
         opts cas.
