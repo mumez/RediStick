@@ -127,11 +127,35 @@ results := stick endpoint
         opts withAttribs.
         opts count: 5.
         opts explorationFactor: 100.
-        opts filter: '.category == "science"'.
+        opts filterBy: [ :elem | (elem @ 'category') = 'science' ].
         opts maxFilteringEffort: 200.
         opts truth.    "exact linear search instead of approximate HNSW"
         opts noThread ].
 ```
+
+#### Fluent Filter Expressions (`filterBy:`)
+
+`filterBy:` builds the FILTER string for you instead of writing it by hand.
+It evaluates the given block with an `RsVectorSetFilterElement`; sending `@`
+with an attribute's dot-path name answers an attribute reference, which
+understands the comparison messages `=`, `~=`, `>`, `>=`, `<`, `<=`, and
+`in:`. Combine expressions with `&` (AND), `|` (OR), and negate with `not`.
+
+```smalltalk
+"Equivalent to opts filter: '.category == \"science\"'"
+opts filterBy: [ :elem | (elem @ 'category') = 'science' ].
+
+"Equivalent to opts filter: '.year >= 1980 and .rating > 7'"
+opts filterBy: [ :elem |
+    ((elem @ 'year') >= 1980) & ((elem @ 'rating') > 7) ].
+
+"Equivalent to opts filter: '.category in [\"science\", \"tech\"] or !(.year < 2000)'"
+opts filterBy: [ :elem |
+    ((elem @ 'category') in: #('science' 'tech'))
+        | ((elem @ 'year') < 2000) not ].
+```
+
+See the [expression syntax reference](https://redis.io/docs/latest/develop/data-types/vector-sets/filtered-search/#expression-syntax) for the underlying FILTER grammar.
 
 ### Graph Neighbors (VLINKS)
 
