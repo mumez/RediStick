@@ -45,9 +45,10 @@ little-endian byte order, as an alternative to the plain VALUES form"
 someLittleEndianFloatBytes := #[143 194 245 61 102 102 230 190 195 245 168 62 41 92 79 63]. "RsVectorSetTestCase fp32BytesFor: #(0.12 -0.45 0.33 0.81)"
 stick endpoint vAdd: 'vs:articles' element: 'article2' vectorFp32: someLittleEndianFloatBytes.
 
-"With options - REDUCE, CAS, quantization, EF, SETATTR, M"
+"With options by `using:`"
+"Note: Some options do not allow you to enter values different from those used when the key was first registered. Therefore, this example uses a new key"
 stick endpoint
-    vAdd: 'vs:articles' element: 'article3' vector: #(0.10 -0.40 0.30 0.75)
+    vAdd: 'vs:articles:draft' element: 'draft-article1' vector: #(0.10 -0.40 0.30 0.75)
     using: [ :opts |
         opts reduceDim: 2.
         opts cas.
@@ -55,6 +56,7 @@ stick endpoint
         opts explorationFactor: 100. "or opts ef: 100"
         opts maxConnections: 8. "or opts m: 8"
         opts setAttr: ({ 'category' -> 'science' } asDictionary) ].
+
 ```
 
 ### Cardinality, Dimensionality, Embeddings, Removal (VCARD / VDIM / VEMB / VREM)
@@ -65,7 +67,7 @@ stick endpoint vDim: 'vs:articles'.   "4, or nil for a missing key"
 
 "Reconstructed float vector, or nil if the element/key doesn't exist"
 stick endpoint vEmb: 'vs:articles' element: 'article1'.
-"#(0.12 -0.45 0.33 0.81)"
+"#(0.12118109315633774 -0.4528346359729767 0.33165356516838074 0.8100000023841858)"
 
 "Raw, quantization-aware fields (VEMB ... RAW)"
 stick endpoint vEmb: 'vs:articles' element: 'article1' raw: true.
