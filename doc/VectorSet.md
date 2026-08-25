@@ -163,9 +163,13 @@ See the [expression syntax reference](https://redis.io/docs/latest/develop/data-
 ### Graph Neighbors (VLINKS)
 
 ```smalltalk
+"Add a couple more elements so article2 has neighbors to link to"
+stick endpoint vAdd: 'vs:articles' element: 'article3' vector: #(0.11 -0.44 0.32 0.80).
+stick endpoint vAdd: 'vs:articles' element: 'article4' vector: #(0.13 -0.46 0.34 0.82).
+
 "Element names directly connected to the given element in the HNSW graph"
 links := stick endpoint vLinks: 'vs:articles' element: 'article2'.
-"#('article2' 'article3'), or nil for a missing key"
+"#('article3' 'article4'), or nil for a missing key"
 
 "With scores - an Array of element -> score Associations"
 links := stick endpoint vLinks: 'vs:articles' element: 'article2' withScores: true.
@@ -188,7 +192,7 @@ stick endpoint vRandMember: 'vs:articles' count: -5.
 ### Cleaning Up
 
 ```smalltalk
-stick endpoint del: #('vs:articles').
+stick endpoint del: #('vs:articles' 'vs:articles:draft').
 ```
 
 ## References
