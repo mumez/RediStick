@@ -42,7 +42,7 @@ RsTsFilter class >> noLabel: aLabel [
 
 { #category : 'private' }
 RsTsFilter class >> parenListFrom: aCollection [
-	^ '(' , ((aCollection collect: [ :v | v asString ]) fold: [ :a :b | a , ',' , b ]) , ')'
+	^ '(' , (',' join: (aCollection collect: [ :v | v asString ])) , ')'
 ]
 
 { #category : 'converting' }

@@ -82,14 +82,14 @@ Class {
 }
 
 { #category : 'transactions' }
-RsRedisEndpoint >> atomic: aBlock [ 
+RsRedisEndpoint >> atomic: aBlock [
 	self multi.
 	aBlock value.
 	^ self exec
 ]
 
 { #category : 'transactions' }
-RsRedisEndpoint >> atomic: aBlock watch: keys [ 
+RsRedisEndpoint >> atomic: aBlock watch: keys [
 	self watch: keys.
 	self multi.
 	aBlock value.
@@ -188,7 +188,7 @@ RsRedisEndpoint >> enterPubsub [
 RsRedisEndpoint >> errorHandlingDo: aBlock returning: returnBlock [
 	^ [ aBlock value ]
 		on: Error
-		do: [ :ex | 
+		do: [ :ex |
 			(ex isKindOf: RsGenericError)
 				ifTrue: [ self onRedisGenericErrorSignaled: ex ]
 				ifFalse: [ self onErrorSignaled: ex ].
@@ -212,7 +212,7 @@ RsRedisEndpoint >> exists: aKey [
 RsRedisEndpoint >> exitPubsub [
 	pubsub := false.
 	listener := nil.
-	
+
 ]
 
 { #category : 'commands-expiration' }
@@ -266,12 +266,12 @@ RsRedisEndpoint >> getSet: aKey value: aValue [
 ]
 
 { #category : 'commands-hashes' }
-RsRedisEndpoint >> hDel: aKey field: aField [ 
+RsRedisEndpoint >> hDel: aKey field: aField [
 	^ self unifiedCommand: {'HDEL' . aKey. aField}
 ]
 
 { #category : 'commands-hashes' }
-RsRedisEndpoint >> hExists: aKey field: aField [ 
+RsRedisEndpoint >> hExists: aKey field: aField [
 	^ (self unifiedCommand: {'HEXISTS' . aKey. aField})
 		= 1
 ]
@@ -338,7 +338,7 @@ RsRedisEndpoint >> hSet: key dictionary: aDict [
 ]
 
 { #category : 'commands-hashes' }
-RsRedisEndpoint >> hSet: key field: field value: value [ 
+RsRedisEndpoint >> hSet: key field: field value: value [
 	^ self unifiedCommand: {'HSET'. key. field. value}
 ]
 
@@ -575,7 +575,7 @@ RsRedisEndpoint >> lPosBackward: aKey value: value maxlen: maxlen [
 ]
 
 { #category : 'commands-lists' }
-RsRedisEndpoint >> lPush: aKey value: aValue [ 
+RsRedisEndpoint >> lPush: aKey value: aValue [
 	^ self
 		unifiedCommand: { 'LPUSH'
 		. aKey
@@ -583,7 +583,7 @@ RsRedisEndpoint >> lPush: aKey value: aValue [
 ]
 
 { #category : 'commands-lists' }
-RsRedisEndpoint >> lPushx: aKey value: aValue [ 
+RsRedisEndpoint >> lPushx: aKey value: aValue [
 	^ self
 		unifiedCommand: { 'LPUSHX'
 		. aKey
@@ -591,22 +591,22 @@ RsRedisEndpoint >> lPushx: aKey value: aValue [
 ]
 
 { #category : 'commands-lists' }
-RsRedisEndpoint >> lRange: aKey start: startIndex end: endIndex [ 
+RsRedisEndpoint >> lRange: aKey start: startIndex end: endIndex [
 	^ self unifiedCommand: {'LRANGE' . aKey. startIndex. endIndex}
 ]
 
 { #category : 'commands-lists' }
-RsRedisEndpoint >> lRem: aKey count: aCount value: aValue [ 
+RsRedisEndpoint >> lRem: aKey count: aCount value: aValue [
 	^ self unifiedCommand: {'LREM' .aKey. aCount. aValue}
 ]
 
 { #category : 'commands-lists' }
-RsRedisEndpoint >> lSet: aKey index: anIndex value: aValue [ 
+RsRedisEndpoint >> lSet: aKey index: anIndex value: aValue [
 	^ self unifiedCommand: {'LSET' .aKey. anIndex. aValue}
 ]
 
 { #category : 'commands-lists' }
-RsRedisEndpoint >> lTrim: aKey start: startIndex end: endIndex [ 
+RsRedisEndpoint >> lTrim: aKey start: startIndex end: endIndex [
 	^ self unifiedCommand: {'LTRIM'  .aKey. startIndex. endIndex}
 ]
 
@@ -632,7 +632,7 @@ RsRedisEndpoint >> mSetNx: aDictionary [
 ]
 
 { #category : 'commands-server' }
-RsRedisEndpoint >> monitor: aStream [ 
+RsRedisEndpoint >> monitor: aStream [
 	self socketStream nextPutAll: 'MONITOR';
 		 crlf;
 		 flush.
@@ -665,7 +665,7 @@ RsRedisEndpoint >> multi [
 RsRedisEndpoint >> onClosing [
 	pubsub ifTrue: [self releasePubsub].
 	super onClosing
-	
+
 ]
 
 { #category : 'error handling' }
@@ -677,14 +677,22 @@ RsRedisEndpoint >> onRedisGenericErrorSignaled: aRsGenericError [
 
 { #category : 'private replies' }
 RsRedisEndpoint >> parseBulkReply [
+	^ self stringFromUtf8Bytes: self parseBulkReplyRaw
+]
+
+{ #category : 'private replies' }
+RsRedisEndpoint >> parseBulkReplyRaw [
+	"Answer the raw ByteArray bytes of a bulk-string reply as read off the
+	socket, without UTF-8 decoding. Used for replies that may contain
+	binary (non-UTF-8) data, e.g. VEMB ... RAW."
 	| length reply |
 	length := self parseInteger.
 	length = -1
 		ifTrue: [ reply := nil ]
-		ifFalse: [ 
+		ifFalse: [
 			reply := self socketStream next: length.
 			self socketStream next: 2 "skip separators"].
-	^ self stringFromUtf8Bytes: reply
+	^ reply
 ]
 
 { #category : 'private replies' }
@@ -702,18 +710,38 @@ RsRedisEndpoint >> parseInteger [
 
 { #category : 'private replies' }
 RsRedisEndpoint >> parseMultiBulkReply [
+	^ self parseMultiBulkReplyWithRaw: false
+]
+
+{ #category : 'private replies' }
+RsRedisEndpoint >> parseMultiBulkReplyRaw [
+	^ self parseMultiBulkReplyWithRaw: true
+]
+
+{ #category : 'private replies' }
+RsRedisEndpoint >> parseMultiBulkReplyWithRaw: aBoolean [
 	| count reply |
 	count := self parseInteger.
 	count = -1
 		ifTrue: [^ nil].
 	reply := OrderedCollection new.
 	count
-		timesRepeat: [reply add: self parseReply].
+		timesRepeat: [reply add: (self parseReplyWithRaw: aBoolean)].
 	^ reply
 ]
 
 { #category : 'private replies' }
 RsRedisEndpoint >> parseReply [
+	^ self parseReplyWithRaw: false
+]
+
+{ #category : 'private replies' }
+RsRedisEndpoint >> parseReplyRaw [
+	^ self parseReplyWithRaw: true
+]
+
+{ #category : 'private replies' }
+RsRedisEndpoint >> parseReplyWithRaw: aBoolean [
 	| strm replyToken |
 	strm := self socketStream ifNil: [ ^nil ].
 	replyToken := [strm next] on: Error do: [:ex | (RsError canNotGetReply) signal].
@@ -722,12 +750,14 @@ RsRedisEndpoint >> parseReply [
 	replyToken = 58 "$: asInteger"
 		ifTrue: [^ self parseInteger].
 	replyToken = 36 "$$ asInteger"
-		ifTrue: [^ self parseBulkReply].
+		ifTrue: [^ aBoolean
+			ifTrue: [ self parseBulkReplyRaw ]
+			ifFalse: [ self parseBulkReply ]].
 	replyToken = 42 "$* asInteger"
-		ifTrue: [^ self parseMultiBulkReply].
+		ifTrue: [^ self parseMultiBulkReplyWithRaw: aBoolean].
 	replyToken = 45 "$- asInteger"
 		ifTrue: [^ self parseError].
-		
+
 	(RsError invalidReplyToken) signal
 ]
 
@@ -752,7 +782,7 @@ Remove the existing timeout on key, turning the key from volatile (a key with an
 { #category : 'commands-connection' }
 RsRedisEndpoint >> ping [
 	^self unifiedCommand: {'PING'}.
-	
+
 ]
 
 { #category : 'commands-pubsub' }
@@ -765,7 +795,7 @@ RsRedisEndpoint >> psubscribe: channelPatterns [
 ]
 
 { #category : 'commands-pubsub' }
-RsRedisEndpoint >> psubscribe: channelPatterns callback: aBlock [ 
+RsRedisEndpoint >> psubscribe: channelPatterns callback: aBlock [
 	pubsub
 		ifTrue: [(RsError pubsub) signal: 'Already in pubsub mode. Unsubscribe first.']
 		ifFalse: [self enterPubsub.
@@ -844,7 +874,7 @@ RsRedisEndpoint >> rPoplPush: sourceKey to: destinationKey [
 ]
 
 { #category : 'commands-lists' }
-RsRedisEndpoint >> rPush: aKey value: aValue [ 
+RsRedisEndpoint >> rPush: aKey value: aValue [
 	^ self
 		unifiedCommand: { 'RPUSH'
 		. aKey
@@ -854,6 +884,15 @@ RsRedisEndpoint >> rPush: aKey value: aValue [
 { #category : 'commands-generic' }
 RsRedisEndpoint >> randomKey [
 	^ self inlineCommand: 'RANDOMKEY'
+]
+
+{ #category : 'private commands' }
+RsRedisEndpoint >> rawUnifiedCommand: args [
+	"like #unifiedCommand:, but parses the reply via #parseReplyRaw so any
+	bulk-string elements are answered as raw ByteArray bytes instead of
+	being UTF-8 decoded. Use for commands whose reply may carry binary
+	data, e.g. VEMB ... RAW."
+	^ self sendUnifiedCommand: args parseWithRaw: true
 ]
 
 { #category : 'private replies' }
@@ -1074,14 +1113,14 @@ RsRedisEndpoint >> sort: aKey by: aPattern [
 ]
 
 { #category : 'commands-sorting' }
-RsRedisEndpoint >> sortByQuery: aRedisSortQuery [ 
+RsRedisEndpoint >> sortByQuery: aRedisSortQuery [
 	^ aRedisSortQuery execute
 ]
 
 { #category : 'factory' }
 RsRedisEndpoint >> sortQueryAt: key [
 	^RsSortQuery key: key on: self
-	
+
 ]
 
 { #category : 'private' }
@@ -1124,7 +1163,7 @@ RsRedisEndpoint >> subscribe: channelArray [
 ]
 
 { #category : 'commands-pubsub' }
-RsRedisEndpoint >> subscribe: channelArray callback: aBlock [ 
+RsRedisEndpoint >> subscribe: channelArray callback: aBlock [
 	pubsub
 		ifTrue: [(RsError pubsub) signal: 'Already in pubsub mode. Unsubscribe first.']
 		ifFalse: [self enterPubsub.
@@ -1151,20 +1190,27 @@ RsRedisEndpoint >> ttl: aKey [
 ]
 
 { #category : 'commands-generic' }
-RsRedisEndpoint >> type: aKey [ 
+RsRedisEndpoint >> type: aKey [
 	^ self unifiedCommand: {'TYPE' . aKey}
 ]
 
 { #category : 'private commands' }
-RsRedisEndpoint >> unifiedCommand: args [
+RsRedisEndpoint >> sendUnifiedCommand: args parseWithRaw: aBoolean [
 	| received |
 	received := nil.
 	self sendMutex
 		critical: [ self
 				errorHandlingDo: [ self writeUnifiedCommand: args.
-					pubsub ifFalse: [ received := self parseReply ] ].
+					pubsub ifFalse: [ received := aBoolean
+						ifTrue: [ self parseReplyRaw ]
+						ifFalse: [ self parseReply ] ] ].
 			received ifNotNil: [ self onDataReceived: received ] ].
 	^ received
+]
+
+{ #category : 'private commands' }
+RsRedisEndpoint >> unifiedCommand: args [
+	^ self sendUnifiedCommand: args parseWithRaw: false
 ]
 
 { #category : 'private' }
@@ -1200,6 +1246,17 @@ RsRedisEndpoint >> utf8BytesFromString: aString [
 	^self portableUtil utf8BytesFromString: aString
 ]
 
+{ #category : 'private-encoding' }
+RsRedisEndpoint >> toJsonString: value [
+	^ STONJSON toString: value
+]
+
+{ #category : 'private-encoding' }
+RsRedisEndpoint >> safeParseJson: result [
+	result ifNil: [ ^ result ].
+	^ STONJSON fromString: result
+]
+
 { #category : 'commands-transactions' }
 RsRedisEndpoint >> watch: keys [
 	self unifiedCommand: {'WATCH'} , keys
@@ -1228,9 +1285,9 @@ RsRedisEndpoint >> writeUnifiedCommand: args [
 	strm nextPut: $* asInteger.
 	self writeBytes: args size asString asByteArray to: strm.
 	args
-		do: [ :ea | 
+		do: [ :ea |
 			| bytes |
-			bytes := (self utf8BytesFromString: ea asString).
+			bytes := ea asRediStickBytesUsing: self.
 			strm nextPut: $$ asInteger.
 			self writeBytes: bytes size asString asByteArray to: strm.
 			self writeBytes: bytes to: strm].
@@ -1266,13 +1323,13 @@ RsRedisEndpoint >> zIncrBy: aKey increment: anIncrement member: aMember [
 ]
 
 { #category : 'commands-sorted-sets' }
-RsRedisEndpoint >> zLexCount: key min: min max: max [ 
-	^ self 
+RsRedisEndpoint >> zLexCount: key min: min max: max [
+	^ self
 		unifiedCommand: {'ZLEXCOUNT'. key. min. max }
 ]
 
 { #category : 'commands-sorted-sets' }
-RsRedisEndpoint >> zRange: aKey start: aStart end: anEnd [ 
+RsRedisEndpoint >> zRange: aKey start: aStart end: anEnd [
 	^ self
 		zRange: aKey
 		start: aStart
@@ -1284,12 +1341,12 @@ RsRedisEndpoint >> zRange: aKey start: aStart end: anEnd [
 RsRedisEndpoint >> zRange: aKey start: aStart end: anEnd includeScore: shouldIncludeScore [
 	| args |
 	args := shouldIncludeScore
-		ifTrue: [ 
+		ifTrue: [
 			{aKey.
 			aStart.
 			anEnd.
 			'WITHSCORES'} ]
-		ifFalse: [ 
+		ifFalse: [
 			{aKey.
 			aStart.
 			anEnd} ].
@@ -1297,14 +1354,14 @@ RsRedisEndpoint >> zRange: aKey start: aStart end: anEnd includeScore: shouldInc
 ]
 
 { #category : 'commands-sorted-sets' }
-RsRedisEndpoint >> zRangeByLex: key min: min max: max [ 
-	^ self 
+RsRedisEndpoint >> zRangeByLex: key min: min max: max [
+	^ self
 		unifiedCommand:{'ZRANGEBYLEX'. key. min. max }
 ]
 
 { #category : 'commands-sorted-sets' }
 RsRedisEndpoint >> zRangeByLex: key min: min max: max offset: offset count: count [
-	^ self 
+	^ self
 		unifiedCommand: {'ZRANGEBYLEX'. key. min. max. 'LIMIT'. offset. count }
 ]
 
@@ -1341,8 +1398,8 @@ RsRedisEndpoint >> zRem: aKey member: aMember [
 ]
 
 { #category : 'commands-sorted-sets' }
-RsRedisEndpoint >> zRemRangeByLex: key min: min max: max [ 
-	^ self 
+RsRedisEndpoint >> zRemRangeByLex: key min: min max: max [
+	^ self
 		unifiedCommand:{ 'ZREMRANGEBYLEX'. key. min. max }
 ]
 
@@ -1367,7 +1424,7 @@ RsRedisEndpoint >> zRemRangeByScore: key min: min max: max [
 ]
 
 { #category : 'commands-sorted-sets' }
-RsRedisEndpoint >> zRevRange: aKey start: aStart end: anEnd [ 
+RsRedisEndpoint >> zRevRange: aKey start: aStart end: anEnd [
 	^ self
 		zRevRange: aKey
 		start: aStart
@@ -1379,12 +1436,12 @@ RsRedisEndpoint >> zRevRange: aKey start: aStart end: anEnd [
 RsRedisEndpoint >> zRevRange: aKey start: aStart end: anEnd includeScore: shouldIncludeScore [
 	| args |
 	args := shouldIncludeScore
-		ifTrue: [ 
+		ifTrue: [
 			{aKey.
 			aStart.
 			anEnd.
 			'WITHSCORES'} ]
-		ifFalse: [ 
+		ifFalse: [
 			{aKey.
 			aStart.
 			anEnd} ].
@@ -1392,14 +1449,14 @@ RsRedisEndpoint >> zRevRange: aKey start: aStart end: anEnd includeScore: should
 ]
 
 { #category : 'commands-sorted-sets' }
-RsRedisEndpoint >> zRevRangeByLex: key min: min max: max [ 
-	^ self 
+RsRedisEndpoint >> zRevRangeByLex: key min: min max: max [
+	^ self
 		unifiedCommand:{ 'ZREVRANGEBYLEX'. key. min. max }
 ]
 
 { #category : 'commands-sorted-sets' }
 RsRedisEndpoint >> zRevRangeByLex: key min: min max: max offset: offset count: count [
-	^ self 
+	^ self
 		unifiedCommand: { 'ZREVRANGEBYLEX'. key. min. max. 'LIMIT'. offset. count }
 ]
 

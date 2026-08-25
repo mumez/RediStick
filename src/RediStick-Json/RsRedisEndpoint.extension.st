@@ -196,7 +196,7 @@ RsRedisEndpoint >> jsonGet: key options: options paths: paths [
 	options ifNotNil: [ args addAll: options asArray ].
 	paths ifNotNil: [ args addAll: paths asArray ].
 	result := self unifiedCommand: args.
-	(options notNil and: [ options hasPrettyFormattingOptions ]) 
+	(options notNil and: [ options hasPrettyFormattingOptions ])
 		ifTrue: [ ^ result ].
 	^ self buildJsonResultFrom: (self safeParseJson: result) key: key paths: paths
 ]
@@ -441,15 +441,4 @@ RsRedisEndpoint >> jsonType: key path: path [
 	path ifNotNil: [ args add: path asString ].
 	result := self unifiedCommand: args.
 	^ self buildJsonResultFrom: result key: key path: path
-]
-
-{ #category : '*RediStick-Json' }
-RsRedisEndpoint >> safeParseJson: result [
-	result ifNil: [ ^ result ].
-	^ STONJSON fromString: result
-]
-
-{ #category : '*RediStick-Json' }
-RsRedisEndpoint >> toJsonString: value [
-	^ STONJSON toString: value
 ]

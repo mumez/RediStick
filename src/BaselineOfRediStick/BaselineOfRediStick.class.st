@@ -45,6 +45,11 @@ BaselineOfRediStick >> baseline: spec [
 		spec package: 'RediStick-TimeSeries-Tests' with: [
 				spec requires: #('RediStick-Tests' 'RediStick-TimeSeries')].
 
+		spec package: 'RediStick-VectorSet' with: [
+				spec requires: #('RediStick-Core')].
+		spec package: 'RediStick-VectorSet-Tests' with: [
+				spec requires: #('RediStick-Tests' 'RediStick-VectorSet')].
+
 		spec
 			group: 'default' with: #('Core');
 			group: 'Core' with: #('RediStick-Core');
@@ -70,7 +75,11 @@ BaselineOfRediStick >> baseline: spec [
 
 		spec
 			group: 'TimeSeries' with: #('RediStick-TimeSeries');
-			group: 'TimeSeriesTests' with: #('RediStick-TimeSeries-Tests')].
+			group: 'TimeSeriesTests' with: #('RediStick-TimeSeries-Tests').
+
+		spec
+			group: 'VectorSet' with: #('RediStick-VectorSet');
+			group: 'VectorSetTests' with: #('RediStick-VectorSet-Tests')].
 
 ]
 
