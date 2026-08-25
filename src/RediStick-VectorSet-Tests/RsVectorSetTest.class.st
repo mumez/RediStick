@@ -157,13 +157,54 @@ RsVectorSetTest >> testVEmbRoundTrip [
 ]
 
 { #category : 'tests' }
-RsVectorSetTest >> testVEmbRaw [
+RsVectorSetTest >> testVEmbRawWithDefaultQuantization [
 	| raw |
-	stick endpoint vAdd: 'vs:embraw' element: 'elem1' vector: self class sampleVectorA using: nil.
-	raw := stick endpoint vEmb: 'vs:embraw' element: 'elem1' raw: true.
-	self assert: raw first equals: 'int8'.
-	self assert: (stick endpoint vEmb: 'vs:embraw' element: 'elem1' raw: false)
-		equals: (stick endpoint vEmb: 'vs:embraw' element: 'elem1')
+	stick endpoint vAdd: 'vs:embraw:q8' element: 'elem1' vector: self class sampleVectorA using: nil.
+	raw := stick endpoint vEmb: 'vs:embraw:q8' element: 'elem1' raw: true.
+	self assert: raw quantType equals: 'int8'.
+	self assert: raw bytes size equals: self class sampleVectorA size.
+	self assert: raw l2Norm notNil.
+	self assert: raw quantRange notNil
+]
+
+{ #category : 'tests' }
+RsVectorSetTest >> testVEmbRawWithNoQuantization [
+	| raw decoded |
+	stick endpoint
+		vAdd: 'vs:embraw:fp32'
+		element: 'elem1'
+		vector: self class sampleVectorA
+		using: [ :options | options noQuantization ].
+	raw := stick endpoint vEmb: 'vs:embraw:fp32' element: 'elem1' raw: true.
+	self assert: raw quantType equals: 'f32'.
+	self assert: raw quantRange equals: nil.
+	decoded := self class floatsFromFp32Bytes: raw bytes.
+	self assert: decoded size equals: self class sampleVectorA size.
+	"Redis stores the vector unit-normalized; multiply back by l2Norm to
+	recover the original magnitudes."
+	decoded with: self class sampleVectorA do: [ :actual :expected |
+		self assert: ((actual * raw l2Norm) - expected) abs < 0.01 ]
+]
+
+{ #category : 'tests' }
+RsVectorSetTest >> testVEmbRawWithBinQuantization [
+	| raw |
+	stick endpoint
+		vAdd: 'vs:embraw:bin'
+		element: 'elem1'
+		vector: self class sampleVectorA
+		using: [ :options | options quantizationBin ].
+	raw := stick endpoint vEmb: 'vs:embraw:bin' element: 'elem1' raw: true.
+	self assert: raw quantType equals: 'bin'.
+	self assert: raw bytes notEmpty.
+	self assert: raw quantRange equals: nil
+]
+
+{ #category : 'tests' }
+RsVectorSetTest >> testVEmbRawFalseMatchesVEmb [
+	stick endpoint vAdd: 'vs:embraw:false' element: 'elem1' vector: self class sampleVectorA using: nil.
+	self assert: (stick endpoint vEmb: 'vs:embraw:false' element: 'elem1' raw: false)
+		equals: (stick endpoint vEmb: 'vs:embraw:false' element: 'elem1')
 ]
 
 { #category : 'tests' }
