@@ -155,3 +155,57 @@ RsFunctionTest >> testFunctionStats [
 	self assert: (stats engines includesKey: 'LUA').
 	self assert: (stats engines at: 'LUA') notNil
 ]
+
+{ #category : 'tests' }
+RsFunctionTest >> testFunctionDumpAndRestore [
+	| payload libs |
+	self loadTestLibrary.
+	payload := stick endpoint functionDump.
+	self assert: payload notNil.
+
+	stick endpoint functionFlush.
+	self assert: stick endpoint functionList size equals: 0.
+
+	self assert: (stick endpoint functionRestore: payload) equals: 'OK'.
+	libs := stick endpoint functionList.
+	self assert: libs size equals: 1.
+	self assert: libs first name equals: 'testlib'
+]
+
+{ #category : 'tests' }
+RsFunctionTest >> testFunctionRestoreWithModeFlush [
+	| payload libs |
+	self loadTestLibrary.
+	payload := stick endpoint functionDump.
+
+	self assert: (stick endpoint functionRestore: payload mode: 'FLUSH') equals: 'OK'.
+	libs := stick endpoint functionList.
+	self assert: libs size equals: 1.
+	self assert: libs first name equals: 'testlib'
+]
+
+{ #category : 'tests' }
+RsFunctionTest >> testFunctionRestoreWithModeReplace [
+	| payload libs |
+	self loadTestLibrary.
+	payload := stick endpoint functionDump.
+
+	self assert: (stick endpoint functionRestore: payload mode: 'REPLACE') equals: 'OK'.
+	libs := stick endpoint functionList.
+	self assert: libs size equals: 1.
+	self assert: libs first name equals: 'testlib'
+]
+
+{ #category : 'tests' }
+RsFunctionTest >> testFunctionRestoreUsing [
+	| payload libs |
+	self loadTestLibrary.
+	payload := stick endpoint functionDump.
+
+	self
+		assert: (stick endpoint functionRestore: payload using: [ :opts | opts policy: 'REPLACE' ])
+		equals: 'OK'.
+	libs := stick endpoint functionList.
+	self assert: libs size equals: 1.
+	self assert: libs first name equals: 'testlib'
+]

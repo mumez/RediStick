@@ -145,3 +145,37 @@ RsRedisEndpoint >> functionKill [
 RsRedisEndpoint >> functionStats [
 	^ RsFunctionStats fromArrayOrDictionary: (self unifiedCommand: { 'FUNCTION'. 'STATS' })
 ]
+
+{ #category : '*RediStick-Function' }
+RsRedisEndpoint >> functionDump [
+	^ self rawUnifiedCommand: { 'FUNCTION'. 'DUMP' }
+]
+
+{ #category : '*RediStick-Function' }
+RsRedisEndpoint >> functionRestore: payload [
+	^ self functionRestore: payload mode: nil
+]
+
+{ #category : '*RediStick-Function' }
+RsRedisEndpoint >> functionRestore: payload mode: aPolicyString [
+	| args |
+	args := OrderedCollection new.
+	args add: 'FUNCTION'.
+	args add: 'RESTORE'.
+	args add: payload.
+	aPolicyString ifNotNil: [ args add: aPolicyString ].
+	^ self unifiedCommand: args
+]
+
+{ #category : '*RediStick-Function' }
+RsRedisEndpoint >> functionRestore: payload using: optionsBlock [
+	| options args |
+	options := RsFunctionRestoreOptions new.
+	optionsBlock value: options.
+	args := OrderedCollection new.
+	args add: 'FUNCTION'.
+	args add: 'RESTORE'.
+	args add: payload.
+	args addAll: options asArray.
+	^ self unifiedCommand: args
+]
