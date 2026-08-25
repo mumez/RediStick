@@ -119,8 +119,7 @@ RsRedisEndpoint >> vInfo: key [
 RsRedisEndpoint >> vGetAttr: key element: element [
 	| result |
 	result := self unifiedCommand: { 'VGETATTR'. key. element }.
-	result ifNil: [ ^ nil ].
-	^ STON fromString: result
+	^ self safeParseJson: result
 ]
 
 { #category : '*RediStick-VectorSet' }
@@ -128,7 +127,7 @@ RsRedisEndpoint >> vSetAttr: key element: element value: aJsonableObject [
 	| json |
 	json := (aJsonableObject isString or: [ aJsonableObject isSymbol ])
 		ifTrue: [ aJsonableObject asString ]
-		ifFalse: [ STON toJsonString: aJsonableObject ].
+		ifFalse: [ self toJsonString: aJsonableObject ].
 	^ (self unifiedCommand: { 'VSETATTR'. key. element. json }) = 1
 ]
 
@@ -218,7 +217,7 @@ RsRedisEndpoint >> vSimParseResult: rawResult withScores: withScores withAttribs
 			ifFalse: [ nil ].
 		withScores ifTrue: [ next := next + 1 ].
 		attribs := withAttribs
-			ifTrue: [ (rawResult at: next) ifNotNil: [ :a | STON fromString: a ] ]
+			ifTrue: [ self safeParseJson: (rawResult at: next) ]
 			ifFalse: [ nil ].
 		RsVectorSetSimResult element: element score: score attribs: attribs ]) asArray
 ]
