@@ -82,9 +82,9 @@ stick endpoint vRem: 'vs:articles' element: 'article1'.
 ```smalltalk
 info := stick endpoint vInfo: 'vs:articles'.
 "a Dictionary, or nil for a missing key"
-info at: 'size'.
-info at: 'vector-dim'.
-info at: 'quant-type'.
+info at: 'size'. "1"
+info at: 'vector-dim'. "4"
+info at: 'quant-type'. "'int8'"
 ```
 
 ### Attributes (VGETATTR / VSETATTR)
@@ -107,7 +107,7 @@ attr at: 'category'. "'science'"
 
 ```smalltalk
 "Search by an existing element (ELE form)"
-results := stick endpoint vSim: 'vs:articles' queryBy: [ :q | q element: 'article1' ].
+results := stick endpoint vSim: 'vs:articles' queryBy: [ :q | q element: 'article2' ].
 
 "Search by a raw vector (VALUES form)"
 results := stick endpoint vSim: 'vs:articles' queryBy: [ :q | q values: #(0.1 -0.4 0.3 0.8) ].
@@ -116,15 +116,10 @@ results := stick endpoint vSim: 'vs:articles' queryBy: [ :q | q values: #(0.1 -0
 32-bit floats in little-endian byte order"
 results := stick endpoint vSim: 'vs:articles' queryBy: [ :q | q valuesFp32: someLittleEndianFloatBytes ].
 
-"Each result is an RsVectorSetSimResult"
-results first element. "matched element name"
-results first score.   "nil unless WITHSCORES requested"
-results first attribs. "nil unless WITHATTRIBS requested"
-
 "With options - WITHSCORES, WITHATTRIBS, COUNT, EF, FILTER, FILTER-EF, TRUTH, NOTHREAD"
 results := stick endpoint
     vSim: 'vs:articles'
-    queryBy: [ :q | q element: 'article1' ]
+    queryBy: [ :q | q element: 'article2' ]
     using: [ :opts |
         opts withScores.
         opts withAttribs.
@@ -135,6 +130,11 @@ results := stick endpoint
         opts truth.    "exact linear search instead of approximate HNSW"
         opts noThread ].
 ```
+
+"Each result is an RsVectorSetSimResult"
+results first element. "'article2'" "matched element name"
+results first score.   "1" "nil unless WITHSCORES requested"
+results first attribs. "a Dictionary ('category' -> 'science')" "nil unless WITHATTRIBS requested"
 
 #### Fluent Filter Expressions (`filterBy:`)
 
@@ -164,11 +164,11 @@ See the [expression syntax reference](https://redis.io/docs/latest/develop/data-
 
 ```smalltalk
 "Element names directly connected to the given element in the HNSW graph"
-links := stick endpoint vLinks: 'vs:articles' element: 'article1'.
+links := stick endpoint vLinks: 'vs:articles' element: 'article2'.
 "#('article2' 'article3'), or nil for a missing key"
 
 "With scores - an Array of element -> score Associations"
-links := stick endpoint vLinks: 'vs:articles' element: 'article1' withScores: true.
+links := stick endpoint vLinks: 'vs:articles' element: 'article2' withScores: true.
 links first key.   "element name"
 links first value. "similarity score"
 ```
