@@ -1251,7 +1251,7 @@ RsRedisEndpoint >> toJsonString: value [
 	^ STONJSON toString: value
 ]
 
-{ #category : '*RediStick-Json' }
+{ #category : 'private-encoding' }
 RsRedisEndpoint >> safeParseJson: result [
 	result ifNil: [ ^ result ].
 	^ STONJSON fromString: result
