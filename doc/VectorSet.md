@@ -70,7 +70,7 @@ stick endpoint vEmb: 'vs:articles' element: 'article1'.
 "#(0.12118109315633774 -0.4528346359729767 0.33165356516838074 0.8100000023841858)"
 
 "Raw, quantization-aware fields (VEMB ... RAW)"
-stick endpoint vEmb: 'vs:articles' element: 'article1' raw: true.
+stick endpoint vEmb: 'vs:articles' element: 'article1' raw: true. "RsVectorSetRawEmbedding(quantType: 'int8' bytes: 4 bytes l2Norm: 0.990908682346344 quantRange: 0.8174315094947815)"
 stick endpoint vEmb: 'vs:articles' element: 'article1' raw: false. "same as vEmb:element:"
 
 "Remove an element - answers true/false"
@@ -108,6 +108,7 @@ attr at: 'category'. "'science'"
 ```smalltalk
 "Search by an existing element (ELE form)"
 results := stick endpoint vSim: 'vs:articles' queryBy: [ :q | q element: 'article2' ].
+"an Array(RsVectorSetSimResult(element: 'article2' score: nil attribs: nil))"
 
 "Search by a raw vector (VALUES form)"
 results := stick endpoint vSim: 'vs:articles' queryBy: [ :q | q values: #(0.1 -0.4 0.3 0.8) ].
@@ -129,12 +130,13 @@ results := stick endpoint
         opts maxFilteringEffort: 200.
         opts truth.    "exact linear search instead of approximate HNSW"
         opts noThread ].
-```
 
 "Each result is an RsVectorSetSimResult"
 results first element. "'article2'" "matched element name"
 results first score.   "1" "nil unless WITHSCORES requested"
 results first attribs. "a Dictionary ('category' -> 'science')" "nil unless WITHATTRIBS requested"
+
+```
 
 #### Fluent Filter Expressions (`filterBy:`)
 
@@ -169,12 +171,12 @@ stick endpoint vAdd: 'vs:articles' element: 'article4' vector: #(0.13 -0.46 0.34
 
 "Element names directly connected to the given element in the HNSW graph"
 links := stick endpoint vLinks: 'vs:articles' element: 'article2'.
-"#('article3' 'article4'), or nil for a missing key"
+"#('article3' 'article3' 'article4'), or nil for a missing key"
 
 "With scores - an Array of element -> score Associations"
 links := stick endpoint vLinks: 'vs:articles' element: 'article2' withScores: true.
-links first key.   "element name"
-links first value. "similarity score"
+links first key.   "'article3'" "element name"
+links first value. "1" "similarity score"
 ```
 
 ### Random Members (VRANDMEMBER)
@@ -185,8 +187,8 @@ stick endpoint vRandMember: 'vs:articles'.
 
 "count follows Redis VRANDMEMBER semantics as-is: positive count = up to
 count distinct elements, negative count = count elements with possible repeats"
-stick endpoint vRandMember: 'vs:articles' count: 2.
-stick endpoint vRandMember: 'vs:articles' count: -5.
+stick endpoint vRandMember: 'vs:articles' count: 2. "#('article3' 'article2')"
+stick endpoint vRandMember: 'vs:articles' count: -5. "#('article3' 'article2' 'article3' 'article4' 'article3')"
 ```
 
 ### Cleaning Up
