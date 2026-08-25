@@ -115,3 +115,33 @@ RsRedisEndpoint >> functionLoad: code replace: aBoolean [
 	args add: normalizedCode.
 	^ self unifiedCommand: args
 ]
+
+{ #category : '*RediStick-Function' }
+RsRedisEndpoint >> functionFlush [
+	^ self unifiedCommand: { 'FUNCTION'. 'FLUSH' }
+]
+
+{ #category : '*RediStick-Function' }
+RsRedisEndpoint >> functionFlushAsync [
+	^ self functionFlush: 'ASYNC'
+]
+
+{ #category : '*RediStick-Function' }
+RsRedisEndpoint >> functionFlushSync [
+	^ self functionFlush: 'SYNC'
+]
+
+{ #category : '*RediStick-Function-private' }
+RsRedisEndpoint >> functionFlush: aMode [
+	^ self unifiedCommand: { 'FUNCTION'. 'FLUSH'. aMode }
+]
+
+{ #category : '*RediStick-Function' }
+RsRedisEndpoint >> functionKill [
+	^ self unifiedCommand: { 'FUNCTION'. 'KILL' }
+]
+
+{ #category : '*RediStick-Function' }
+RsRedisEndpoint >> functionStats [
+	^ RsFunctionStats fromArrayOrDictionary: (self unifiedCommand: { 'FUNCTION'. 'STATS' })
+]

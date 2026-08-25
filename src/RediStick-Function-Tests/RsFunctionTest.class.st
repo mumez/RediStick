@@ -108,3 +108,50 @@ RsFunctionTest >> testFunctionLoad [
 	name := self loadTestLibrary.
 	self assert: name equals: 'testlib'
 ]
+
+{ #category : 'tests' }
+RsFunctionTest >> testFunctionFlush [
+	self loadTestLibrary.
+	self assert: stick endpoint functionList size equals: 1.
+	self assert: stick endpoint functionFlush equals: 'OK'.
+	self assert: stick endpoint functionList size equals: 0
+]
+
+{ #category : 'tests' }
+RsFunctionTest >> testFunctionFlushAsync [
+	self loadTestLibrary.
+	self assert: stick endpoint functionList size equals: 1.
+	self assert: stick endpoint functionFlushAsync equals: 'OK'.
+	self assert: stick endpoint functionList size equals: 0
+]
+
+{ #category : 'tests' }
+RsFunctionTest >> testFunctionFlushSync [
+	self loadTestLibrary.
+	self assert: stick endpoint functionList size equals: 1.
+	self assert: stick endpoint functionFlushSync equals: 'OK'.
+	self assert: stick endpoint functionList size equals: 0
+]
+
+{ #category : 'tests' }
+RsFunctionTest >> testFunctionKill [
+	"No script is running in a unit test context, so Redis replies with an error.
+	RsRedisEndpoint does not raise Redis protocol errors to the caller; instead it
+	reports them via the stick's onRedisGenericErrorBlock, so capture it there."
+	| caughtError |
+	caughtError := nil.
+	stick onRedisGenericError: [ :ex | caughtError := ex ].
+	self assert: stick endpoint functionKill isNil.
+	self assert: caughtError notNil.
+	self assert: caughtError errorPrefix equals: 'NOTBUSY'
+]
+
+{ #category : 'tests' }
+RsFunctionTest >> testFunctionStats [
+	| stats |
+	self loadTestLibrary.
+	stats := stick endpoint functionStats.
+	self assert: stats runningScript isNil.
+	self assert: (stats engines includesKey: 'LUA').
+	self assert: (stats engines at: 'LUA') notNil
+]
