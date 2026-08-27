@@ -23,9 +23,9 @@ Class {
 RsFunctionListOptions >> asArray [
 	| args |
 	args := OrderedCollection new.
-	libraryName ifNotNil: [
+	self libraryName ifNotNil: [
 		args add: 'LIBRARYNAME'.
-		args add: libraryName ].
+		args add: self libraryName ].
 	self withCode ifTrue: [
 		args add: 'WITHCODE' ].
 	^ args asArray

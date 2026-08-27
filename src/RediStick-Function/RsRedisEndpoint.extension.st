@@ -35,10 +35,7 @@ RsRedisEndpoint >> fCall: functionName command: commandName keys: keys args: arg
 			(args isString or: [ args isCollection not ])
 				ifTrue: [ Array with: args ]
 				ifFalse: [ args asArray ] ].
-	cmdArgs := OrderedCollection new.
-	cmdArgs add: commandName.
-	cmdArgs add: functionName.
-	cmdArgs add: keysColl size.
+	cmdArgs := { commandName. functionName. keysColl size } asOrderedCollection.
 	cmdArgs addAll: keysColl.
 	cmdArgs addAll: argsColl.
 	^ self unifiedCommand: cmdArgs

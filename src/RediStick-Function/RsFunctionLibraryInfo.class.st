@@ -89,9 +89,9 @@ RsFunctionLibraryInfo >> name: anObject [
 { #category : 'printing' }
 RsFunctionLibraryInfo >> printOn: aStream [
 	super printOn: aStream.
-	name ifNotNil: [
+	self name ifNotNil: [
 		aStream
 			nextPut: $(;
-			nextPutAll: name;
+			nextPutAll: self name;
 			nextPut: $) ]
 ]
