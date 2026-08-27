@@ -110,6 +110,31 @@ RsFunctionTest >> testFunctionLoad [
 ]
 
 { #category : 'tests' }
+RsFunctionTest >> testFunctionPut [
+	| luaCode libs |
+	luaCode := 'redis.register_function("echo_args", function(keys, args)
+    return args[1]
+end)'.
+	self assert: (stick endpoint functionPut: 'testlib' code: luaCode) equals: 'testlib'.
+
+	libs := stick endpoint functionList: 'testlib'.
+	self assert: libs size equals: 1.
+	self assert: libs first name equals: 'testlib'.
+	self assert: (stick endpoint fCall: 'echo_args' args: 'hello') equals: 'hello'
+]
+
+{ #category : 'tests' }
+RsFunctionTest >> testFunctionPutReplacesExisting [
+	| luaCode |
+	self loadTestLibrary.
+	luaCode := 'redis.register_function("echo_args", function(keys, args)
+    return args[1]
+end)'.
+	self assert: (stick endpoint functionPut: 'testlib' code: luaCode) equals: 'testlib'.
+	self assert: stick endpoint functionList size equals: 1
+]
+
+{ #category : 'tests' }
 RsFunctionTest >> testFunctionFlush [
 	self loadTestLibrary.
 	self assert: stick endpoint functionList size equals: 1.
