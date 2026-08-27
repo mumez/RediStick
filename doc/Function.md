@@ -41,9 +41,6 @@ A library is Lua source starting with a shebang line (`#!lua name=<library>`) th
 code := '#!lua name=mylib
 redis.register_function("echo_args", function(keys, args)
     return args[1]
-end)
-redis.register_function("concat_keys_args", function(keys, args)
-    return keys[1] .. ":" .. args[1]
 end)'.
 
 "Answers the library name"
@@ -54,8 +51,19 @@ stick endpoint functionLoad: code replace: true.
 
 "Shortcut: builds the shebang line for you from a library name and
 plain Lua code, then loads with REPLACE always enabled"
-luaCode := 'redis.register_function("echo_args", function(keys, args)
+luaCode := '
+redis.register_function("echo_args", function(keys, args)
     return args[1]
+end)
+redis.register_function("concat_keys_args", function(keys, args)
+    return keys[1] .. ":" .. args[1]
+end)
+redis.register_function("sum_args", function(keys, args)
+    local sum = 0
+    for _, v in ipairs(args) do
+        sum = sum + tonumber(v)
+    end
+    return sum
 end)'.
 stick endpoint functionPut: 'mylib' code: luaCode. "'mylib'"
 ```
@@ -75,7 +83,18 @@ stick endpoint fCall: 'concat_keys_args' keys: 'mykey' args: 'myval'. "'mykey:my
 stick endpoint fCall: 'concat_keys_args' keys: #('mykey') args: #('myval').
 
 "Read-only call (function must be registered with the 'no-writes' flag)"
-stick endpoint fCallRo: 'read_key' keys: 'somekey'.
+roCode := '
+redis.register_function{
+    function_name = "read_key",
+    callback = function(keys, args)
+        return redis.call("get", keys[1])
+    end,
+    flags = {"no-writes"}
+}'.
+stick endpoint functionPut: 'mylib_ro' code: roCode.
+
+stick endpoint set: 'somekey' value: 'somevalue'.
+stick endpoint fCallRo: 'read_key' keys: 'somekey'. "'somevalue'"
 ```
 
 ### Listing Libraries (FUNCTION LIST)
