@@ -222,14 +222,37 @@ RsFunctionTest >> testFunctionRestoreWithModeReplace [
 ]
 
 { #category : 'tests' }
-RsFunctionTest >> testFunctionRestoreUsing [
+RsFunctionTest >> testFunctionRestoreAppending [
+	| payload libs |
+	self loadTestLibrary.
+	payload := stick endpoint functionDump.
+	stick endpoint functionFlush.
+
+	self assert: (stick endpoint functionRestoreAppending: payload) equals: 'OK'.
+	libs := stick endpoint functionList.
+	self assert: libs size equals: 1.
+	self assert: libs first name equals: 'testlib'
+]
+
+{ #category : 'tests' }
+RsFunctionTest >> testFunctionRestoreFlushing [
 	| payload libs |
 	self loadTestLibrary.
 	payload := stick endpoint functionDump.
 
-	self
-		assert: (stick endpoint functionRestore: payload using: [ :opts | opts policy: 'REPLACE' ])
-		equals: 'OK'.
+	self assert: (stick endpoint functionRestoreFlushing: payload) equals: 'OK'.
+	libs := stick endpoint functionList.
+	self assert: libs size equals: 1.
+	self assert: libs first name equals: 'testlib'
+]
+
+{ #category : 'tests' }
+RsFunctionTest >> testFunctionRestoreReplacing [
+	| payload libs |
+	self loadTestLibrary.
+	payload := stick endpoint functionDump.
+
+	self assert: (stick endpoint functionRestoreReplacing: payload) equals: 'OK'.
 	libs := stick endpoint functionList.
 	self assert: libs size equals: 1.
 	self assert: libs first name equals: 'testlib'

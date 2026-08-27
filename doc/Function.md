@@ -128,13 +128,15 @@ stick endpoint functionListUsing: [ :opts |
 payload := stick endpoint functionDump.
 
 "Restore from a payload"
-stick endpoint functionRestore: payload. "'OK'"
+stick endpoint functionRestore: payload. "nil - error log 'ERR Library mylib already exists'"
 
 "With a policy - APPEND (default), FLUSH, or REPLACE"
-stick endpoint functionRestore: payload mode: 'REPLACE'.
+stick endpoint functionRestore: payload mode: 'REPLACE'. "'OK'"
 
-"Via options block"
-stick endpoint functionRestore: payload using: [ :opts | opts policy: 'REPLACE' ].
+"Shortcuts for each policy"
+stick endpoint functionRestoreAppending: payload.
+stick endpoint functionRestoreFlushing: payload.
+stick endpoint functionRestoreReplacing: payload.
 ```
 
 ### Server Statistics (FUNCTION STATS)

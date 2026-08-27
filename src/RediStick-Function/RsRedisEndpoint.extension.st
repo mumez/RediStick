@@ -172,14 +172,16 @@ RsRedisEndpoint >> functionRestore: payload mode: aPolicyString [
 ]
 
 { #category : '*RediStick-Function' }
-RsRedisEndpoint >> functionRestore: payload using: optionsBlock [
-	| options args |
-	options := RsFunctionRestoreOptions new.
-	optionsBlock value: options.
-	args := OrderedCollection new.
-	args add: 'FUNCTION'.
-	args add: 'RESTORE'.
-	args add: payload.
-	args addAll: options asArray.
-	^ self unifiedCommand: args
+RsRedisEndpoint >> functionRestoreAppending: payload [
+	^ self functionRestore: payload mode: 'APPEND'
+]
+
+{ #category : '*RediStick-Function' }
+RsRedisEndpoint >> functionRestoreFlushing: payload [
+	^ self functionRestore: payload mode: 'FLUSH'
+]
+
+{ #category : '*RediStick-Function' }
+RsRedisEndpoint >> functionRestoreReplacing: payload [
+	^ self functionRestore: payload mode: 'REPLACE'
 ]
