@@ -144,7 +144,7 @@ stick endpoint functionRestoreReplacing: payload.
 ```smalltalk
 stats := stick endpoint functionStats.
 stats runningScript. "nil, or details about a currently running function"
-stats engines.        "a Dictionary, e.g. { 'LUA' -> ... }"
+stats engines.        "a Dictionary('LUA'->a Dictionary('functions_count'->4 'libraries_count'->2 ) )"
 ```
 
 ### Deleting a Library (FUNCTION DELETE)
