@@ -106,8 +106,8 @@ libs first name.      "'mylib'"
 libs first engine.     "'LUA'"
 libs first code.       "nil unless WITHCODE was requested"
 libs first functions.  "an Array of RsFunctionInfo"
-libs first functions first name.        "'echo_args'"
-libs first functions first isNoWrites.  "true/false"
+libs first functions collect: #name.        "#('sum_args' 'echo_args' 'concat_keys_args')"
+libs second functions collect: #isNoWrites.  "#(true)"
 
 "Filter by LIBRARYNAME pattern"
 stick endpoint functionList: 'mylib*'.
@@ -119,36 +119,6 @@ stick endpoint functionList: 'mylib' withCode: true.
 stick endpoint functionListUsing: [ :opts |
     opts libraryName: 'mylib'.
     opts withCode: true ].
-```
-
-### Deleting a Library (FUNCTION DELETE)
-
-```smalltalk
-stick endpoint functionDelete: 'mylib'. "'OK'"
-```
-
-### Flushing All Libraries (FUNCTION FLUSH)
-
-```smalltalk
-stick endpoint functionFlush.       "'OK', uses server default mode"
-stick endpoint functionFlushAsync.  "'OK', FLUSH ASYNC"
-stick endpoint functionFlushSync.   "'OK', FLUSH SYNC"
-```
-
-### Killing a Running Function (FUNCTION KILL)
-
-```smalltalk
-"Only meaningful while a function is actually executing on the server;
-otherwise Redis replies with a NOTBUSY error"
-stick endpoint functionKill.
-```
-
-### Server Statistics (FUNCTION STATS)
-
-```smalltalk
-stats := stick endpoint functionStats.
-stats runningScript. "nil, or details about a currently running function"
-stats engines.        "a Dictionary, e.g. { 'LUA' -> ... }"
 ```
 
 ### Backup and Restore (FUNCTION DUMP / RESTORE)
@@ -165,4 +135,34 @@ stick endpoint functionRestore: payload mode: 'REPLACE'.
 
 "Via options block"
 stick endpoint functionRestore: payload using: [ :opts | opts policy: 'REPLACE' ].
+```
+
+### Server Statistics (FUNCTION STATS)
+
+```smalltalk
+stats := stick endpoint functionStats.
+stats runningScript. "nil, or details about a currently running function"
+stats engines.        "a Dictionary, e.g. { 'LUA' -> ... }"
+```
+
+### Deleting a Library (FUNCTION DELETE)
+
+```smalltalk
+stick endpoint functionDelete: 'mylib'. "'OK'"
+```
+
+### Deleting All Libraries (FUNCTION FLUSH)
+
+```smalltalk
+stick endpoint functionFlush.       "'OK', uses server default mode"
+stick endpoint functionFlushAsync.  "'OK', FLUSH ASYNC"
+stick endpoint functionFlushSync.   "'OK', FLUSH SYNC"
+```
+
+### Killing a Running Function (FUNCTION KILL)
+
+```smalltalk
+"Only meaningful while a function is actually executing on the server;
+otherwise Redis replies with a NOTBUSY error"
+stick endpoint functionKill.
 ```
