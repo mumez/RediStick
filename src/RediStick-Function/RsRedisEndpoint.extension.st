@@ -117,6 +117,13 @@ RsRedisEndpoint >> functionLoad: code replace: aBoolean [
 ]
 
 { #category : '*RediStick-Function' }
+RsRedisEndpoint >> functionPut: libName code: luaCode [
+	| shebang |
+	shebang := '#!lua name=', libName, String lf.
+	^ self functionLoad: shebang , luaCode replace: true
+]
+
+{ #category : '*RediStick-Function' }
 RsRedisEndpoint >> functionFlush [
 	^ self unifiedCommand: { 'FUNCTION'. 'FLUSH' }
 ]
