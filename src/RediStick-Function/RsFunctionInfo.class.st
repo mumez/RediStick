@@ -23,6 +23,7 @@ Class {
 { #category : 'instance creation' }
 RsFunctionInfo class >> fromArrayOrDictionary: aCollectionOrDict [
 	| dict |
+	aCollectionOrDict ifNil: [ ^ nil ].
 	aCollectionOrDict isDictionary ifTrue: [ ^ self fromDictionary: aCollectionOrDict ].
 	dict := Dictionary new.
 	1 to: aCollectionOrDict size by: 2 do: [ :i |

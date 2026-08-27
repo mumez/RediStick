@@ -41,6 +41,15 @@ RsFunctionTest >> testFCallWithArgs [
 ]
 
 { #category : 'tests' }
+RsFunctionTest >> testFCallWithByteArrayArgs [
+	| bytes result |
+	self loadTestLibrary.
+	bytes := #[104 101 108 108 111].
+	result := stick endpoint fCall: 'echo_args' args: bytes.
+	self assert: result equals: 'hello'
+]
+
+{ #category : 'tests' }
 RsFunctionTest >> testFCallWithKeysAndArgs [
 	self loadTestLibrary.
 	self assert: (stick endpoint fCall: 'concat_keys_args' keys: #('mykey') args: #('myval')) equals: 'mykey:myval'.
@@ -107,6 +116,18 @@ RsFunctionTest >> testFunctionLoad [
 	| name |
 	name := self loadTestLibrary.
 	self assert: name equals: 'testlib'
+]
+
+{ #category : 'tests' }
+RsFunctionTest >> testFunctionLoadWithCrlf [
+	| code name |
+	code := '#!lua name=crlflib' , String crlf ,
+		'redis.register_function("crlf_echo", function(keys, args)' , String crlf ,
+		'    return args[1]' , String crlf ,
+		'end)'.
+	name := stick endpoint functionLoad: code replace: true.
+	self assert: name equals: 'crlflib'.
+	self assert: (stick endpoint fCall: 'crlf_echo' args: 'ok') equals: 'ok'
 ]
 
 { #category : 'tests' }
@@ -179,6 +200,13 @@ RsFunctionTest >> testFunctionStats [
 	self assert: stats runningScript isNil.
 	self assert: (stats engines includesKey: 'LUA').
 	self assert: (stats engines at: 'LUA') notNil
+]
+
+{ #category : 'tests' }
+RsFunctionTest >> testFunctionStatsFromNil [
+	self assert: (RsFunctionStats fromArrayOrDictionary: nil) isNil.
+	self assert: (RsFunctionInfo fromArrayOrDictionary: nil) isNil.
+	self assert: (RsFunctionLibraryInfo fromArrayOrDictionary: nil) isNil
 ]
 
 { #category : 'tests' }

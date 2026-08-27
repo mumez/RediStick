@@ -26,13 +26,13 @@ RsRedisEndpoint >> fCall: functionName command: commandName keys: keys args: arg
 	keysColl := keys
 		ifNil: [ #() ]
 		ifNotNil: [
-			(keys isString or: [ keys isCollection not ])
+			(keys isString or: [ (keys isKindOf: ByteArray) or: [ keys isCollection not ] ])
 				ifTrue: [ Array with: keys ]
 				ifFalse: [ keys asArray ] ].
 	argsColl := args
 		ifNil: [ #() ]
 		ifNotNil: [
-			(args isString or: [ args isCollection not ])
+			(args isString or: [ (args isKindOf: ByteArray) or: [ args isCollection not ] ])
 				ifTrue: [ Array with: args ]
 				ifFalse: [ args asArray ] ].
 	cmdArgs := { commandName. functionName. keysColl size } asOrderedCollection.
@@ -104,7 +104,7 @@ RsRedisEndpoint >> functionLoad: code [
 { #category : '*RediStick-Function' }
 RsRedisEndpoint >> functionLoad: code replace: aBoolean [
 	| normalizedCode args |
-	normalizedCode := code copyReplaceAll: String cr with: String lf.
+	normalizedCode := code withUnixLineEndings.
 	args := OrderedCollection new.
 	args add: 'FUNCTION'.
 	args add: 'LOAD'.
@@ -147,7 +147,10 @@ RsRedisEndpoint >> functionKill [
 
 { #category : '*RediStick-Function' }
 RsRedisEndpoint >> functionStats [
-	^ RsFunctionStats fromArrayOrDictionary: (self unifiedCommand: { 'FUNCTION'. 'STATS' })
+	| raw |
+	raw := self unifiedCommand: { 'FUNCTION'. 'STATS' }.
+	raw ifNil: [ ^ nil ].
+	^ RsFunctionStats fromArrayOrDictionary: raw
 ]
 
 { #category : '*RediStick-Function' }
