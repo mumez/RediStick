@@ -50,6 +50,11 @@ BaselineOfRediStick >> baseline: spec [
 		spec package: 'RediStick-VectorSet-Tests' with: [
 				spec requires: #('RediStick-Tests' 'RediStick-VectorSet')].
 
+		spec package: 'RediStick-Function' with: [
+				spec requires: #('RediStick-Core')].
+		spec package: 'RediStick-Function-Tests' with: [
+				spec requires: #('RediStick-Tests' 'RediStick-Function')].
+
 		spec
 			group: 'default' with: #('Core');
 			group: 'Core' with: #('RediStick-Core');
@@ -79,7 +84,11 @@ BaselineOfRediStick >> baseline: spec [
 
 		spec
 			group: 'VectorSet' with: #('RediStick-VectorSet');
-			group: 'VectorSetTests' with: #('RediStick-VectorSet-Tests')].
+			group: 'VectorSetTests' with: #('RediStick-VectorSet-Tests').
+
+		spec
+			group: 'Function' with: #('RediStick-Function');
+			group: 'FunctionTests' with: #('RediStick-Function-Tests')].
 
 ]
 
