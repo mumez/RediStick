@@ -271,13 +271,13 @@ RsRedisEndpointTest >> testXGroupAutoClaim [
 	stick endpoint xAck: streamKey group: groupKey id: summary minId.
 	(Delay forMilliseconds: 200) wait.
 	
-	claimedA := stick endpoint xAutoClaim: streamKey group: groupKey consumer: consumerKeyA minIdleTime: 10 start: summary minId count: 1 idsOnly: true.
+	claimedA := stick endpoint xAutoClaim: streamKey group: groupKey consumer: consumerKeyA minIdleTime: 50 start: summary minId count: 1 idsOnly: true.
 	self deny: claimedA nextId equals: '0-0'.
 	self assert: claimedA claimedMessages size equals: 1.
 	self assert: claimedA deletedMessages size equals: 0.
 	self assert: (claimedA claimedMessages allSatisfy: [ :each | each isString ]) equals: true.
 	
-	claimedB := stick endpoint xAutoClaim: streamKey group: groupKey consumer: consumerKeyA minIdleTime: 10 start: summary minId.
+	claimedB := stick endpoint xAutoClaim: streamKey group: groupKey consumer: consumerKeyA minIdleTime: 50 start: summary minId.
 	self assert: claimedB nextId equals: '0-0'.
 	self assert: claimedB claimedMessages size equals: 3.
 	self assert: claimedB deletedMessages size equals: 0.
@@ -324,7 +324,7 @@ RsRedisEndpointTest >> testXGroupClaim [
 	(Delay forMilliseconds: 200) wait.
 	
 	pendingsB := stick endpoint xPending: streamKey group: groupKey start: '-' end: '+' count: 2 consumer: consumerKeyB.
-	stick endpoint xClaim: streamKey group: groupKey consumer: consumerKeyA minIdleTime: 10 id: pendingsB first id.
+	stick endpoint xClaim: streamKey group: groupKey consumer: consumerKeyA minIdleTime: 50 id: pendingsB first id.
 	
 	summary := stick endpoint xPending: streamKey group: groupKey.
 	
@@ -414,20 +414,22 @@ RsRedisEndpointTest >> testXInfoConsumers [
 	ents2 := stick endpoint xGroupRead: streamKey id: '>' group: groupKey consumer: consumerKeyB count: 2.
 	
 	stick endpoint xAck: streamKey group: groupKey id: ents1 first id.
-	(Delay forMilliseconds: 100) wait.
+	"Allow enough elapsed time for XINFO CONSUMERS idle/inactive counters to
+	stabilize; CI runners can be slow, so keep a generous margin below the wait."
+	(Delay forMilliseconds: 200) wait.
 	
 	consumerInfoCol := stick endpoint xInfoConsumers: streamKey group: groupKey.
 	self assert: consumerInfoCol size equals: 2.
 	
 	consumerInfoA := consumerInfoCol detect: [ :each | each name = consumerKeyA ] ifNone:[].
 	self assert: consumerInfoA pending equals: 0.
-	self assert: consumerInfoA idle > 100 equals: true.
-	self assert: consumerInfoA inactive > 100 equals: true.
+	self assert: consumerInfoA idle >= 100.
+	self assert: consumerInfoA inactive >= 100.
 	
 	consumerInfoB := consumerInfoCol detect: [ :each | each name = consumerKeyB ] ifNone:[].
 	self assert: consumerInfoB pending equals: 2.
-	self assert: consumerInfoB idle > 100 equals: true.
-	self assert: consumerInfoB inactive > 100 equals: true.
+	self assert: consumerInfoB idle >= 100.
+	self assert: consumerInfoB inactive >= 100.
 	
 	destroyedSize := stick endpoint xGroupDestroy: streamKey group: groupKey.
 	self assert: destroyedSize equals: 1.
@@ -493,7 +495,7 @@ RsRedisEndpointTest >> testXInfoStream [
 	ents2 := stick endpoint xGroupRead: streamKey id: '>' group: groupKey consumer: consumerKeyB count: 2.
 	
 	stick endpoint xAck: streamKey group: groupKey id: ents1 first id.
-	(Delay forMilliseconds: 100) wait.
+	(Delay forMilliseconds: 200) wait.
 	
 	streamInfo := stick endpoint xInfoStream: streamKey.
 	self assert: streamInfo size equals: 3.
@@ -533,7 +535,7 @@ RsRedisEndpointTest >> testXInfoStreamFull [
 	ents2 := stick endpoint xGroupRead: streamKey id: '>' group: groupKey consumer: consumerKeyB count: 2.
 	
 	stick endpoint xAck: streamKey group: groupKey id: ents1 first id.
-	(Delay forMilliseconds: 100) wait.
+	(Delay forMilliseconds: 200) wait.
 	
 	streamInfo := stick endpoint xInfoStream: streamKey full: true count: 2.
 	self assert: streamInfo size equals: 3.

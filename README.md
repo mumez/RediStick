@@ -96,6 +96,15 @@ Metacello new
   load: #('Core' 'VectorSet').
 ```
 
+### With Function package
+
+```smalltalk
+Metacello new
+  baseline: 'RediStick';
+  repository: 'github://mumez/RediStick/src';
+  load: #('Core' 'Function').
+```
+
 ## Sample Code
 
 ### Basic usage
@@ -159,3 +168,9 @@ Please read [TimeSeries.md](./doc/TimeSeries.md).
 RediStick supports [Redis Vector Sets](https://redis.io/docs/latest/develop/data-types/vector-sets/) - an approximate nearest-neighbor vector data type built into Redis 8.0+.
 
 Please read [VectorSet.md](./doc/VectorSet.md).
+
+### Using Function
+
+RediStick supports [Redis Functions](https://redis.io/docs/latest/develop/programmability/functions-intro/) - server-side Lua functions organized in libraries.
+
+Please read [Function.md](./doc/Function.md).

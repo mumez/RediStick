@@ -67,7 +67,7 @@ RsStreamConsumerGroupPollerTest >> testPollWithPendings [
 	#(1 2 3 0 4 5 6 7 0) doWithIndex: [ :each :idx | 
 		strm nextPut: (idx  -> each).
 	].
-	(Delay forMilliseconds: 100) wait.
+	[ entries1 size < 7 ] whileTrue: [ (Delay forMilliseconds: 50) wait ].
 	self assert: entries1 size equals: 7.
 	self assert: entries1 first equals: 1.
 	self assert: entries1 last equals: (8/7).
@@ -108,7 +108,7 @@ RsStreamConsumerGroupPollerTest >> testPollWithPendingsAutoClaimed [
 	#(1 2 3 0 4 5 6 7 0) doWithIndex: [ :each :idx | 
 		strm nextPut: (idx  -> each).
 	].
-	(Delay forMilliseconds: 100) wait.
+	[ entries1 size < 7 ] whileTrue: [ (Delay forMilliseconds: 50) wait ].
 	self assert: entries1 size equals: 7.
 	self assert: entries1 first equals: 1.
 	self assert: entries1 last equals: (8/7).
@@ -125,12 +125,13 @@ RsStreamConsumerGroupPollerTest >> testPollWithPendingsAutoClaimed [
 	poller2 := consumer2 poller.
 	poller2 onReceive: [ :each | entries2 add: each].
 	poller2 shouldAutoClaim: true.
-	poller2 claimMinIdleMilliseconds: 10.
+	poller2 claimMinIdleMilliseconds: 50.
 	poller2 start.
 	#(10 11 12) doWithIndex: [ :each :idx | 
 		strm nextPut: (idx  -> each).
 	].
-	[consumerGroup summaryPendingList isEmpty] whileFalse: [(Delay forMilliseconds: 100) wait].
+	[ consumerGroup summaryPendingList isEmpty not
+		or: [ entries2 size < 5 ] ] whileTrue: [ (Delay forMilliseconds: 50) wait ].
 
 	self assert: consumer1 allPendings size equals: 0.
 	self assert: consumer2 allPendings size equals: 0.
