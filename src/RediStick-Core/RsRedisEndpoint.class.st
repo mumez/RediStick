@@ -54,6 +54,7 @@ Internal Representation:
 - timeout - Command timeout in seconds (default: 30)
 - listener - Background process receiving Pub/Sub messages
 - sendMutex - Mutex ensuring thread-safe command serialization
+- shouldReturnRawBytes - Boolean flag causing unifiedCommand: to return undecoded bulk-reply bytes
 
 Implementation Points:
 - Thread-safe via sendMutex protecting all socket write operations
@@ -75,7 +76,8 @@ Class {
 		'subscriptionMode',
 		'timeout',
 		'listener',
-		'sendMutex'
+		'sendMutex',
+		'shouldReturnRawBytes'
 	],
 	#category : 'RediStick-Core',
 	#package : 'RediStick-Core'
@@ -895,6 +897,16 @@ RsRedisEndpoint >> rawUnifiedCommand: args [
 	^ self sendUnifiedCommand: args parseWithRaw: true
 ]
 
+{ #category : 'private commands' }
+RsRedisEndpoint >> returnRawBytesWhile: aBlock [
+	"Evaluate aBlock with #shouldReturnRawBytes temporarily set to true,
+	restoring the previous value afterwards even if aBlock signals an error."
+	| previous |
+	previous := self shouldReturnRawBytes.
+	self shouldReturnRawBytes: true.
+	^ [ aBlock value ] ensure: [ self shouldReturnRawBytes: previous ]
+]
+
 { #category : 'private replies' }
 RsRedisEndpoint >> readSingleLineAsBytes [
 	| upToCr |
@@ -1181,6 +1193,16 @@ RsRedisEndpoint >> subscriptionMode [
 	^subscriptionMode
 ]
 
+{ #category : 'accessing' }
+RsRedisEndpoint >> shouldReturnRawBytes [
+	^ shouldReturnRawBytes ifNil: [ false ]
+]
+
+{ #category : 'accessing' }
+RsRedisEndpoint >> shouldReturnRawBytes: aBoolean [
+	shouldReturnRawBytes := aBoolean
+]
+
 { #category : 'commands-expiration' }
 RsRedisEndpoint >> ttl: aKey [
 	^ self
@@ -1210,7 +1232,7 @@ RsRedisEndpoint >> sendUnifiedCommand: args parseWithRaw: aBoolean [
 
 { #category : 'private commands' }
 RsRedisEndpoint >> unifiedCommand: args [
-	^ self sendUnifiedCommand: args parseWithRaw: false
+	^ self sendUnifiedCommand: args parseWithRaw: self shouldReturnRawBytes
 ]
 
 { #category : 'private' }

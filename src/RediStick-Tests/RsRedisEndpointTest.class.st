@@ -147,3 +147,53 @@ RsRedisEndpointTest >> testSetAndGet [
 	stick endpoint set: 'testSetAndGet' value: value.
 	self assert: (stick endpoint get: 'testSetAndGet') equals: value
 ]
+
+{ #category : 'tests' }
+RsRedisEndpointTest >> testShouldReturnRawBytesDefaultsToFalse [
+	self deny: stick endpoint shouldReturnRawBytes
+]
+
+{ #category : 'tests' }
+RsRedisEndpointTest >> testShouldReturnRawBytesTrueReturnsRawBytes [
+	| key bytes result |
+	key := 'testShouldReturnRawBytesTrueReturnsRawBytes'.
+	bytes := #[1 2 3 255 0 128].
+	stick endpoint set: key value: bytes.
+	stick endpoint shouldReturnRawBytes: true.
+	result := stick endpoint get: key.
+	self assert: result equals: bytes.
+	stick endpoint shouldReturnRawBytes: false
+]
+
+{ #category : 'tests' }
+RsRedisEndpointTest >> testShouldReturnRawBytesFalseRestoresDecodedResults [
+	| key value result |
+	key := 'testShouldReturnRawBytesFalseRestoresDecodedResults'.
+	value := 'someValue'.
+	stick endpoint set: key value: value.
+	stick endpoint shouldReturnRawBytes: true.
+	stick endpoint shouldReturnRawBytes: false.
+	result := stick endpoint get: key.
+	self assert: result equals: value
+]
+
+{ #category : 'tests' }
+RsRedisEndpointTest >> testReturnRawBytesWhileRestoresPreviousValueOnCompletion [
+	| key bytes result |
+	key := 'testReturnRawBytesWhileRestoresPreviousValueOnCompletion'.
+	bytes := #[9 8 7].
+	stick endpoint set: key value: bytes.
+	self deny: stick endpoint shouldReturnRawBytes.
+	result := stick endpoint returnRawBytesWhile: [ stick endpoint get: key ].
+	self assert: result equals: bytes.
+	self deny: stick endpoint shouldReturnRawBytes
+]
+
+{ #category : 'tests' }
+RsRedisEndpointTest >> testReturnRawBytesWhileRestoresPreviousValueOnException [
+	self deny: stick endpoint shouldReturnRawBytes.
+	[ stick endpoint returnRawBytesWhile: [ Error signal: 'boom' ] ]
+		on: Error
+		do: [ :ex | ex return: nil ].
+	self deny: stick endpoint shouldReturnRawBytes
+]
