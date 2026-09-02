@@ -897,7 +897,7 @@ RsRedisEndpoint >> rawUnifiedCommand: args [
 	^ self sendUnifiedCommand: args parseWithRaw: true
 ]
 
-{ #category : 'private commands' }
+{ #category : 'raw-bytes-mode' }
 RsRedisEndpoint >> returnRawBytesWhile: aBlock [
 	"Evaluate aBlock with #shouldReturnRawBytes temporarily set to true,
 	restoring the previous value afterwards even if aBlock signals an error."
