@@ -30,6 +30,11 @@ smalltalkci -s Pharo64-13
 - **RsRediStick**: Connection management with auto-reconnection via Stick framework
 - **BaselineOfRediStick**: Metacello baseline defining package dependencies and groups
 
+### Raw Bytes Mode
+`RsRedisEndpoint` can return bulk-reply values as undecoded raw bytes instead of the default string/object parsing. This is useful for binary-safe values (e.g. serialized blobs) where decoding as a string would corrupt the data.
+- `shouldReturnRawBytes` / `shouldReturnRawBytes:` - Accessor pair for the flag (default `false`); when `true`, `unifiedCommand:` returns raw bytes instead of parsed replies
+- `returnRawBytesWhile:` - Evaluates a block with the flag temporarily set to `true`, restoring the previous value afterwards (even if the block errors)
+
 ### Package Structure
 - `RediStick-Core`: Base Redis client functionality
 - `RediStick-Connection-Pool`: Connection pooling support

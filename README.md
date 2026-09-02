@@ -122,6 +122,15 @@ stick endpoint get: 'a'.
 stick endpoint set: 'a' value: 999.
 ```
 
+### Using raw bytes mode
+
+By default, bulk replies are decoded as strings. `returnRawBytesWhile:` lets you retrieve the undecoded raw bytes instead, which is useful for binary-safe values such as serialized blobs.
+
+```smalltalk
+rawBytes := stick endpoint returnRawBytesWhile: [
+	stick endpoint get: 'binaryKey' ].
+```
+
 ### Using a connection pool with a wrapper class
 
 ```smalltalk
