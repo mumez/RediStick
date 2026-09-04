@@ -149,51 +149,64 @@ RsRedisEndpointTest >> testSetAndGet [
 ]
 
 { #category : 'tests' }
-RsRedisEndpointTest >> testShouldReturnRawBytesDefaultsToFalse [
-	self deny: stick endpoint shouldReturnRawBytes
+RsRedisEndpointTest >> testShouldUseRawBytesDefaultsToFalse [
+	self deny: stick endpoint shouldUseRawBytes
 ]
 
 { #category : 'tests' }
-RsRedisEndpointTest >> testShouldReturnRawBytesTrueReturnsRawBytes [
+RsRedisEndpointTest >> testShouldUseRawBytesTrueReturnsRawBytes [
 	| key bytes result |
-	key := 'testShouldReturnRawBytesTrueReturnsRawBytes'.
+	key := 'testShouldUseRawBytesTrueReturnsRawBytes'.
 	bytes := #[1 2 3 255 0 128].
 	stick endpoint set: key value: bytes.
-	stick endpoint shouldReturnRawBytes: true.
+	stick endpoint shouldUseRawBytes: true.
 	result := stick endpoint get: key.
 	self assert: result equals: bytes.
-	stick endpoint shouldReturnRawBytes: false
+	stick endpoint shouldUseRawBytes: false
 ]
 
 { #category : 'tests' }
-RsRedisEndpointTest >> testShouldReturnRawBytesFalseRestoresDecodedResults [
+RsRedisEndpointTest >> testShouldUseRawBytesFalseRestoresDecodedResults [
 	| key value result |
-	key := 'testShouldReturnRawBytesFalseRestoresDecodedResults'.
+	key := 'testShouldUseRawBytesFalseRestoresDecodedResults'.
 	value := 'someValue'.
 	stick endpoint set: key value: value.
-	stick endpoint shouldReturnRawBytes: true.
-	stick endpoint shouldReturnRawBytes: false.
+	stick endpoint shouldUseRawBytes: true.
+	stick endpoint shouldUseRawBytes: false.
 	result := stick endpoint get: key.
 	self assert: result equals: value
 ]
 
 { #category : 'tests' }
-RsRedisEndpointTest >> testReturnRawBytesWhileRestoresPreviousValueOnCompletion [
+RsRedisEndpointTest >> testUseRawBytesWhileRestoresPreviousValueOnCompletion [
 	| key bytes result |
-	key := 'testReturnRawBytesWhileRestoresPreviousValueOnCompletion'.
+	key := 'testUseRawBytesWhileRestoresPreviousValueOnCompletion'.
 	bytes := #[9 8 7].
 	stick endpoint set: key value: bytes.
-	self deny: stick endpoint shouldReturnRawBytes.
-	result := stick endpoint returnRawBytesWhile: [ stick endpoint get: key ].
+	self deny: stick endpoint shouldUseRawBytes.
+	result := stick endpoint useRawBytesWhile: [ stick endpoint get: key ].
 	self assert: result equals: bytes.
-	self deny: stick endpoint shouldReturnRawBytes
+	self deny: stick endpoint shouldUseRawBytes
 ]
 
 { #category : 'tests' }
-RsRedisEndpointTest >> testReturnRawBytesWhileRestoresPreviousValueOnException [
-	self deny: stick endpoint shouldReturnRawBytes.
-	[ stick endpoint returnRawBytesWhile: [ Error signal: 'boom' ] ]
+RsRedisEndpointTest >> testUseRawBytesWhileRestoresPreviousValueOnException [
+	self deny: stick endpoint shouldUseRawBytes.
+	[ stick endpoint useRawBytesWhile: [ Error signal: 'boom' ] ]
 		on: Error
 		do: [ :ex | ex return: nil ].
-	self deny: stick endpoint shouldReturnRawBytes
+	self deny: stick endpoint shouldUseRawBytes
+]
+
+{ #category : 'tests' }
+RsRedisEndpointTest >> testUseRawBytesWhileSendingStringNotUtf8Encoded [
+	| key rawString result |
+	key := 'testUseRawBytesWhileSendingStringNotUtf8Encoded'.
+	rawString := String new: 3.
+	rawString at: 1 put: (Character value: 16r80).
+	rawString at: 2 put: (Character value: 16rFF).
+	rawString at: 3 put: (Character value: 16r41).
+	stick endpoint useRawBytesWhile: [ stick endpoint set: key value: rawString ].
+	result := stick endpoint useRawBytesWhile: [ stick endpoint get: key ].
+	self assert: result equals: rawString asByteArray
 ]

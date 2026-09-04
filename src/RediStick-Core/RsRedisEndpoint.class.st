@@ -54,7 +54,7 @@ Internal Representation:
 - timeout - Command timeout in seconds (default: 30)
 - listener - Background process receiving Pub/Sub messages
 - sendMutex - Mutex ensuring thread-safe command serialization
-- shouldReturnRawBytes - Boolean flag causing unifiedCommand: to return undecoded bulk-reply bytes
+- shouldUseRawBytes - Boolean flag causing unifiedCommand: to skip UTF-8 (de)coding on both read (raw bulk-reply bytes) and write (raw string bytes) paths
 
 Implementation Points:
 - Thread-safe via sendMutex protecting all socket write operations
@@ -77,7 +77,7 @@ Class {
 		'timeout',
 		'listener',
 		'sendMutex',
-		'shouldReturnRawBytes'
+		'shouldUseRawBytes'
 	],
 	#category : 'RediStick-Core',
 	#package : 'RediStick-Core'
@@ -898,13 +898,13 @@ RsRedisEndpoint >> rawUnifiedCommand: args [
 ]
 
 { #category : 'raw-bytes-mode' }
-RsRedisEndpoint >> returnRawBytesWhile: aBlock [
-	"Evaluate aBlock with #shouldReturnRawBytes temporarily set to true,
+RsRedisEndpoint >> useRawBytesWhile: aBlock [
+	"Evaluate aBlock with #shouldUseRawBytes temporarily set to true,
 	restoring the previous value afterwards even if aBlock signals an error."
 	| previous |
-	previous := self shouldReturnRawBytes.
-	self shouldReturnRawBytes: true.
-	^ [ aBlock value ] ensure: [ self shouldReturnRawBytes: previous ]
+	previous := self shouldUseRawBytes.
+	self shouldUseRawBytes: true.
+	^ [ aBlock value ] ensure: [ self shouldUseRawBytes: previous ]
 ]
 
 { #category : 'private replies' }
@@ -1194,13 +1194,13 @@ RsRedisEndpoint >> subscriptionMode [
 ]
 
 { #category : 'accessing' }
-RsRedisEndpoint >> shouldReturnRawBytes [
-	^ shouldReturnRawBytes ifNil: [ false ]
+RsRedisEndpoint >> shouldUseRawBytes [
+	^ shouldUseRawBytes ifNil: [ false ]
 ]
 
 { #category : 'accessing' }
-RsRedisEndpoint >> shouldReturnRawBytes: aBoolean [
-	shouldReturnRawBytes := aBoolean
+RsRedisEndpoint >> shouldUseRawBytes: aBoolean [
+	shouldUseRawBytes := aBoolean
 ]
 
 { #category : 'commands-expiration' }
@@ -1232,7 +1232,7 @@ RsRedisEndpoint >> sendUnifiedCommand: args parseWithRaw: aBoolean [
 
 { #category : 'private commands' }
 RsRedisEndpoint >> unifiedCommand: args [
-	^ self sendUnifiedCommand: args parseWithRaw: self shouldReturnRawBytes
+	^ self sendUnifiedCommand: args parseWithRaw: self shouldUseRawBytes
 ]
 
 { #category : 'private' }
@@ -1265,6 +1265,7 @@ RsRedisEndpoint >> unwatch [
 { #category : 'private-encoding' }
 RsRedisEndpoint >> utf8BytesFromString: aString [
 	aString ifNil: [ ^nil ].
+	self shouldUseRawBytes ifTrue: [ ^aString asByteArray ].
 	^self portableUtil utf8BytesFromString: aString
 ]
 
