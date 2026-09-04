@@ -31,9 +31,9 @@ smalltalkci -s Pharo64-13
 - **BaselineOfRediStick**: Metacello baseline defining package dependencies and groups
 
 ### Raw Bytes Mode
-`RsRedisEndpoint` can return bulk-reply values as undecoded raw bytes instead of the default string/object parsing. This is useful for binary-safe values (e.g. serialized blobs) where decoding as a string would corrupt the data.
-- `shouldReturnRawBytes` / `shouldReturnRawBytes:` - Accessor pair for the flag (default `false`); when `true`, `unifiedCommand:` returns raw bytes instead of parsed replies
-- `returnRawBytesWhile:` - Evaluates a block with the flag temporarily set to `true`, restoring the previous value afterwards (even if the block errors)
+`RsRedisEndpoint` can skip UTF-8 (de)coding entirely for binary-safe values (e.g. serialized blobs) where transcoding as a string would corrupt the data. This governs both directions: bulk-reply values are returned as undecoded raw bytes instead of the default string/object parsing, and outgoing String/ByteArray command values are sent as raw bytes instead of being UTF-8 encoded.
+- `shouldUseRawBytes` / `shouldUseRawBytes:` - Accessor pair for the flag (default `false`); when `true`, `unifiedCommand:` returns raw bytes instead of parsed replies, and `utf8BytesFromString:` (used by both `writeString:` and `Object>>asRediStickBytesUsing:` for command value args) returns the string's raw bytes instead of UTF-8 encoding them
+- `useRawBytesWhile:` - Evaluates a block with the flag temporarily set to `true`, restoring the previous value afterwards (even if the block errors)
 
 ### Package Structure
 - `RediStick-Core`: Base Redis client functionality
