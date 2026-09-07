@@ -1,0 +1,112 @@
+"
+I represent the cursor position for a TS.READ command: an explicit timestamp, or one of the '-' (earliest) / '+' (latest) / '$' (newest) sentinels.
+
+Responsibility:
+- I hold the cursor value (timestamp or sentinel) for TS.READ, normalizing timestamps on construction.
+- I render myself as the argument value TS.READ expects, rejecting a negative timestamp.
+
+Collaborators:
+- RsRedisEndpoint: builds a TS.READ command by asking me for #asArgumentValue.
+
+Public API and Key Messages:
+- #earliest / #start (class or instance side) - positions the cursor at the earliest sample ('-' sentinel).
+- #latest / #end (class or instance side) - positions the cursor at the latest sample, inclusive ('+' sentinel).
+- #newest (class or instance side) - positions the cursor to receive only samples added after the call ('$' sentinel).
+- #timestamp: (class or instance side) - positions the cursor at an explicit timestamp, normalized immediately.
+- #asArgumentValue - answers the TS.READ cursor argument.
+"
+Class {
+	#name : 'RsTsReadCursor',
+	#superclass : 'Object',
+	#instVars : [
+		'value'
+	],
+	#category : 'RediStick-TimeSeries',
+	#package : 'RediStick-TimeSeries'
+}
+
+{ #category : 'instance creation' }
+RsTsReadCursor class >> earliest [
+	^ self new value: '-'; yourself
+]
+
+{ #category : 'instance creation' }
+RsTsReadCursor class >> end [
+	^ self latest 
+]
+
+{ #category : 'instance creation' }
+RsTsReadCursor class >> latest [
+	^ self new value: '+'; yourself
+]
+
+{ #category : 'instance creation' }
+RsTsReadCursor class >> newest [
+	^ self new value: '$'; yourself
+]
+
+{ #category : 'instance creation' }
+RsTsReadCursor class >> start [
+	^ self earliest 
+]
+
+{ #category : 'instance creation' }
+RsTsReadCursor class >> timestamp: aDateAndTimeOrInteger [
+	^ self new timestamp: aDateAndTimeOrInteger; yourself
+]
+
+{ #category : 'converting' }
+RsTsReadCursor >> asArgumentValue [
+	self validate.
+	^ self value
+]
+
+{ #category : 'accessing' }
+RsTsReadCursor >> earliest [
+	self value: '-'
+]
+
+{ #category : 'accessing' }
+RsTsReadCursor >> end [
+	self latest
+]
+
+{ #category : 'accessing' }
+RsTsReadCursor >> latest [
+	self value: '+'
+]
+
+{ #category : 'accessing' }
+RsTsReadCursor >> newest [
+	self value: '$'
+]
+
+{ #category : 'accessing' }
+RsTsReadCursor >> start [
+	self earliest
+]
+
+{ #category : 'accessing' }
+RsTsReadCursor >> timestamp: dataAndTimeOrInteger [
+	| normalizedInteger |
+	normalizedInteger :=  dataAndTimeOrInteger asRediStickUnixTimestampMillis.
+	self value: normalizedInteger
+]
+
+{ #category : 'validation' }
+RsTsReadCursor >> validate [
+
+	(self value isInteger and: [ self value < 0 ]) ifTrue: [
+		RsError invalidArguments signal: 'Minus timestamp value is not allowed ' ]
+]
+
+{ #category : 'accessing' }
+RsTsReadCursor >> value [
+	^ value
+]
+
+{ #category : 'accessing' }
+RsTsReadCursor >> value: anObject [
+
+	value := anObject
+]
