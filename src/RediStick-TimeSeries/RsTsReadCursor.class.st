@@ -3,7 +3,7 @@ I represent the cursor position for a TS.READ command: an explicit timestamp, or
 
 Responsibility:
 - I hold the cursor value (timestamp or sentinel) for TS.READ, normalizing timestamps on construction.
-- I render myself as the argument value TS.READ expects, rejecting a negative timestamp.
+- I render myself as the argument value TS.READ expects, validating on that conversion.
 
 Collaborators:
 - RsRedisEndpoint: builds a TS.READ command by asking me for #asArgumentValue.
@@ -14,6 +14,7 @@ Public API and Key Messages:
 - #newest (class or instance side) - positions the cursor to receive only samples added after the call ('$' sentinel).
 - #timestamp: (class or instance side) - positions the cursor at an explicit timestamp, normalized immediately.
 - #asArgumentValue - answers the TS.READ cursor argument.
+- #validate - checks the cursor is well-formed; not run at construction, only when #asArgumentValue converts the cursor for sending. A negative timestamp raises RsError at that point, not at #timestamp:.
 "
 Class {
 	#name : 'RsTsReadCursor',
@@ -95,6 +96,7 @@ RsTsReadCursor >> timestamp: dataAndTimeOrInteger [
 
 { #category : 'validation' }
 RsTsReadCursor >> validate [
+	"Runs on #asArgumentValue (send-time), not on construction, so a cursor can be freely reassigned before it's sent."
 
 	(self value isInteger and: [ self value < 0 ]) ifTrue: [
 		RsError invalidArguments signal: 'Minus timestamp value is not allowed ' ]
