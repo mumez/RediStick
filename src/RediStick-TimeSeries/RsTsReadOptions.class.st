@@ -11,7 +11,7 @@ Collaborators:
 Public API and Key Messages:
 - #block:minCount: - sets BLOCK milliseconds and minCount together (both are required by Redis, or neither).
 - #maxCount: - sets MAX_COUNT.
-- #asArray - answers the command tokens in Redis's required order (BLOCK ... before MAX_COUNT ...), omitting any unset option.
+- #asArray - answers the command tokens in Redis's required order (BLOCK ... before MAX_COUNT ...), omitting any unset option. Raises RsError if only one of BLOCK milliseconds/minCount is set.
 "
 Class {
 	#name : 'RsTsReadOptions',
@@ -29,6 +29,8 @@ Class {
 RsTsReadOptions >> asArray [
 	| opts |
 	opts := OrderedCollection new.
+	self blockMilliseconds isNil == self blockMinCount isNil ifFalse: [
+		RsError invalidArguments signal: 'BLOCK requires both milliseconds and minCount, or neither' ].
 	(self blockMilliseconds notNil and: [ self blockMinCount notNil ]) ifTrue: [
 		opts addAll: { 'BLOCK'. self blockMilliseconds. self blockMinCount } ].
 	self maxCount ifNotNil: [ :c | opts addAll: { 'MAX_COUNT'. c } ].

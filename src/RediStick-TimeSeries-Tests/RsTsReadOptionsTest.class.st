@@ -35,11 +35,19 @@ RsTsReadOptionsTest >> testBlockAndMaxCountCombinedInRedisOrder [
 ]
 
 { #category : 'tests' }
-RsTsReadOptionsTest >> testBlockWithoutMinCountIsIgnored [
+RsTsReadOptionsTest >> testBlockWithoutMinCountSignalsError [
 	| opts |
 	opts := RsTsReadOptions new.
 	opts block: 1000 minCount: nil.
-	self assertCollection: opts asArray equals: #()
+	self should: [ opts asArray ] raise: RsError
+]
+
+{ #category : 'tests' }
+RsTsReadOptionsTest >> testMinCountWithoutBlockSignalsError [
+	| opts |
+	opts := RsTsReadOptions new.
+	opts block: nil minCount: 5.
+	self should: [ opts asArray ] raise: RsError
 ]
 
 { #category : 'tests' }
