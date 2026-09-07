@@ -577,20 +577,33 @@ RsRedisEndpoint >> tsParseGroupedRangeRow: row groupBy: groupBy [
 ]
 
 { #category : '*RediStick-TimeSeries' }
-RsRedisEndpoint >> tsRead: key cursor: aTimestampOrSentinel [
-	^ self tsRead: key cursor: aTimestampOrSentinel using: nil
+RsRedisEndpoint >> tsRead: key cursor: aRsTsReadCursor [
+	^ self tsRead: key cursor: aRsTsReadCursor using: nil
 ]
 
 { #category : '*RediStick-TimeSeries' }
-RsRedisEndpoint >> tsRead: key cursor: aTimestampOrSentinel using: optionsBlock [
+RsRedisEndpoint >> tsRead: key cursor: aRsTsReadCursor using: optionsBlock [
 	| args options |
 	args := {
 		        'TS.READ'.
 		        key.
-		        (RsTsRange normalizeTimestamp: aTimestampOrSentinel) } asOrderedCollection.
+		        aRsTsReadCursor asArgumentValue } asOrderedCollection.
 	optionsBlock ifNotNil: [
 		options := RsTsReadOptions new.
 		optionsBlock value: options.
 		args addAll: options asArray ].
 	^ self tsParseRangeSamples: (self unifiedCommand: args asArray)
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsRead: key cursorBy: cursorBlock [
+	^ self tsRead: key cursorBy: cursorBlock using: nil
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsRead: key cursorBy: cursorBlock using: optionsBlock [
+	| cursor |
+	cursor := RsTsReadCursor new.
+	cursorBlock value: cursor.
+	^ self tsRead: key cursor: cursor using: optionsBlock
 ]
