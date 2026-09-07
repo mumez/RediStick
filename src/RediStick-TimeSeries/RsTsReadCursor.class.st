@@ -14,7 +14,7 @@ Public API and Key Messages:
 - #newest (class or instance side) - positions the cursor to receive only samples added after the call ('$' sentinel).
 - #timestamp: (class or instance side) - positions the cursor at an explicit timestamp, normalized immediately.
 - #asArgumentValue - answers the TS.READ cursor argument.
-- #validate - checks the cursor is well-formed; not run at construction, only when #asArgumentValue converts the cursor for sending. A negative timestamp raises RsError at that point, not at #timestamp:.
+- #validate - checks the cursor is well-formed; not run at construction, only when #asArgumentValue converts the cursor for sending. An unset (nil) value, a negative timestamp, or any other non-integer, non-sentinel value raises RsError at that point, not at #timestamp:.
 "
 Class {
 	#name : 'RsTsReadCursor',
@@ -98,8 +98,12 @@ RsTsReadCursor >> timestamp: dateAndTimeOrInteger [
 RsTsReadCursor >> validate [
 	"Runs on #asArgumentValue (send-time), not on construction, so a cursor can be freely reassigned before it's sent."
 
+	self value isNil ifTrue: [
+		RsError invalidArguments signal: 'Cursor value is not set' ].
 	(self value isInteger and: [ self value < 0 ]) ifTrue: [
-		RsError invalidArguments signal: 'Minus timestamp value is not allowed ' ]
+		RsError invalidArguments signal: 'Minus timestamp value is not allowed ' ].
+	(self value isString and: [ (#('-' '+' '$') includes: self value) not ]) ifTrue: [
+		RsError invalidArguments signal: 'Cursor value must be an integer timestamp or one of ''-'', ''+'', ''$''' ]
 ]
 
 { #category : 'accessing' }
