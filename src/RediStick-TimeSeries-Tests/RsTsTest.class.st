@@ -575,6 +575,195 @@ RsTsTest >> testTsDeleteRule [
 	self assert: rules isEmpty
 ]
 
+{ #category : 'tests' }
+RsTsTest >> testTsReadBasic [
+	| key result |
+	key := 'test:ts:read:basic'.
+	stick endpoint tsAdd: key timestamp: 1000 value: 30.
+	stick endpoint tsAdd: key timestamp: 1010 value: 35.
+	stick endpoint tsAdd: key timestamp: 1020 value: 40.
+
+	result := stick endpoint tsRead: key cursor: (RsTsReadCursor timestamp: 0).
+	self assert: result size equals: 3.
+	self assert: result first key equals: 1000.
+	self assert: result third value equals: 40
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsReadWithStartSentinel [
+	| key result |
+	key := 'test:ts:read:start'.
+	stick endpoint tsAdd: key timestamp: 1000 value: 30.
+	stick endpoint tsAdd: key timestamp: 1010 value: 35.
+
+	result := stick endpoint tsRead: key cursor: RsTsReadCursor start.
+	self assert: result size equals: 2
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsReadWithLatestSentinel [
+	| key result |
+	key := 'test:ts:read:latest'.
+	stick endpoint tsAdd: key timestamp: 1000 value: 30.
+	stick endpoint tsAdd: key timestamp: 2000 value: 40.
+
+	result := stick endpoint tsRead: key cursor: RsTsReadCursor latest.
+	self assert: result size equals: 1.
+	self assert: result first key equals: 2000
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsReadFromExplicitTimestamp [
+	| key result |
+	key := 'test:ts:read:explicit'.
+	stick endpoint tsAdd: key timestamp: 1000 value: 30.
+	stick endpoint tsAdd: key timestamp: 1010 value: 35.
+	stick endpoint tsAdd: key timestamp: 1020 value: 40.
+
+	result := stick endpoint tsRead: key cursor: (RsTsReadCursor timestamp: 1010).
+	self assert: result size equals: 2.
+	self assert: result first key equals: 1010
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsReadEmptySeriesReturnsEmptyArray [
+	| key result |
+	key := 'test:ts:read:empty'.
+	stick endpoint tsCreate: key.
+	result := stick endpoint tsRead: key cursor: (RsTsReadCursor timestamp: 0).
+	self assertCollection: result equals: #()
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsReadWithMaxCount [
+	| key result |
+	key := 'test:ts:read:maxcount'.
+	stick endpoint tsAdd: key timestamp: 1000 value: 30.
+	stick endpoint tsAdd: key timestamp: 1010 value: 35.
+	stick endpoint tsAdd: key timestamp: 1020 value: 40.
+
+	result := stick endpoint
+		tsRead: key
+		cursor: (RsTsReadCursor timestamp: 0)
+		using: [ :opts | opts maxCount: 2 ].
+	self assert: result size equals: 2.
+	self assert: result first key equals: 1000.
+	self assert: result second key equals: 1010
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsReadWithBlockReturnsImmediatelyWhenMinCountAlreadyMet [
+	| key result |
+	key := 'test:ts:read:block:immediate'.
+	stick endpoint tsAdd: key timestamp: 1000 value: 30.
+	stick endpoint tsAdd: key timestamp: 1010 value: 35.
+
+	result := stick endpoint
+		tsRead: key
+		cursor: (RsTsReadCursor timestamp: 0)
+		using: [ :opts | opts block: 5000 minCount: 2 ].
+	self assert: result size equals: 2
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsReadWithBlockReturnsPartialResultsAfterTimeout [
+	| key result |
+	key := 'test:ts:read:block:timeout'.
+	stick endpoint tsAdd: key timestamp: 1000 value: 30.
+
+	result := stick endpoint
+		tsRead: key
+		cursor: (RsTsReadCursor timestamp: 0)
+		using: [ :opts | opts block: 300 minCount: 5 ].
+	self assert: result size equals: 1
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsReadCursorByEarliest [
+	| key result |
+	key := 'test:ts:read:cursorby:earliest'.
+	stick endpoint tsAdd: key timestamp: 1000 value: 30.
+	stick endpoint tsAdd: key timestamp: 2000 value: 40.
+
+	result := stick endpoint tsRead: key cursorBy: [ :cur | cur earliest ].
+	self assert: result size equals: 2.
+	self assert: result first key equals: 1000
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsReadCursorByLatest [
+	| key result |
+	key := 'test:ts:read:cursorby:latest'.
+	stick endpoint tsAdd: key timestamp: 1000 value: 30.
+	stick endpoint tsAdd: key timestamp: 2000 value: 40.
+
+	result := stick endpoint tsRead: key cursorBy: [ :cur | cur latest ].
+	self assert: result size equals: 1.
+	self assert: result first key equals: 2000
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsReadCursorByNewest [
+	| key result |
+	key := 'test:ts:read:cursorby:newest'.
+	stick endpoint tsAdd: key timestamp: 1000 value: 30.
+	stick endpoint tsAdd: key timestamp: 2000 value: 40.
+
+	result := stick endpoint tsRead: key cursorBy: [ :cur | cur newest ].
+	self assertCollection: result equals: #()
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsReadCursorByTimestampInteger [
+	| key result |
+	key := 'test:ts:read:cursorby:timestamp:integer'.
+	stick endpoint tsAdd: key timestamp: 1000 value: 30.
+	stick endpoint tsAdd: key timestamp: 1010 value: 35.
+	stick endpoint tsAdd: key timestamp: 1020 value: 40.
+
+	result := stick endpoint tsRead: key cursorBy: [ :cur | cur timestamp: 1010 ].
+	self assert: result size equals: 2.
+	self assert: result first key equals: 1010
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsReadCursorByTimestampDateAndTimeNow [
+	| key result |
+	key := 'test:ts:read:cursorby:timestamp:dateandtime'.
+	stick endpoint tsAdd: key timestamp: 1000 value: 30.
+
+	result := stick endpoint tsRead: key cursorBy: [ :cur | cur timestamp: DateAndTime now ].
+	self assertCollection: result equals: #()
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsReadCursorByTimestampUsingMaxCount [
+	| key result |
+	key := 'test:ts:read:cursorby:timestamp'.
+	stick endpoint tsAdd: key timestamp: 1000 value: 30.
+	stick endpoint tsAdd: key timestamp: 1010 value: 35.
+	stick endpoint tsAdd: key timestamp: 1020 value: 40.
+
+	result := stick endpoint
+		tsRead: key
+		cursorBy: [ :cur | cur timestamp: 1000 ]
+		using: [ :opts | opts maxCount: 2 ].
+	self assert: result size equals: 2.
+	self assert: result first key equals: 1000.
+	self assert: result second key equals: 1010
+]
+
+{ #category : 'tests' }
+RsTsTest >> testTsReadCursorByTimestampNegativeIntegerRaisesError [
+	| key |
+	key := 'test:ts:read:cursorby:timestamp:negative'.
+	stick endpoint tsAdd: key timestamp: 1000 value: 30.
+
+	self should: [
+		stick endpoint tsRead: key cursorBy: [ :cur | cur timestamp: -1 ] ]
+		raise: RsError
+]
+
 { #category : 'helpers' }
 RsTsTest >> labelsAsDictionary: aLabelsArray [
 	"Converts the nested labels array returned by TS.INFO

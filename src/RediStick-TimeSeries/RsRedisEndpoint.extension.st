@@ -575,3 +575,35 @@ RsRedisEndpoint >> tsParseGroupedRangeRow: row groupBy: groupBy [
 		sourceKeys: ((labelsDict at: '__source__' ifAbsent: [ '' ]) substrings: ',') asArray
 		values: (self tsParseRangeSamples: row third)
 ]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsRead: key cursor: aRsTsReadCursor [
+	^ self tsRead: key cursor: aRsTsReadCursor using: nil
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsRead: key cursor: aRsTsReadCursor using: optionsBlock [
+	| args options |
+	args := {
+		        'TS.READ'.
+		        key.
+		        aRsTsReadCursor asArgumentValue } asOrderedCollection.
+	optionsBlock ifNotNil: [
+		options := RsTsReadOptions new.
+		optionsBlock value: options.
+		args addAll: options asArray ].
+	^ self tsParseRangeSamples: (self unifiedCommand: args asArray)
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsRead: key cursorBy: cursorBlock [
+	^ self tsRead: key cursorBy: cursorBlock using: nil
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsRead: key cursorBy: cursorBlock using: optionsBlock [
+	| cursor |
+	cursor := RsTsReadCursor new.
+	cursorBlock value: cursor.
+	^ self tsRead: key cursor: cursor using: optionsBlock
+]
