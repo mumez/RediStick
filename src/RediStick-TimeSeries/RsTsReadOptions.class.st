@@ -1,3 +1,18 @@
+"
+I represent the optional BLOCK and MAX_COUNT parameters for a TS.READ command.
+
+Responsibility:
+- I hold the optional blocking (milliseconds/minCount) and MAX_COUNT settings for TS.READ.
+- I render myself as the ordered array of command-argument tokens TS.READ expects.
+
+Collaborators:
+- RsRedisEndpoint: builds a TS.READ command by asking me for #asArray and appending it after the key/cursor.
+
+Public API and Key Messages:
+- #block:minCount: - sets BLOCK milliseconds and minCount together (both are required by Redis, or neither).
+- #maxCount: - sets MAX_COUNT.
+- #asArray - answers the command tokens in Redis's required order (BLOCK ... before MAX_COUNT ...), omitting any unset option.
+"
 Class {
 	#name : 'RsTsReadOptions',
 	#superclass : 'Object',
