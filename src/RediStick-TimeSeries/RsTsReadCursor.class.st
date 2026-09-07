@@ -28,7 +28,7 @@ Class {
 
 { #category : 'instance creation' }
 RsTsReadCursor class >> earliest [
-	^ self new value: '-'; yourself
+	^ self new earliest
 ]
 
 { #category : 'instance creation' }
@@ -38,12 +38,12 @@ RsTsReadCursor class >> end [
 
 { #category : 'instance creation' }
 RsTsReadCursor class >> latest [
-	^ self new value: '+'; yourself
+	^ self new latest
 ]
 
 { #category : 'instance creation' }
 RsTsReadCursor class >> newest [
-	^ self new value: '$'; yourself
+	^ self new newest
 ]
 
 { #category : 'instance creation' }
@@ -88,9 +88,9 @@ RsTsReadCursor >> start [
 ]
 
 { #category : 'accessing' }
-RsTsReadCursor >> timestamp: dataAndTimeOrInteger [
+RsTsReadCursor >> timestamp: dateAndTimeOrInteger [
 	| normalizedInteger |
-	normalizedInteger :=  dataAndTimeOrInteger asRediStickUnixTimestampMillis.
+	normalizedInteger :=  dateAndTimeOrInteger asRediStickUnixTimestampMillis.
 	self value: normalizedInteger
 ]
 
