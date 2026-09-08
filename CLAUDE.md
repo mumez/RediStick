@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 RediStick is a Redis client for Pharo Smalltalk (and GemStone/S) that uses the Stick auto-reconnection layer. The project is structured as a modular Smalltalk package with multiple optional components for different Redis features.
 
+> **Implementation planning**: Before planning new features, review `doc/plans/common-patterns.md` for reusable implementation patterns (e.g. the Parameter-Class Pattern) established in prior work.
+
 ## Development Commands
 
 ### Running Tests

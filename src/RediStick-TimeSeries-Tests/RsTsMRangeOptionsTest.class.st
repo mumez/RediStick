@@ -69,6 +69,22 @@ RsTsMRangeOptionsTest >> testCount [
 ]
 
 { #category : 'tests' }
+RsTsMRangeOptionsTest >> testExcludeEmptyFlag [
+	| opts |
+	opts := RsTsMRangeOptions new.
+	opts excludeEmpty.
+	self assert: opts isExcludeEmpty
+]
+
+{ #category : 'tests' }
+RsTsMRangeOptionsTest >> testExcludeEmptyDoesNotAffectAsArray [
+	| opts |
+	opts := RsTsMRangeOptions new.
+	opts excludeEmpty.
+	self assertCollection: opts asArray equals: #()
+]
+
+{ #category : 'tests' }
 RsTsMRangeOptionsTest >> testAllOptionsCombinedInRedisOrder [
 	| opts |
 	opts := RsTsMRangeOptions new.

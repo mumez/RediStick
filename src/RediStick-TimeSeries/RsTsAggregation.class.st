@@ -126,9 +126,16 @@ RsTsAggregation >> varS [
 
 { #category : 'converting' }
 RsTsAggregation >> asArray [
-	self aggregators ifEmpty: [ (RsError invalidArguments) signal: 'At least one aggregator must be selected' ].
+	| aggregatorsString |
+	aggregatorsString := self aggregatorsString.
 	self bucketDuration ifNil: [ (RsError invalidArguments) signal: 'bucketDuration must be set' ].
 	(self isSingleAggregator and: [ self aggregators size > 1 ])
 		ifTrue: [ (RsError invalidArguments) signal: 'Only one aggregator is allowed in this context' ].
-	^ { 'AGGREGATION'. ($, join: self aggregators). self bucketDuration }
+	^ { 'AGGREGATION'. aggregatorsString. self bucketDuration }
+]
+
+{ #category : 'converting' }
+RsTsAggregation >> aggregatorsString [
+	self aggregators ifEmpty: [ (RsError invalidArguments) signal: 'At least one aggregator must be selected' ].
+	^ $, join: self aggregators
 ]

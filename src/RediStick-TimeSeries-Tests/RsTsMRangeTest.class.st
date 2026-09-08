@@ -134,3 +134,61 @@ RsTsMRangeTest >> testTsMRangeNoMatchingSeriesReturnsEmptyArray [
 		filterBy: [ :f | f label: 'type' eq: 'test:ts:mrange:nomatch' ])
 	equals: #()
 ]
+
+{ #category : 'tests' }
+RsTsMRangeTest >> testTsMRangeExcludeEmptyExcludesSeriesWithNoSamplesInRange [
+	| key1 key2 result |
+	key1 := 'test:ts:mrange:excludeempty:1'.
+	key2 := 'test:ts:mrange:excludeempty:2'.
+	stick endpoint tsCreate: key1 using: [ :opts | opts labels: { 'type' -> 'mrexcl' } ].
+	stick endpoint tsCreate: key2 using: [ :opts | opts labels: { 'type' -> 'mrexcl' } ].
+	stick endpoint tsAdd: key1 timestamp: 1000 value: 10.
+	stick endpoint tsAdd: key1 timestamp: 2000 value: 20.
+	"key2 gets a sample outside the queried range only"
+	stick endpoint tsAdd: key2 timestamp: 9000 value: 99.
+
+	result := stick endpoint
+		tsMRangeBy: [ :r | r from: 1000 to: 2000 ]
+		filterBy: [ :f | f label: 'type' eq: 'mrexcl' ]
+		aggregationBy: nil
+		using: [ :opts | opts excludeEmpty ].
+
+	self assert: result size equals: 1.
+	self assert: result first key equals: key1
+]
+
+{ #category : 'tests' }
+RsTsMRangeTest >> testTsMRangeWithoutExcludeEmptyIncludesEmptySeries [
+	| key1 key2 result |
+	key1 := 'test:ts:mrange:noexcludeempty:1'.
+	key2 := 'test:ts:mrange:noexcludeempty:2'.
+	stick endpoint tsCreate: key1 using: [ :opts | opts labels: { 'type' -> 'mrnoexcl' } ].
+	stick endpoint tsCreate: key2 using: [ :opts | opts labels: { 'type' -> 'mrnoexcl' } ].
+	stick endpoint tsAdd: key1 timestamp: 1000 value: 10.
+	stick endpoint tsAdd: key1 timestamp: 2000 value: 20.
+	stick endpoint tsAdd: key2 timestamp: 9000 value: 99.
+
+	result := stick endpoint
+		tsMRangeBy: [ :r | r from: 1000 to: 2000 ]
+		filterBy: [ :f | f label: 'type' eq: 'mrnoexcl' ].
+
+	self assert: result size equals: 2.
+	self assert: (result anySatisfy: [ :rv | rv key = key2 and: [ rv values isEmpty ] ])
+]
+
+{ #category : 'tests' }
+RsTsMRangeTest >> testTsMRangeExcludeEmptyWithGroupBySignalsError [
+	| key |
+	key := 'test:ts:mrange:excludeempty:groupby'.
+	stick endpoint tsCreate: key using: [ :opts | opts labels: { 'type' -> 'mrexclgrp'. 'region' -> 'east' } ].
+	stick endpoint tsAdd: key timestamp: 1000 value: 10.
+
+	self should: [
+		stick endpoint
+			tsMRangeBy: [ :r | r all ]
+			filterBy: [ :f | f label: 'type' eq: 'mrexclgrp' ]
+			aggregationBy: [ :agg | agg sum; bucketDuration: 1000 ]
+			groupBy: [ :g | g label: 'region'; reduce: 'sum' ]
+			using: [ :opts | opts excludeEmpty ]
+	] raise: RsError
+]

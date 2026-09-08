@@ -240,11 +240,12 @@ RsRedisEndpointTest >> testXGroupAddThenReadMultiple [
 
 { #category : '*RediStick-Stream-Tests' }
 RsRedisEndpointTest >> testXGroupAutoClaim [
-	| streamKey groupKey consumerKeyA consumerKeyB created summary claimedA claimedB destroyedSize |
+	| streamKey groupKey consumerKeyA consumerKeyB created summary claimedA claimedB destroyedSize minIdleTime deadline |
 	streamKey := 'stream-testXGroupAutoClaim'.
 	groupKey := 'group-a'.
 	consumerKeyA := 'consumer-a'.
 	consumerKeyB := 'consumer-b'.
+	minIdleTime := 100.
 	
 	stick endpoint xTrim: streamKey maxLen: 1000.
 	stick endpoint xAdd: streamKey field: 'a' value: '1'.
@@ -269,15 +270,19 @@ RsRedisEndpointTest >> testXGroupAutoClaim [
 	self assert: (summary consumers at: consumerKeyA) equals: 1.
 	self assert: (summary consumers at: consumerKeyB) equals: 4.
 	stick endpoint xAck: streamKey group: groupKey id: summary minId.
-	(Delay forMilliseconds: 200) wait.
-	
-	claimedA := stick endpoint xAutoClaim: streamKey group: groupKey consumer: consumerKeyA minIdleTime: 50 start: summary minId count: 1 idsOnly: true.
+	"Poll until pending entries are idle enough for XAUTOCLAIM; CI runners can be slow."
+	deadline := DateAndTime now + 5 seconds.
+	claimedA := nil.
+	[
+		claimedA := stick endpoint xAutoClaim: streamKey group: groupKey consumer: consumerKeyA minIdleTime: minIdleTime start: summary minId count: 1 idsOnly: true.
+		claimedA claimedMessages isEmpty and: [ DateAndTime now < deadline ]
+	] whileTrue: [ (Delay forMilliseconds: 50) wait ].
 	self deny: claimedA nextId equals: '0-0'.
 	self assert: claimedA claimedMessages size equals: 1.
 	self assert: claimedA deletedMessages size equals: 0.
 	self assert: (claimedA claimedMessages allSatisfy: [ :each | each isString ]) equals: true.
 	
-	claimedB := stick endpoint xAutoClaim: streamKey group: groupKey consumer: consumerKeyA minIdleTime: 50 start: summary minId.
+	claimedB := stick endpoint xAutoClaim: streamKey group: groupKey consumer: consumerKeyA minIdleTime: minIdleTime start: claimedA nextId.
 	self assert: claimedB nextId equals: '0-0'.
 	self assert: claimedB claimedMessages size equals: 3.
 	self assert: claimedB deletedMessages size equals: 0.

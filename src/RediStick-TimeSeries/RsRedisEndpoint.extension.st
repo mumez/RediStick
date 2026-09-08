@@ -370,6 +370,41 @@ RsRedisEndpoint >> tsMGetFilterBy: filterBlock using: optionsBlock [
 	^ self tsParseMGetResult: result
 ]
 
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsQueryLabels [
+	^ self tsQueryLabelsFilterBy: nil
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsQueryLabelsFilterBy: filterBlock [
+	^ self tsQueryLabelsCommand: { 'LABELS' } filterBy: filterBlock
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsQueryLabelValuesOf: aLabel [
+	^ self tsQueryLabelValuesOf: aLabel filterBy: nil
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsQueryLabelValuesOf: aLabel filterBy: filterBlock [
+	^ self tsQueryLabelsCommand: { 'VALUES'. aLabel } filterBy: filterBlock
+]
+
+{ #category : '*RediStick-TimeSeries-private' }
+RsRedisEndpoint >> tsQueryLabelsCommand: subArgs filterBy: filterBlock [
+	"private"
+	| builder args |
+	args := { 'TS.QUERYLABELS' } asOrderedCollection.
+	args addAll: subArgs.
+	filterBlock ifNotNil: [
+		builder := RsTsFilterBuilder new.
+		filterBlock value: builder.
+		builder validate.
+		args add: 'FILTER'.
+		args addAll: (builder filters collect: [ :f | f asString ]) ].
+	^ (self unifiedCommand: args asArray) ifNil: [ #() ] ifNotNil: [ :r | r asArray ]
+]
+
 { #category : '*RediStick-TimeSeries-private' }
 RsRedisEndpoint >> tsParseMGetResult: rawResult [
 	"private"
@@ -495,19 +530,67 @@ RsRedisEndpoint >> tsExecuteMRange: cmdName rangeBy: rangeBlock filterBy: filter
 	builder := RsTsFilterBuilder new.
 	filterBlock value: builder.
 	builder validate.
-	optionsBlock ifNotNil: [
-		options := RsTsMRangeOptions new.
-		optionsBlock value: options ].
-	aggregationBlock ifNotNil: [
-		aggOptions := RsTsAggregationOptions new.
-		aggregationBlock cull: aggOptions aggregation cull: aggOptions ].
-	groupingBlock ifNotNil: [
-		groupBy := RsTsGroupBy new.
-		groupingBlock value: groupBy ].
+	options := self tsMRangeOptionsFrom: optionsBlock.
+	aggOptions := self tsMRangeAggregationOptionsFrom: aggregationBlock.
+	groupBy := self tsGroupByFrom: groupingBlock.
+	self tsReconcileGroupBy: groupBy with: options.
+	^ self
+		tsMRangeResultFor: cmdName range: range options: options
+		aggOptions: aggOptions filterBuilder: builder groupBy: groupBy
+]
+
+{ #category : '*RediStick-TimeSeries-private' }
+RsRedisEndpoint >> tsMRangeOptionsFrom: optionsBlock [
+	"private"
+	| options |
+	optionsBlock ifNil: [ ^ nil ].
+	options := RsTsMRangeOptions new.
+	optionsBlock value: options.
+	^ options
+]
+
+{ #category : '*RediStick-TimeSeries-private' }
+RsRedisEndpoint >> tsMRangeAggregationOptionsFrom: aggregationBlock [
+	"private"
+	| aggOptions |
+	aggregationBlock ifNil: [ ^ nil ].
+	aggOptions := RsTsAggregationOptions new.
+	aggregationBlock cull: aggOptions aggregation cull: aggOptions.
+	^ aggOptions
+]
+
+{ #category : '*RediStick-TimeSeries-private' }
+RsRedisEndpoint >> tsGroupByFrom: groupingBlock [
+	"private"
+	| groupBy |
+	groupingBlock ifNil: [ ^ nil ].
+	groupBy := RsTsGroupBy new.
+	groupingBlock value: groupBy.
+	^ groupBy
+]
+
+{ #category : '*RediStick-TimeSeries-private' }
+RsRedisEndpoint >> tsReconcileGroupBy: groupBy with: options [
+	"private"
+	self tsValidateExcludeEmpty: options compatibleWithGroupBy: groupBy.
 	(groupBy notNil and: [ options notNil and: [ options selectedLabels notNil ] ])
 		ifTrue: [
 			options selectedLabels:
-				(self tsSelectedLabels: options selectedLabels withGroupMetadataFor: groupBy) ].
+				(self tsSelectedLabels: options selectedLabels withGroupMetadataFor: groupBy) ]
+]
+
+{ #category : '*RediStick-TimeSeries-private' }
+RsRedisEndpoint >> tsValidateExcludeEmpty: options compatibleWithGroupBy: groupBy [
+	"private"
+	(groupBy notNil and: [ options notNil and: [ options isExcludeEmpty ] ])
+		ifTrue: [
+			(RsError invalidArguments) signal:
+				'EXCLUDEEMPTY cannot be used together with GROUPBY' ]
+]
+
+{ #category : '*RediStick-TimeSeries-private' }
+RsRedisEndpoint >> tsMRangeResultFor: cmdName range: range options: options aggOptions: aggOptions filterBuilder: builder groupBy: groupBy [
+	"private"
 	^ self
 		tsParseMRangeResult: (self unifiedCommand: (self
 			tsMRangeArgsFor: cmdName range: range options: options
@@ -537,6 +620,12 @@ RsRedisEndpoint >> tsMRangeArgsFor: cmdName range: range options: options aggOpt
 		(options isNil or: [ options isWithLabels not and: [ options selectedLabels isNil ] ])
 			ifTrue: [ args add: 'WITHLABELS' ] ].
 	aggOptions ifNotNil: [ args addAll: aggOptions asArray ].
+	"EXCLUDEEMPTY must precede FILTER: verified against a live Redis 8.10 server, the
+	FILTER clause otherwise swallows it as an unterminated filter expression
+	('ERR TSDB: failed parsing labels'), even though Redis's own syntax_fmt metadata
+	places it after FILTER/GROUPBY. Trust the server and the docs' own worked example
+	over that syntax_fmt field."
+	(options notNil and: [ options isExcludeEmpty ]) ifTrue: [ args add: 'EXCLUDEEMPTY' ].
 	args add: 'FILTER'.
 	args addAll: (builder filters collect: [ :f | f asString ]).
 	groupBy ifNotNil: [ args addAll: groupBy asArray ].
@@ -574,4 +663,160 @@ RsRedisEndpoint >> tsParseGroupedRangeRow: row groupBy: groupBy [
 		reducer: (labelsDict at: '__reducer__' ifAbsent: [ nil ])
 		sourceKeys: ((labelsDict at: '__source__' ifAbsent: [ '' ]) substrings: ',') asArray
 		values: (self tsParseRangeSamples: row third)
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsNRangeBy: rangeBlock keys: keysCollection [
+	^ self
+		tsExecuteNRange: 'TS.NRANGE'
+		keys: keysCollection
+		rangeBy: rangeBlock
+		aggregationBy: nil
+		using: nil
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsNRangeBy: rangeBlock keys: keysCollection using: optionsBlock [
+	^ self
+		tsExecuteNRange: 'TS.NRANGE'
+		keys: keysCollection
+		rangeBy: rangeBlock
+		aggregationBy: nil
+		using: optionsBlock
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsNRangeBy: rangeBlock keys: keysCollection aggregationBy: aggregationBlock [
+	^ self
+		tsExecuteNRange: 'TS.NRANGE'
+		keys: keysCollection
+		rangeBy: rangeBlock
+		aggregationBy: aggregationBlock
+		using: nil
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsNRangeBy: rangeBlock keys: keysCollection aggregationBy: aggregationBlock using: optionsBlock [
+	^ self
+		tsExecuteNRange: 'TS.NRANGE'
+		keys: keysCollection
+		rangeBy: rangeBlock
+		aggregationBy: aggregationBlock
+		using: optionsBlock
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsNRevRangeBy: rangeBlock keys: keysCollection [
+	^ self
+		tsExecuteNRange: 'TS.NREVRANGE'
+		keys: keysCollection
+		rangeBy: rangeBlock
+		aggregationBy: nil
+		using: nil
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsNRevRangeBy: rangeBlock keys: keysCollection using: optionsBlock [
+	^ self
+		tsExecuteNRange: 'TS.NREVRANGE'
+		keys: keysCollection
+		rangeBy: rangeBlock
+		aggregationBy: nil
+		using: optionsBlock
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsNRevRangeBy: rangeBlock keys: keysCollection aggregationBy: aggregationBlock [
+	^ self
+		tsExecuteNRange: 'TS.NREVRANGE'
+		keys: keysCollection
+		rangeBy: rangeBlock
+		aggregationBy: aggregationBlock
+		using: nil
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsNRevRangeBy: rangeBlock keys: keysCollection aggregationBy: aggregationBlock using: optionsBlock [
+	^ self
+		tsExecuteNRange: 'TS.NREVRANGE'
+		keys: keysCollection
+		rangeBy: rangeBlock
+		aggregationBy: aggregationBlock
+		using: optionsBlock
+]
+
+{ #category : '*RediStick-TimeSeries-private' }
+RsRedisEndpoint >> tsExecuteNRange: cmdName keys: keysCollection rangeBy: rangeBlock aggregationBy: aggregationBlock using: optionsBlock [
+	"private"
+	| range options aggOptions nAgg args |
+	keysCollection ifEmpty: [ (RsError invalidArguments) signal: 'At least one key is required' ].
+	range := self tsRangeFrom: (rangeBlock value: RsTsRange).
+	optionsBlock ifNotNil: [
+		options := RsTsRangeOptions new.
+		optionsBlock value: options ].
+	aggregationBlock ifNotNil: [
+		aggOptions := RsTsAggregationOptions new.
+		nAgg := RsTsNAggregation new.
+		aggOptions aggregation: nAgg.
+		aggregationBlock cull: nAgg cull: aggOptions ].
+	args := self
+		tsNRangeArgsFor: cmdName keys: keysCollection
+		range: range options: options
+		aggOptions: aggOptions.
+	^ self tsParseNRangeResult: (self unifiedCommand: args)
+]
+
+{ #category : '*RediStick-TimeSeries-private' }
+RsRedisEndpoint >> tsNRangeArgsFor: cmdName keys: keysCollection range: aTsRange options: options aggOptions: aggOptions [
+	"private"
+	| args |
+	args := OrderedCollection new.
+	args add: cmdName; add: keysCollection size.
+	args addAll: keysCollection.
+	args addAll: aTsRange asArray.
+	options ifNotNil: [ args addAll: options asArray ].
+	aggOptions ifNotNil: [ args addAll: aggOptions asArray ].
+	^ args asArray
+]
+
+{ #category : '*RediStick-TimeSeries-private' }
+RsRedisEndpoint >> tsParseNRangeResult: rawResult [
+	"private"
+	rawResult ifNil: [ ^ #() ].
+	^ (rawResult collect: [ :row |
+		RsTsNRangeRow
+			timestamp: row first
+			values: (row second collect: [ :v | self tsParseValue: v ]) ]) asArray
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsRead: key cursor: aRsTsReadCursor [
+	^ self tsRead: key cursor: aRsTsReadCursor using: nil
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsRead: key cursor: aRsTsReadCursor using: optionsBlock [
+	| args options |
+	args := {
+		        'TS.READ'.
+		        key.
+		        aRsTsReadCursor asArgumentValue } asOrderedCollection.
+	optionsBlock ifNotNil: [
+		options := RsTsReadOptions new.
+		optionsBlock value: options.
+		args addAll: options asArray ].
+	^ self tsParseRangeSamples: (self unifiedCommand: args asArray)
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsRead: key cursorBy: cursorBlock [
+	^ self tsRead: key cursorBy: cursorBlock using: nil
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsRead: key cursorBy: cursorBlock using: optionsBlock [
+	| cursor |
+	cursor := RsTsReadCursor new.
+	cursorBlock value: cursor.
+	^ self tsRead: key cursor: cursor using: optionsBlock
 ]

@@ -49,19 +49,22 @@ RsSearchResultSet >> loadResultsFrom: anArray [
 
 { #category : 'loading' }
 RsSearchResultSet >> loadResultsFrom: anArray parseHints: parseHints [
-	| resultCol chunkSize readStream |
+	| resultCol readStream resultCount optionalCount fieldPairCount perDocSize |
 	resultCol := OrderedCollection new.
-	chunkSize := (parseHints values select: [ :e | e ]) size.
-	
 	readStream := anArray readStream.
-	[ readStream atEnd ] whileFalse: [ | chunk |
-		chunk := readStream next: chunkSize.
-		resultCol add: (RsSearchResult fromChunk: chunk parseHints: parseHints)
-	].
-
+	resultCount := self total asInteger max: 1.
+	optionalCount := (#(#withScores #withPayloads #withSortKeys)
+		count: [ :key | parseHints at: key ifAbsent: [ false ] ]).
+	fieldPairCount := 0.
+	anArray isEmpty ifFalse: [
+		perDocSize := anArray size // resultCount.
+		fieldPairCount := (perDocSize - 1 - optionalCount) // 2 max: 0 ].
+	[ readStream atEnd ] whileFalse: [
+		resultCol add: (RsSearchResult
+			fromStream: readStream
+			parseHints: parseHints
+			fieldPairCount: fieldPairCount) ].
 	self results: resultCol
-
-
 ]
 
 { #category : 'accessing' }

@@ -73,3 +73,24 @@ RsTsMRevRangeTest >> testTsMRevRangeReturnsRangeValueInstances [
 	self assert: result size equals: 1.
 	self assert: result first isRsTsRangeValue
 ]
+
+{ #category : 'tests' }
+RsTsMRevRangeTest >> testTsMRevRangeExcludeEmptyExcludesSeriesWithNoSamplesInRange [
+	| key1 key2 result |
+	key1 := 'test:ts:mrevrange:excludeempty:1'.
+	key2 := 'test:ts:mrevrange:excludeempty:2'.
+	stick endpoint tsCreate: key1 using: [ :opts | opts labels: { 'type' -> 'mrevexcl' } ].
+	stick endpoint tsCreate: key2 using: [ :opts | opts labels: { 'type' -> 'mrevexcl' } ].
+	stick endpoint tsAdd: key1 timestamp: 1000 value: 10.
+	stick endpoint tsAdd: key1 timestamp: 2000 value: 20.
+	stick endpoint tsAdd: key2 timestamp: 9000 value: 99.
+
+	result := stick endpoint
+		tsMRevRangeBy: [ :r | r from: 1000 to: 2000 ]
+		filterBy: [ :f | f label: 'type' eq: 'mrevexcl' ]
+		aggregationBy: nil
+		using: [ :opts | opts excludeEmpty ].
+
+	self assert: result size equals: 1.
+	self assert: result first key equals: key1
+]

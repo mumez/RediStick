@@ -24,6 +24,14 @@ RsTsAggregationTest >> testMultipleAggregatorsJoinedByComma [
 ]
 
 { #category : 'tests' }
+RsTsAggregationTest >> testAggregatorsString [
+	| agg |
+	agg := RsTsAggregation new.
+	agg min; avg; max.
+	self assert: agg aggregatorsString equals: 'min,avg,max'
+]
+
+{ #category : 'tests' }
 RsTsAggregationTest >> testAllAggregatorTokens [
 	#( #avg 'avg' #sum 'sum' #min 'min' #max 'max' #range 'range' #count 'count'
 	   #countNaN 'countNaN' #countAll 'countAll' #first 'first' #last 'last'
