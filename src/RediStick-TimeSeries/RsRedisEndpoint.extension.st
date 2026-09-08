@@ -381,12 +381,12 @@ RsRedisEndpoint >> tsQueryLabelsFilterBy: filterBlock [
 ]
 
 { #category : '*RediStick-TimeSeries' }
-RsRedisEndpoint >> tsQueryLabelValues: aLabel [
-	^ self tsQueryLabelValues: aLabel filterBy: nil
+RsRedisEndpoint >> tsQueryLabelValuesOf: aLabel [
+	^ self tsQueryLabelValuesOf: aLabel filterBy: nil
 ]
 
 { #category : '*RediStick-TimeSeries' }
-RsRedisEndpoint >> tsQueryLabelValues: aLabel filterBy: filterBlock [
+RsRedisEndpoint >> tsQueryLabelValuesOf: aLabel filterBy: filterBlock [
 	^ self tsQueryLabelsCommand: { 'VALUES'. aLabel } filterBy: filterBlock
 ]
 

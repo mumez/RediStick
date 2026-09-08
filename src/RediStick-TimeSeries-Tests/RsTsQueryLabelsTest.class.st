@@ -55,7 +55,7 @@ RsTsQueryLabelsTest >> testTsQueryLabelValuesReturnsDistinctValues [
 	stick endpoint tsCreate: 'test:ts:ql:values:a' using: [ :opts | opts labels: { 'type' -> 'qlvala' } ].
 	stick endpoint tsCreate: 'test:ts:ql:values:b' using: [ :opts | opts labels: { 'type' -> 'qlvalb' } ].
 
-	result := stick endpoint tsQueryLabelValues: 'type'.
+	result := stick endpoint tsQueryLabelValuesOf: 'type'.
 	self assert: (result includes: 'qlvala').
 	self assert: (result includes: 'qlvalb')
 ]
@@ -63,7 +63,7 @@ RsTsQueryLabelsTest >> testTsQueryLabelValuesReturnsDistinctValues [
 { #category : 'tests' }
 RsTsQueryLabelsTest >> testTsQueryLabelValuesForNonExistentLabelReturnsEmptyArray [
 	| result |
-	result := stick endpoint tsQueryLabelValues: 'test:ts:ql:nolabel:zzz'.
+	result := stick endpoint tsQueryLabelValuesOf: 'test:ts:ql:nolabel:zzz'.
 	self assertCollection: result equals: #()
 ]
 
@@ -75,12 +75,12 @@ RsTsQueryLabelsTest >> testTsQueryLabelValuesFilterByFiltered [
 	stick endpoint tsCreate: keyA using: [ :opts | opts labels: { 'type' -> 'qlvalfilt'. 'region' -> 'east' } ].
 	stick endpoint tsCreate: keyB using: [ :opts | opts labels: { 'type' -> 'other'. 'region' -> 'west' } ].
 
-	result := stick endpoint tsQueryLabelValues: 'region' filterBy: [ :filter | filter label: 'type' eq: 'qlvalfilt' ].
+	result := stick endpoint tsQueryLabelValuesOf: 'region' filterBy: [ :filter | filter label: 'type' eq: 'qlvalfilt' ].
 	self assert: (result includes: 'east').
 	self deny: (result includes: 'west')
 ]
 
 { #category : 'tests' }
 RsTsQueryLabelsTest >> testTsQueryLabelValuesFilterByWithoutFiltersSignalsError [
-	self should: [ stick endpoint tsQueryLabelValues: 'type' filterBy: [ :filter | ] ] raise: Error
+	self should: [ stick endpoint tsQueryLabelValuesOf: 'type' filterBy: [ :filter | ] ] raise: Error
 ]
