@@ -31,6 +31,19 @@ RsSearchResult class >> fromChunk: chunkArray parseHints: parseHints [
 ]
 
 { #category : 'instance creation' }
+RsSearchResult class >> fromStream: aStream parseHints: parseHints fieldPairCount: fieldPairCount [
+	| inst |
+	inst := self new.
+	inst id: aStream next.
+	#(#withScores #withPayloads #withSortKeys) do: [ :key |
+		(parseHints at: key ifAbsent: [ false ]) ifTrue: [
+			inst loadValueFromChunk: aStream next hints: { key -> true } asDictionary ] ].
+	(parseHints at: #withContent ifAbsent: [ true ]) ifTrue: [
+		inst loadContentFromStream: aStream fieldPairCount: fieldPairCount ].
+	^ inst
+]
+
+{ #category : 'instance creation' }
 RsSearchResult class >> id: documentId [
 	^ self id: documentId content: #()
 ]
@@ -76,6 +89,22 @@ RsSearchResult >> isEnabled: key in: consumingHints [
 ]
 
 { #category : 'loading' }
+RsSearchResult >> loadContentFromStream: aStream fieldPairCount: fieldPairCount [
+	| nextValue pairs |
+	aStream atEnd ifTrue: [ ^ self ].
+	nextValue := aStream peek.
+	(nextValue isCollection and: [ nextValue isString not ])
+		ifTrue: [ self content: aStream next ]
+		ifFalse: [
+			pairs := OrderedCollection new.
+			fieldPairCount timesRepeat: [
+				aStream atEnd ifFalse: [
+					pairs add: aStream next.
+					aStream atEnd ifFalse: [ pairs add: aStream next ] ] ].
+			self content: pairs asArray ]
+]
+
+{ #category : 'loading' }
 RsSearchResult >> loadValueFromChunk: aValue hints: consumingHints [
 	(self isEnabled: #withScores in: consumingHints) ifTrue: [
 		self score: aValue.
@@ -111,11 +140,7 @@ RsSearchResult >> score [
 
 { #category : 'accessing' }
 RsSearchResult >> score: anObject [
-	| val |
-	val := anObject isString
-		       ifTrue: [ anObject asInteger ]
-		       ifFalse: [ anObject ].
-	score := val
+	score := anObject asNumber
 ]
 
 { #category : 'accessing' }
