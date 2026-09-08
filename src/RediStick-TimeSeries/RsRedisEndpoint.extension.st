@@ -370,6 +370,41 @@ RsRedisEndpoint >> tsMGetFilterBy: filterBlock using: optionsBlock [
 	^ self tsParseMGetResult: result
 ]
 
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsQueryLabels [
+	^ self tsQueryLabelsFilterBy: nil
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsQueryLabelsFilterBy: filterBlock [
+	^ self tsQueryLabelsCommand: { 'LABELS' } filterBy: filterBlock
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsQueryLabelValuesOf: aLabel [
+	^ self tsQueryLabelValuesOf: aLabel filterBy: nil
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsQueryLabelValuesOf: aLabel filterBy: filterBlock [
+	^ self tsQueryLabelsCommand: { 'VALUES'. aLabel } filterBy: filterBlock
+]
+
+{ #category : '*RediStick-TimeSeries-private' }
+RsRedisEndpoint >> tsQueryLabelsCommand: subArgs filterBy: filterBlock [
+	"private"
+	| builder args |
+	args := { 'TS.QUERYLABELS' } asOrderedCollection.
+	args addAll: subArgs.
+	filterBlock ifNotNil: [
+		builder := RsTsFilterBuilder new.
+		filterBlock value: builder.
+		builder validate.
+		args add: 'FILTER'.
+		args addAll: (builder filters collect: [ :f | f asString ]) ].
+	^ (self unifiedCommand: args asArray) ifNil: [ #() ] ifNotNil: [ :r | r asArray ]
+]
+
 { #category : '*RediStick-TimeSeries-private' }
 RsRedisEndpoint >> tsParseMGetResult: rawResult [
 	"private"
