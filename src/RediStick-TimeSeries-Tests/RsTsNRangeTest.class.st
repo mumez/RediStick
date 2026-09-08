@@ -29,7 +29,8 @@ RsTsNRangeTest >> testTsNRangeBasicGroupsByTimestamp [
 
 	self assert: result second timestamp equals: 2000.
 	self assert: result second values size equals: 2.
-	self assert: result second values first equals: 30
+	self assert: result second values first equals: 30.
+	self assert: result second values second isNaN
 ]
 
 { #category : 'tests' }
@@ -53,7 +54,7 @@ RsTsNRangeTest >> testTsNRangeWithAggregationPerKey [
 			nAgg bucketDuration: 1000 ].
 
 	self assert: result notEmpty.
-	self assert: result first values size equals: 3
+	self assertCollection: result first values asArray equals: #(15 100 200)
 ]
 
 { #category : 'tests' }

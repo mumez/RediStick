@@ -1,3 +1,20 @@
+"
+I build the per-key AGGREGATION clause for TS.NRANGE/TS.NREVRANGE.
+
+Responsibility:
+- I hold one RsTsAggregation per key, in key order, added via #forKey:.
+- I hold a single bucketDuration shared by all keys.
+- I convert myself into the AGGREGATION command tokens via #asArray.
+
+Collaborators:
+- RsTsAggregation: each per-key entry is a plain RsTsAggregation. Unlike TS.RANGE/TS.MRANGE (one aggregator list for the whole command), TS.NRANGE allows a comma-joined multi-aggregator list per key, so #asArray calls #aggregatorsString on each entry to bypass RsTsAggregation's single-aggregator check.
+- RsTsAggregationOptions: wraps me for ALIGN/BUCKETTIMESTAMP/EMPTY, via its #aggregation: setter.
+
+Public API and Key Messages:
+- #forKey: aBlock - creates a new RsTsAggregation, evaluates aBlock with it, appends it in key order, and answers it.
+- #bucketDuration: - sets the shared bucket duration.
+- #asArray - answers the AGGREGATION command tokens; signals Error if no per-key aggregation or no bucketDuration was provided.
+"
 Class {
 	#name : 'RsTsNAggregation',
 	#superclass : 'Object',
