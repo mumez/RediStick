@@ -190,5 +190,5 @@ RsTsMRangeTest >> testTsMRangeExcludeEmptyWithGroupBySignalsError [
 			aggregationBy: [ :agg | agg sum; bucketDuration: 1000 ]
 			groupBy: [ :g | g label: 'region'; reduce: 'sum' ]
 			using: [ :opts | opts excludeEmpty ]
-	] raise: Error
+	] raise: RsError
 ]

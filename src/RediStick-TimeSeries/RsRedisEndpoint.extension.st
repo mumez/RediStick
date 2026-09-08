@@ -572,7 +572,7 @@ RsRedisEndpoint >> tsGroupByFrom: groupingBlock [
 { #category : '*RediStick-TimeSeries-private' }
 RsRedisEndpoint >> tsReconcileGroupBy: groupBy with: options [
 	"private"
-	self tsValidateExcludeEmpty: options notWithGroupBy: groupBy.
+	self tsValidateExcludeEmpty: options compatibleWithGroupBy: groupBy.
 	(groupBy notNil and: [ options notNil and: [ options selectedLabels notNil ] ])
 		ifTrue: [
 			options selectedLabels:
@@ -580,7 +580,7 @@ RsRedisEndpoint >> tsReconcileGroupBy: groupBy with: options [
 ]
 
 { #category : '*RediStick-TimeSeries-private' }
-RsRedisEndpoint >> tsValidateExcludeEmpty: options notWithGroupBy: groupBy [
+RsRedisEndpoint >> tsValidateExcludeEmpty: options compatibleWithGroupBy: groupBy [
 	"private"
 	(groupBy notNil and: [ options notNil and: [ options isExcludeEmpty ] ])
 		ifTrue: [
@@ -620,6 +620,11 @@ RsRedisEndpoint >> tsMRangeArgsFor: cmdName range: range options: options aggOpt
 		(options isNil or: [ options isWithLabels not and: [ options selectedLabels isNil ] ])
 			ifTrue: [ args add: 'WITHLABELS' ] ].
 	aggOptions ifNotNil: [ args addAll: aggOptions asArray ].
+	"EXCLUDEEMPTY must precede FILTER: verified against a live Redis 8.10 server, the
+	FILTER clause otherwise swallows it as an unterminated filter expression
+	('ERR TSDB: failed parsing labels'), even though Redis's own syntax_fmt metadata
+	places it after FILTER/GROUPBY. Trust the server and the docs' own worked example
+	over that syntax_fmt field."
 	(options notNil and: [ options isExcludeEmpty ]) ifTrue: [ args add: 'EXCLUDEEMPTY' ].
 	args add: 'FILTER'.
 	args addAll: (builder filters collect: [ :f | f asString ]).
