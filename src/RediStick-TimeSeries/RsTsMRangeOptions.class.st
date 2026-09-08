@@ -1,3 +1,23 @@
+"
+I represent the optional parameters for a TS.MRANGE / TS.MREVRANGE command.
+
+Responsibility:
+- I hold the optional flags and filters that refine a multi-series range query: LATEST, FILTER_BY_TS, FILTER_BY_VALUE, WITHLABELS/SELECTED_LABELS, COUNT, and EXCLUDEEMPTY.
+- I render my current settings as an ordered array of command arguments in the order Redis expects.
+
+Collaborators:
+- RsRedisEndpoint: builds me via an options block passed to #tsMRangeBy:filterBy:using: (and its MREVRANGE counterparts), then appends #asArray to the outgoing command.
+- RsTsRange: used to normalize timestamps supplied to #filterByTs:.
+
+Public API and Key Messages:
+- #latest / #isLatest - request the latest (possibly partial) sample for each series
+- #filterByTs: / #filterByTs - restrict returned samples to specific timestamps
+- #filterByValueMin:max: - restrict returned samples to a value range
+- #withLabels / #selectedLabels: - control which labels are returned per series
+- #excludeEmpty / #isExcludeEmpty - omit series with no samples in the queried range (cannot be combined with GROUPBY)
+- #count: - cap the number of samples returned per series
+- #asArray - render the configured options as command arguments
+"
 Class {
 	#name : 'RsTsMRangeOptions',
 	#superclass : 'Object',
@@ -8,7 +28,8 @@ Class {
 		'filterByValueMax',
 		'withLabels',
 		'selectedLabels',
-		'count'
+		'count',
+		'excludeEmpty'
 	],
 	#category : 'RediStick-TimeSeries',
 	#package : 'RediStick-TimeSeries'
@@ -18,7 +39,8 @@ Class {
 RsTsMRangeOptions >> initialize [
 	super initialize.
 	latest := false.
-	withLabels := false
+	withLabels := false.
+	excludeEmpty := false
 ]
 
 { #category : 'accessing' }
@@ -85,6 +107,16 @@ RsTsMRangeOptions >> count: anInteger [
 { #category : 'accessing' }
 RsTsMRangeOptions >> count [
 	^ count
+]
+
+{ #category : 'accessing' }
+RsTsMRangeOptions >> excludeEmpty [
+	excludeEmpty := true
+]
+
+{ #category : 'accessing' }
+RsTsMRangeOptions >> isExcludeEmpty [
+	^ excludeEmpty
 ]
 
 { #category : 'converting' }
