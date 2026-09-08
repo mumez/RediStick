@@ -51,6 +51,22 @@ RsTsReadOptionsTest >> testMinCountWithoutBlockSignalsError [
 ]
 
 { #category : 'tests' }
+RsTsReadOptionsTest >> testBlockMinCountGreaterThanMaxCountSignalsError [
+	| opts |
+	opts := RsTsReadOptions new.
+	opts block: 1000 minCount: 10; maxCount: 5.
+	self should: [ opts asArray ] raise: RsError
+]
+
+{ #category : 'tests' }
+RsTsReadOptionsTest >> testBlockMinCountEqualToMaxCountIsAllowed [
+	| opts |
+	opts := RsTsReadOptions new.
+	opts block: 1000 minCount: 5; maxCount: 5.
+	self assertCollection: opts asArray equals: { 'BLOCK'. 1000. 5. 'MAX_COUNT'. 5 }
+]
+
+{ #category : 'tests' }
 RsTsReadOptionsTest >> testAccessors [
 	| opts |
 	opts := RsTsReadOptions new.
