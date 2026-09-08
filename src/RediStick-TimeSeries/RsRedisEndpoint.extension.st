@@ -612,6 +612,130 @@ RsRedisEndpoint >> tsParseGroupedRangeRow: row groupBy: groupBy [
 ]
 
 { #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsNRangeBy: rangeBlock keys: keysCollection [
+	^ self
+		tsExecuteNRange: 'TS.NRANGE'
+		keys: keysCollection
+		rangeBy: rangeBlock
+		aggregationBy: nil
+		using: nil
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsNRangeBy: rangeBlock keys: keysCollection using: optionsBlock [
+	^ self
+		tsExecuteNRange: 'TS.NRANGE'
+		keys: keysCollection
+		rangeBy: rangeBlock
+		aggregationBy: nil
+		using: optionsBlock
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsNRangeBy: rangeBlock keys: keysCollection aggregationBy: aggregationBlock [
+	^ self
+		tsExecuteNRange: 'TS.NRANGE'
+		keys: keysCollection
+		rangeBy: rangeBlock
+		aggregationBy: aggregationBlock
+		using: nil
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsNRangeBy: rangeBlock keys: keysCollection aggregationBy: aggregationBlock using: optionsBlock [
+	^ self
+		tsExecuteNRange: 'TS.NRANGE'
+		keys: keysCollection
+		rangeBy: rangeBlock
+		aggregationBy: aggregationBlock
+		using: optionsBlock
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsNRevRangeBy: rangeBlock keys: keysCollection [
+	^ self
+		tsExecuteNRange: 'TS.NREVRANGE'
+		keys: keysCollection
+		rangeBy: rangeBlock
+		aggregationBy: nil
+		using: nil
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsNRevRangeBy: rangeBlock keys: keysCollection using: optionsBlock [
+	^ self
+		tsExecuteNRange: 'TS.NREVRANGE'
+		keys: keysCollection
+		rangeBy: rangeBlock
+		aggregationBy: nil
+		using: optionsBlock
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsNRevRangeBy: rangeBlock keys: keysCollection aggregationBy: aggregationBlock [
+	^ self
+		tsExecuteNRange: 'TS.NREVRANGE'
+		keys: keysCollection
+		rangeBy: rangeBlock
+		aggregationBy: aggregationBlock
+		using: nil
+]
+
+{ #category : '*RediStick-TimeSeries' }
+RsRedisEndpoint >> tsNRevRangeBy: rangeBlock keys: keysCollection aggregationBy: aggregationBlock using: optionsBlock [
+	^ self
+		tsExecuteNRange: 'TS.NREVRANGE'
+		keys: keysCollection
+		rangeBy: rangeBlock
+		aggregationBy: aggregationBlock
+		using: optionsBlock
+]
+
+{ #category : '*RediStick-TimeSeries-private' }
+RsRedisEndpoint >> tsExecuteNRange: cmdName keys: keysCollection rangeBy: rangeBlock aggregationBy: aggregationBlock using: optionsBlock [
+	"private"
+	| range options aggOptions nAgg args |
+	keysCollection ifEmpty: [ (RsError invalidArguments) signal: 'At least one key is required' ].
+	range := self tsRangeFrom: (rangeBlock value: RsTsRange).
+	optionsBlock ifNotNil: [
+		options := RsTsRangeOptions new.
+		optionsBlock value: options ].
+	aggregationBlock ifNotNil: [
+		aggOptions := RsTsAggregationOptions new.
+		nAgg := RsTsNAggregation new.
+		aggOptions aggregation: nAgg.
+		aggregationBlock cull: nAgg cull: aggOptions ].
+	args := self
+		tsNRangeArgsFor: cmdName keys: keysCollection
+		range: range options: options
+		aggOptions: aggOptions.
+	^ self tsParseNRangeResult: (self unifiedCommand: args)
+]
+
+{ #category : '*RediStick-TimeSeries-private' }
+RsRedisEndpoint >> tsNRangeArgsFor: cmdName keys: keysCollection range: aTsRange options: options aggOptions: aggOptions [
+	"private"
+	| args |
+	args := OrderedCollection new.
+	args add: cmdName; add: keysCollection size.
+	args addAll: keysCollection.
+	args addAll: aTsRange asArray.
+	options ifNotNil: [ args addAll: options asArray ].
+	aggOptions ifNotNil: [ args addAll: aggOptions asArray ].
+	^ args asArray
+]
+
+{ #category : '*RediStick-TimeSeries-private' }
+RsRedisEndpoint >> tsParseNRangeResult: rawResult [
+	"private"
+	rawResult ifNil: [ ^ #() ].
+	^ (rawResult collect: [ :row |
+		RsTsNRangeRow
+			timestamp: row first
+			values: (row second collect: [ :v | self tsParseValue: v ]) ]) asArray
+]
+
+{ #category : '*RediStick-TimeSeries' }
 RsRedisEndpoint >> tsRead: key cursor: aRsTsReadCursor [
 	^ self tsRead: key cursor: aRsTsReadCursor using: nil
 ]
