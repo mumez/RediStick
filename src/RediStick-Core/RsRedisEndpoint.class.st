@@ -1080,6 +1080,31 @@ RsRedisEndpoint >> set: aKey value: aValue [
 ]
 
 { #category : 'commands-strings' }
+RsRedisEndpoint >> set: aKey value: aValue options: setOptions [
+	"setOptions is an RsSetOptions or nil.
+	Returns the raw Redis reply: 'OK', nil when a condition is not met, or the old value when GET is specified"
+
+	| args |
+	args := {
+		        'SET'.
+		        aKey.
+		        aValue }.
+	setOptions ifNotNil: [ args := args , setOptions asArray ].
+	^ self unifiedCommand: args
+]
+
+{ #category : 'commands-strings' }
+RsRedisEndpoint >> set: aKey value: aValue using: optionsBlock [
+	"optionsBlock receives an RsSetOptions to configure, e.g.
+	[ :opts | opts ifNotExists; get; expireIn: 1000 ]"
+
+	| options |
+	options := RsSetOptions new.
+	optionsBlock value: options.
+	^ self set: aKey value: aValue options: options
+]
+
+{ #category : 'commands-strings' }
 RsRedisEndpoint >> setNx: aKey value: aValue [
 	^ self
 		unifiedCommand:
