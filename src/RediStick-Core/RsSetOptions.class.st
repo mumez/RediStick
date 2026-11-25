@@ -6,7 +6,7 @@ Responsibility:
   - Condition: #ifNotExists (NX), #ifAlreadyExists (XX), #ifEqual: (IFEQ), #ifNotEqual: (IFNE), #ifDigestEqual: (IFDEQ), #ifDigestNotEqual: (IFDNE)
   - #get (GET) to return the old value
   - Expiration: #expireIn: (EX), #expireInMilliseconds: (PX), #expireAt: (EXAT), #expireAtMilliseconds: (PXAT), #keepTtl (KEEPTTL)
-- Convert the options into SET command arguments (#asArray)
+- Hold the options as semantic state (condition mode + value, expiration mode + value) and build the SET command tokens in #asArray
 
 Within each group (condition / expiration), the last message sent wins. Option combinations are not validated; Redis reports invalid ones.
 
@@ -20,9 +20,11 @@ Class {
 	#name : 'RsSetOptions',
 	#superclass : 'Object',
 	#instVars : [
-		'condition',
+		'conditionMode',
+		'conditionValue',
 		'shouldGet',
-		'expiration'
+		'expirationMode',
+		'expirationValue'
 	],
 	#category : 'RediStick-Core',
 	#package : 'RediStick-Core'
@@ -32,58 +34,87 @@ Class {
 RsSetOptions >> asArray [
 	| args |
 	args := OrderedCollection new.
-	self condition ifNotNil: [ :cond | args addAll: cond ].
+	args addAll: self conditionArgs.
 	self shouldGet ifTrue: [ args add: 'GET' ].
-	self expiration ifNotNil: [ :expr | args addAll: expr ].
+	args addAll: self expirationArgs.
 	^ args asArray
 ]
 
-{ #category : 'accessing' }
-RsSetOptions >> condition [
-	^ condition
+{ #category : 'private' }
+RsSetOptions >> conditionArgs [
+	self conditionMode ifNil: [ ^ #(  ) ].
+	self conditionMode = #ifNotExists ifTrue: [ ^ #( 'NX' ) ].
+	self conditionMode = #ifAlreadyExists ifTrue: [ ^ #( 'XX' ) ].
+	self conditionMode = #ifEqual ifTrue: [ ^ { 'IFEQ'. self conditionValue } ].
+	self conditionMode = #ifNotEqual ifTrue: [ ^ { 'IFNE'. self conditionValue } ].
+	self conditionMode = #ifDigestEqual ifTrue: [ ^ { 'IFDEQ'. self conditionValue } ].
+	self conditionMode = #ifDigestNotEqual ifTrue: [ ^ { 'IFDNE'. self conditionValue } ].
+	^ RsError signal: 'Unknown SET condition: ' , self conditionMode printString
 ]
 
 { #category : 'accessing' }
-RsSetOptions >> condition: anArray [
-	condition := anArray
+RsSetOptions >> conditionMode [
+	^ conditionMode
+]
+
+{ #category : 'private' }
+RsSetOptions >> conditionMode: aSymbol value: anObject [
+	conditionMode := aSymbol.
+	conditionValue := anObject
 ]
 
 { #category : 'accessing' }
-RsSetOptions >> expiration [
-	^ expiration
+RsSetOptions >> conditionValue [
+	^ conditionValue
+]
+
+{ #category : 'private' }
+RsSetOptions >> expirationArgs [
+	self expirationMode ifNil: [ ^ #(  ) ].
+	self expirationMode = #expireIn ifTrue: [ ^ { 'EX'. self expirationValue } ].
+	self expirationMode = #expireInMilliseconds ifTrue: [ ^ { 'PX'. self expirationValue } ].
+	self expirationMode = #expireAt ifTrue: [
+		^ { 'EXAT'. (self unixSecondsFrom: self expirationValue) } ].
+	self expirationMode = #expireAtMilliseconds ifTrue: [
+		^ { 'PXAT'. (self unixMillisecondsFrom: self expirationValue) } ].
+	self expirationMode = #keepTtl ifTrue: [ ^ #( 'KEEPTTL' ) ].
+	^ RsError signal: 'Unknown SET expiration: ' , self expirationMode printString
 ]
 
 { #category : 'accessing' }
-RsSetOptions >> expiration: anArray [
-	expiration := anArray
+RsSetOptions >> expirationMode [
+	^ expirationMode
+]
+
+{ #category : 'private' }
+RsSetOptions >> expirationMode: aSymbol value: anObject [
+	expirationMode := aSymbol.
+	expirationValue := anObject
+]
+
+{ #category : 'accessing' }
+RsSetOptions >> expirationValue [
+	^ expirationValue
 ]
 
 { #category : 'actions' }
 RsSetOptions >> expireAt: aDateAndTimeOrUnixSeconds [
-	self expiration: {
-		              'EXAT'.
-		              (self unixSecondsFrom: aDateAndTimeOrUnixSeconds) }
+	self expirationMode: #expireAt value: aDateAndTimeOrUnixSeconds
 ]
 
 { #category : 'actions' }
 RsSetOptions >> expireAtMilliseconds: aDateAndTimeOrUnixMilliseconds [
-	self expiration: {
-		              'PXAT'.
-		              (self unixMillisecondsFrom: aDateAndTimeOrUnixMilliseconds) }
+	self expirationMode: #expireAtMilliseconds value: aDateAndTimeOrUnixMilliseconds
 ]
 
 { #category : 'actions' }
 RsSetOptions >> expireIn: seconds [
-	self expiration: {
-		              'EX'.
-		              seconds }
+	self expirationMode: #expireIn value: seconds
 ]
 
 { #category : 'actions' }
 RsSetOptions >> expireInMilliseconds: milliseconds [
-	self expiration: {
-		              'PX'.
-		              milliseconds }
+	self expirationMode: #expireInMilliseconds value: milliseconds
 ]
 
 { #category : 'actions' }
@@ -93,45 +124,37 @@ RsSetOptions >> get [
 
 { #category : 'actions' }
 RsSetOptions >> ifAlreadyExists [
-	self condition: #( 'XX' )
+	self conditionMode: #ifAlreadyExists value: nil
 ]
 
 { #category : 'actions' }
 RsSetOptions >> ifDigestEqual: aDigestString [
-	self condition: {
-		             'IFDEQ'.
-		             aDigestString }
+	self conditionMode: #ifDigestEqual value: aDigestString
 ]
 
 { #category : 'actions' }
 RsSetOptions >> ifDigestNotEqual: aDigestString [
-	self condition: {
-		             'IFDNE'.
-		             aDigestString }
+	self conditionMode: #ifDigestNotEqual value: aDigestString
 ]
 
 { #category : 'actions' }
 RsSetOptions >> ifEqual: aValue [
-	self condition: {
-		             'IFEQ'.
-		             aValue }
+	self conditionMode: #ifEqual value: aValue
 ]
 
 { #category : 'actions' }
 RsSetOptions >> ifNotEqual: aValue [
-	self condition: {
-		             'IFNE'.
-		             aValue }
+	self conditionMode: #ifNotEqual value: aValue
 ]
 
 { #category : 'actions' }
 RsSetOptions >> ifNotExists [
-	self condition: #( 'NX' )
+	self conditionMode: #ifNotExists value: nil
 ]
 
 { #category : 'actions' }
 RsSetOptions >> keepTtl [
-	self expiration: #( 'KEEPTTL' )
+	self expirationMode: #keepTtl value: nil
 ]
 
 { #category : 'testing' }
@@ -146,8 +169,11 @@ RsSetOptions >> shouldGet: aBoolean [
 
 { #category : 'private' }
 RsSetOptions >> unixMillisecondsFrom: aDateAndTimeOrInteger [
+	"DateAndTime subtraction is offset-independent, so no UTC normalization is needed.
+	#asUnixTime is not used here because it truncates to whole seconds."
+
 	aDateAndTimeOrInteger isInteger ifTrue: [ ^ aDateAndTimeOrInteger ].
-	^ ((aDateAndTimeOrInteger offset: Duration zero) - DateAndTime unixEpoch) asMilliSeconds
+	^ (aDateAndTimeOrInteger - DateAndTime unixEpoch) asMilliSeconds
 ]
 
 { #category : 'private' }

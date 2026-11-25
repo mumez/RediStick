@@ -208,6 +208,7 @@ RsRedisEndpointTest >> testSetUsingIfAlreadyExists [
 { #category : 'tests' }
 RsRedisEndpointTest >> testSetUsingIfDigestEqual [
 	| key digest |
+	self skipUnlessRedisVersionAtLeast: #( 8 4 ).
 	key := 'testSetUsingIfDigestEqual'.
 	stick endpoint set: key value: 'first'.
 	digest := stick endpoint unifiedCommand: { 'DIGEST'. key }.
@@ -220,6 +221,7 @@ RsRedisEndpointTest >> testSetUsingIfDigestEqual [
 { #category : 'tests' }
 RsRedisEndpointTest >> testSetUsingIfDigestNotEqual [
 	| key digest |
+	self skipUnlessRedisVersionAtLeast: #( 8 4 ).
 	key := 'testSetUsingIfDigestNotEqual'.
 	stick endpoint set: key value: 'first'.
 	digest := stick endpoint unifiedCommand: { 'DIGEST'. key }.
@@ -232,6 +234,7 @@ RsRedisEndpointTest >> testSetUsingIfDigestNotEqual [
 { #category : 'tests' }
 RsRedisEndpointTest >> testSetUsingIfEqual [
 	| key |
+	self skipUnlessRedisVersionAtLeast: #( 8 4 ).
 	key := 'testSetUsingIfEqual'.
 	stick endpoint set: key value: 'first'.
 	self assert: (stick endpoint set: key value: 'second' using: [ :opts | opts ifEqual: 'other' ]) isNil.
@@ -243,6 +246,7 @@ RsRedisEndpointTest >> testSetUsingIfEqual [
 { #category : 'tests' }
 RsRedisEndpointTest >> testSetUsingIfNotEqual [
 	| key |
+	self skipUnlessRedisVersionAtLeast: #( 8 4 ).
 	key := 'testSetUsingIfNotEqual'.
 	stick endpoint set: key value: 'first'.
 	self assert: (stick endpoint set: key value: 'second' using: [ :opts | opts ifNotEqual: 'first' ]) isNil.

@@ -35,6 +35,40 @@ RsSetOptionsTest >> testConditionIsOverwritten [
 ]
 
 { #category : 'tests' }
+RsSetOptionsTest >> testConditionValueIsClearedWhenOverwritten [
+	| options |
+	options := RsSetOptions new.
+	options
+		ifEqual: 'old';
+		ifNotExists.
+	self assert: options asArray equals: #( 'NX' )
+]
+
+{ #category : 'tests' }
+RsSetOptionsTest >> testExpirationValueIsClearedWhenOverwritten [
+	| options |
+	options := RsSetOptions new.
+	options
+		expireAt: 1893423600;
+		keepTtl.
+	self assert: options asArray equals: #( 'KEEPTTL' )
+]
+
+{ #category : 'tests' }
+RsSetOptionsTest >> testSemanticState [
+	| options time |
+	time := DateAndTime now.
+	options := RsSetOptions new.
+	options
+		ifEqual: 'old';
+		expireAt: time.
+	self assert: options conditionMode equals: #ifEqual.
+	self assert: options conditionValue equals: 'old'.
+	self assert: options expirationMode equals: #expireAt.
+	self assert: options expirationValue equals: time
+]
+
+{ #category : 'tests' }
 RsSetOptionsTest >> testExpirationIsOverwritten [
 	| options |
 	options := RsSetOptions new.
