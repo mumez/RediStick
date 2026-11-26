@@ -280,6 +280,9 @@ RsRedisEndpoint >> getEx: aKey using: optionsBlock [
 	options := RsGetExOptions new.
 	optionsBlock value: options.
 	^ self getEx: aKey options: options
+]
+
+{ #category : 'commands-strings' }
 RsRedisEndpoint >> getDel: aKey [
 	"GETDEL: Return the value of aKey and delete the key. Answer nil if the key does not exist"
 

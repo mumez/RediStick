@@ -71,6 +71,9 @@ RsRedisEndpointTest >> testGetExUsingPersist [
 	stick endpoint set: key value: 'v' using: [ :opts | opts expireIn: 100 ].
 	self assert: (stick endpoint getEx: key using: [ :opts | opts persist ]) equals: 'v'.
 	self assert: (stick endpoint ttl: key) equals: -1
+]
+
+{ #category : 'tests' }
 RsRedisEndpointTest >> testGetDel [
 	stick endpoint set: 'testGetDel' value: 'hello'.
 	self assert: (stick endpoint getDel: 'testGetDel') equals: 'hello'.
