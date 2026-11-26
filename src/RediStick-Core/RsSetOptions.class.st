@@ -73,9 +73,9 @@ RsSetOptions >> commandName [
 ]
 
 { #category : 'private' }
-RsSetOptions >> customExpirationArgs [
+RsSetOptions >> expirationArgs [
 	self expirationMode = #keepTtl ifTrue: [ ^ #( 'KEEPTTL' ) ].
-	^ super customExpirationArgs
+	^ super expirationArgs
 ]
 
 { #category : 'actions' }

@@ -6,7 +6,7 @@ Responsibility:
   #expireIn: (EX), #expireInMilliseconds: (PX), #expireAt: (EXAT), #expireAtMilliseconds: (PXAT)
 - Hold the expiration as semantic state (mode + value); the last expiration message sent wins
 - Convert a DateAndTime to unix seconds/milliseconds for EXAT/PXAT (integers are passed through)
-- Build the expiration tokens in #expirationArgs; subclasses add their command-specific modes (e.g. KEEPTTL, PERSIST) by overriding #customExpirationArgs
+- Build the expiration tokens in #expirationArgs; subclasses add their command-specific modes (e.g. KEEPTTL, PERSIST) by overriding #expirationArgs and falling back to super; an unknown mode signals RsError invalidArguments
 - Subclasses answer their Redis command name in #commandName so error messages keep the command context
 
 Option combinations are not validated; Redis reports invalid ones.
@@ -25,14 +25,6 @@ Class {
 	#package : 'RediStick-Core'
 }
 
-{ #category : 'private' }
-RsExpirationOptions >> customExpirationArgs [
-	"Override in subclasses to handle command-specific expiration modes, calling super for unknown ones"
-
-	^ RsError invalidArguments signal:
-		  'Unknown ' , self commandName , ' expiration: ' , self expirationMode printString
-]
-
 { #category : 'accessing' }
 RsExpirationOptions >> commandName [
 	"Answer the Redis command name these options belong to, used in error messages"
@@ -49,7 +41,7 @@ RsExpirationOptions >> expirationArgs [
 		^ { 'EXAT'. (self unixSecondsFrom: self expirationValue) } ].
 	self expirationMode = #expireAtMilliseconds ifTrue: [
 		^ { 'PXAT'. (self unixMillisecondsFrom: self expirationValue) } ].
-	^ self customExpirationArgs
+	^ self signalInvalidExpirationMode
 ]
 
 { #category : 'accessing' }
@@ -86,6 +78,12 @@ RsExpirationOptions >> expireIn: seconds [
 { #category : 'actions' }
 RsExpirationOptions >> expireInMilliseconds: milliseconds [
 	self expirationMode: #expireInMilliseconds value: milliseconds
+]
+
+{ #category : 'private' }
+RsExpirationOptions >> signalInvalidExpirationMode [
+	^ RsError invalidArguments signal:
+		  'Unknown ' , self commandName , ' expiration: ' , self expirationMode printString
 ]
 
 { #category : 'private' }

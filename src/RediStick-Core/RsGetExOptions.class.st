@@ -33,9 +33,9 @@ RsGetExOptions >> commandName [
 ]
 
 { #category : 'private' }
-RsGetExOptions >> customExpirationArgs [
+RsGetExOptions >> expirationArgs [
 	self expirationMode = #persist ifTrue: [ ^ #( 'PERSIST' ) ].
-	^ super customExpirationArgs
+	^ super expirationArgs
 ]
 
 { #category : 'actions' }
