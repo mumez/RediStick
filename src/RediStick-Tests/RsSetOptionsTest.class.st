@@ -55,6 +55,26 @@ RsSetOptionsTest >> testExpirationValueIsClearedWhenOverwritten [
 ]
 
 { #category : 'tests' }
+RsSetOptionsTest >> testUnknownConditionModeSignalsInvalidArguments [
+	| options error |
+	options := RsSetOptions new.
+	options conditionMode: #unknown value: nil.
+	error := [ options asArray. nil ] on: RsError do: [ :ex | ex ].
+	self assert: error notNil.
+	self assert: error kind equals: #InvalidArguments
+]
+
+{ #category : 'tests' }
+RsSetOptionsTest >> testUnknownExpirationModeSignalsInvalidArguments [
+	| options error |
+	options := RsSetOptions new.
+	options expirationMode: #unknown value: nil.
+	error := [ options asArray. nil ] on: RsError do: [ :ex | ex ].
+	self assert: error notNil.
+	self assert: error kind equals: #InvalidArguments
+]
+
+{ #category : 'tests' }
 RsSetOptionsTest >> testSemanticState [
 	| options time |
 	time := DateAndTime now.

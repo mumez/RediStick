@@ -49,7 +49,7 @@ RsSetOptions >> conditionArgs [
 	self conditionMode = #ifNotEqual ifTrue: [ ^ { 'IFNE'. self conditionValue } ].
 	self conditionMode = #ifDigestEqual ifTrue: [ ^ { 'IFDEQ'. self conditionValue } ].
 	self conditionMode = #ifDigestNotEqual ifTrue: [ ^ { 'IFDNE'. self conditionValue } ].
-	^ RsError signal: 'Unknown SET condition: ' , self conditionMode printString
+	^ RsError invalidArguments signal: 'Unknown SET condition: ' , self conditionMode printString
 ]
 
 { #category : 'accessing' }
@@ -78,7 +78,7 @@ RsSetOptions >> expirationArgs [
 	self expirationMode = #expireAtMilliseconds ifTrue: [
 		^ { 'PXAT'. (self unixMillisecondsFrom: self expirationValue) } ].
 	self expirationMode = #keepTtl ifTrue: [ ^ #( 'KEEPTTL' ) ].
-	^ RsError signal: 'Unknown SET expiration: ' , self expirationMode printString
+	^ RsError invalidArguments signal: 'Unknown SET expiration: ' , self expirationMode printString
 ]
 
 { #category : 'accessing' }
