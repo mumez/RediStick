@@ -7,6 +7,7 @@ Responsibility:
   - #get (GET) to return the old value
   - Expiration: #expireIn: (EX), #expireInMilliseconds: (PX), #expireAt: (EXAT), #expireAtMilliseconds: (PXAT), #keepTtl (KEEPTTL)
 - Hold the options as semantic state (condition mode + value, expiration mode + value) and build the SET command tokens in #asArray
+- The common expiration options are inherited from RsExpirationOptions; #keepTtl is SET-specific
 
 Within each group (condition / expiration), the last message sent wins. Option combinations are not validated; Redis reports invalid ones.
 
@@ -18,13 +19,11 @@ Example:
 "
 Class {
 	#name : 'RsSetOptions',
-	#superclass : 'Object',
+	#superclass : 'RsExpirationOptions',
 	#instVars : [
 		'conditionMode',
 		'conditionValue',
-		'shouldGet',
-		'expirationMode',
-		'expirationValue'
+		'shouldGet'
 	],
 	#category : 'RediStick-Core',
 	#package : 'RediStick-Core'
@@ -68,53 +67,15 @@ RsSetOptions >> conditionValue [
 	^ conditionValue
 ]
 
+{ #category : 'accessing' }
+RsSetOptions >> commandName [
+	^ 'SET'
+]
+
 { #category : 'private' }
 RsSetOptions >> expirationArgs [
-	self expirationMode ifNil: [ ^ #(  ) ].
-	self expirationMode = #expireIn ifTrue: [ ^ { 'EX'. self expirationValue } ].
-	self expirationMode = #expireInMilliseconds ifTrue: [ ^ { 'PX'. self expirationValue } ].
-	self expirationMode = #expireAt ifTrue: [
-		^ { 'EXAT'. (self unixSecondsFrom: self expirationValue) } ].
-	self expirationMode = #expireAtMilliseconds ifTrue: [
-		^ { 'PXAT'. (self unixMillisecondsFrom: self expirationValue) } ].
 	self expirationMode = #keepTtl ifTrue: [ ^ #( 'KEEPTTL' ) ].
-	^ RsError invalidArguments signal: 'Unknown SET expiration: ' , self expirationMode printString
-]
-
-{ #category : 'accessing' }
-RsSetOptions >> expirationMode [
-	^ expirationMode
-]
-
-{ #category : 'private' }
-RsSetOptions >> expirationMode: aSymbol value: anObject [
-	expirationMode := aSymbol.
-	expirationValue := anObject
-]
-
-{ #category : 'accessing' }
-RsSetOptions >> expirationValue [
-	^ expirationValue
-]
-
-{ #category : 'actions' }
-RsSetOptions >> expireAt: aDateAndTimeOrUnixSeconds [
-	self expirationMode: #expireAt value: aDateAndTimeOrUnixSeconds
-]
-
-{ #category : 'actions' }
-RsSetOptions >> expireAtMilliseconds: aDateAndTimeOrUnixMilliseconds [
-	self expirationMode: #expireAtMilliseconds value: aDateAndTimeOrUnixMilliseconds
-]
-
-{ #category : 'actions' }
-RsSetOptions >> expireIn: seconds [
-	self expirationMode: #expireIn value: seconds
-]
-
-{ #category : 'actions' }
-RsSetOptions >> expireInMilliseconds: milliseconds [
-	self expirationMode: #expireInMilliseconds value: milliseconds
+	^ super expirationArgs
 ]
 
 { #category : 'actions' }
@@ -165,19 +126,4 @@ RsSetOptions >> shouldGet [
 { #category : 'accessing' }
 RsSetOptions >> shouldGet: aBoolean [
 	shouldGet := aBoolean
-]
-
-{ #category : 'private' }
-RsSetOptions >> unixMillisecondsFrom: aDateAndTimeOrInteger [
-	"DateAndTime subtraction is offset-independent, so no UTC normalization is needed.
-	#asUnixTime is not used here because it truncates to whole seconds."
-
-	aDateAndTimeOrInteger isInteger ifTrue: [ ^ aDateAndTimeOrInteger ].
-	^ (aDateAndTimeOrInteger - DateAndTime unixEpoch) asMilliSeconds
-]
-
-{ #category : 'private' }
-RsSetOptions >> unixSecondsFrom: aDateAndTimeOrInteger [
-	aDateAndTimeOrInteger isInteger ifTrue: [ ^ aDateAndTimeOrInteger ].
-	^ aDateAndTimeOrInteger asUnixTime
 ]

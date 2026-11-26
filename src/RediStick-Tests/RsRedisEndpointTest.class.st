@@ -6,6 +6,74 @@ Class {
 }
 
 { #category : 'tests' }
+RsRedisEndpointTest >> testGetExOptionsNil [
+	| key |
+	key := 'testGetExOptionsNil'.
+	stick endpoint set: key value: 'v' using: [ :opts | opts expireIn: 100 ].
+	self assert: (stick endpoint getEx: key options: nil) equals: 'v'.
+	self assert: ((stick endpoint ttl: key) between: 80 and: 100)
+]
+
+{ #category : 'tests' }
+RsRedisEndpointTest >> testGetExUsingExpireAt [
+	| key |
+	key := 'testGetExUsingExpireAt'.
+	stick endpoint set: key value: 'v'.
+	self
+		assert: (stick endpoint getEx: key using: [ :opts | opts expireAt: DateAndTime now + 100 seconds ])
+		equals: 'v'.
+	self assert: ((stick endpoint ttl: key) between: 80 and: 100)
+]
+
+{ #category : 'tests' }
+RsRedisEndpointTest >> testGetExUsingExpireAtMilliseconds [
+	| key |
+	key := 'testGetExUsingExpireAtMilliseconds'.
+	stick endpoint set: key value: 'v'.
+	self
+		assert: (stick endpoint getEx: key using: [ :opts |
+				 opts expireAtMilliseconds: DateAndTime now + 100 seconds ])
+		equals: 'v'.
+	self assert: ((stick endpoint pttl: key) between: 80000 and: 100000)
+]
+
+{ #category : 'tests' }
+RsRedisEndpointTest >> testGetExUsingExpireIn [
+	| key |
+	key := 'testGetExUsingExpireIn'.
+	stick endpoint set: key value: 'v'.
+	self assert: (stick endpoint ttl: key) equals: -1.
+	self assert: (stick endpoint getEx: key using: [ :opts | opts expireIn: 60 ]) equals: 'v'.
+	self assert: ((stick endpoint ttl: key) between: 40 and: 60)
+]
+
+{ #category : 'tests' }
+RsRedisEndpointTest >> testGetExUsingExpireInMilliseconds [
+	| key |
+	key := 'testGetExUsingExpireInMilliseconds'.
+	stick endpoint set: key value: 'v'.
+	self
+		assert: (stick endpoint getEx: key using: [ :opts | opts expireInMilliseconds: 100000 ])
+		equals: 'v'.
+	self assert: ((stick endpoint pttl: key) between: 80000 and: 100000)
+]
+
+{ #category : 'tests' }
+RsRedisEndpointTest >> testGetExUsingMissingKey [
+	self assert: (stick endpoint getEx: 'testGetExUsingMissingKey' using: [ :opts | opts expireIn: 60 ]) isNil.
+	self assert: (stick endpoint ttl: 'testGetExUsingMissingKey') equals: -2
+]
+
+{ #category : 'tests' }
+RsRedisEndpointTest >> testGetExUsingPersist [
+	| key |
+	key := 'testGetExUsingPersist'.
+	stick endpoint set: key value: 'v' using: [ :opts | opts expireIn: 100 ].
+	self assert: (stick endpoint getEx: key using: [ :opts | opts persist ]) equals: 'v'.
+	self assert: (stick endpoint ttl: key) equals: -1
+]
+
+{ #category : 'tests' }
 RsRedisEndpointTest >> testGetDel [
 	stick endpoint set: 'testGetDel' value: 'hello'.
 	self assert: (stick endpoint getDel: 'testGetDel') equals: 'hello'.
