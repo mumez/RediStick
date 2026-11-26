@@ -149,6 +149,150 @@ RsRedisEndpointTest >> testSetAndGet [
 ]
 
 { #category : 'tests' }
+RsRedisEndpointTest >> testSetUsingExpireAt [
+	| ttl |
+	stick endpoint set: 'testSetUsingExpireAt' value: 'v' using: [ :opts |
+		opts expireAt: DateAndTime now + 100 seconds ].
+	ttl := stick endpoint ttl: 'testSetUsingExpireAt'.
+	self assert: (ttl between: 90 and: 100)
+]
+
+{ #category : 'tests' }
+RsRedisEndpointTest >> testSetUsingExpireAtMilliseconds [
+	| pttl |
+	stick endpoint set: 'testSetUsingExpireAtMilliseconds' value: 'v' using: [ :opts |
+		opts expireAtMilliseconds: DateAndTime now + 100 seconds ].
+	pttl := stick endpoint pttl: 'testSetUsingExpireAtMilliseconds'.
+	self assert: (pttl between: 90000 and: 100000)
+]
+
+{ #category : 'tests' }
+RsRedisEndpointTest >> testSetUsingExpireIn [
+	| ttl |
+	self
+		assert: (stick endpoint set: 'testSetUsingExpireIn' value: 'v' using: [ :opts | opts expireIn: 100 ])
+		equals: 'OK'.
+	ttl := stick endpoint ttl: 'testSetUsingExpireIn'.
+	self assert: (ttl between: 90 and: 100)
+]
+
+{ #category : 'tests' }
+RsRedisEndpointTest >> testSetUsingExpireInMilliseconds [
+	| pttl |
+	stick endpoint set: 'testSetUsingExpireInMilliseconds' value: 'v' using: [ :opts |
+		opts expireInMilliseconds: 100000 ].
+	pttl := stick endpoint pttl: 'testSetUsingExpireInMilliseconds'.
+	self assert: (pttl between: 90000 and: 100000)
+]
+
+{ #category : 'tests' }
+RsRedisEndpointTest >> testSetUsingGet [
+	| key |
+	key := 'testSetUsingGet'.
+	self assert: (stick endpoint set: key value: 'first' using: [ :opts | opts get ]) isNil.
+	self assert: (stick endpoint set: key value: 'second' using: [ :opts | opts get ]) equals: 'first'.
+	self assert: (stick endpoint get: key) equals: 'second'
+]
+
+{ #category : 'tests' }
+RsRedisEndpointTest >> testSetUsingIfAlreadyExists [
+	| key |
+	key := 'testSetUsingIfAlreadyExists'.
+	self assert: (stick endpoint set: key value: 'first' using: [ :opts | opts ifAlreadyExists ]) isNil.
+	self assert: (stick endpoint get: key) isNil.
+	stick endpoint set: key value: 'first'.
+	self assert: (stick endpoint set: key value: 'second' using: [ :opts | opts ifAlreadyExists ]) equals: 'OK'.
+	self assert: (stick endpoint get: key) equals: 'second'
+]
+
+{ #category : 'tests' }
+RsRedisEndpointTest >> testSetUsingIfDigestEqual [
+	| key digest |
+	self skipUnlessRedisVersionAtLeast: #( 8 4 ).
+	key := 'testSetUsingIfDigestEqual'.
+	stick endpoint set: key value: 'first'.
+	digest := stick endpoint unifiedCommand: { 'DIGEST'. key }.
+	self assert: (stick endpoint set: key value: 'second' using: [ :opts | opts ifDigestEqual: '0000000000000000' ]) isNil.
+	self assert: (stick endpoint get: key) equals: 'first'.
+	self assert: (stick endpoint set: key value: 'second' using: [ :opts | opts ifDigestEqual: digest ]) equals: 'OK'.
+	self assert: (stick endpoint get: key) equals: 'second'
+]
+
+{ #category : 'tests' }
+RsRedisEndpointTest >> testSetUsingIfDigestNotEqual [
+	| key digest |
+	self skipUnlessRedisVersionAtLeast: #( 8 4 ).
+	key := 'testSetUsingIfDigestNotEqual'.
+	stick endpoint set: key value: 'first'.
+	digest := stick endpoint unifiedCommand: { 'DIGEST'. key }.
+	self assert: (stick endpoint set: key value: 'second' using: [ :opts | opts ifDigestNotEqual: digest ]) isNil.
+	self assert: (stick endpoint get: key) equals: 'first'.
+	self assert: (stick endpoint set: key value: 'second' using: [ :opts | opts ifDigestNotEqual: '0000000000000000' ]) equals: 'OK'.
+	self assert: (stick endpoint get: key) equals: 'second'
+]
+
+{ #category : 'tests' }
+RsRedisEndpointTest >> testSetUsingIfEqual [
+	| key |
+	self skipUnlessRedisVersionAtLeast: #( 8 4 ).
+	key := 'testSetUsingIfEqual'.
+	stick endpoint set: key value: 'first'.
+	self assert: (stick endpoint set: key value: 'second' using: [ :opts | opts ifEqual: 'other' ]) isNil.
+	self assert: (stick endpoint get: key) equals: 'first'.
+	self assert: (stick endpoint set: key value: 'second' using: [ :opts | opts ifEqual: 'first' ]) equals: 'OK'.
+	self assert: (stick endpoint get: key) equals: 'second'
+]
+
+{ #category : 'tests' }
+RsRedisEndpointTest >> testSetUsingIfNotEqual [
+	| key |
+	self skipUnlessRedisVersionAtLeast: #( 8 4 ).
+	key := 'testSetUsingIfNotEqual'.
+	stick endpoint set: key value: 'first'.
+	self assert: (stick endpoint set: key value: 'second' using: [ :opts | opts ifNotEqual: 'first' ]) isNil.
+	self assert: (stick endpoint get: key) equals: 'first'.
+	self assert: (stick endpoint set: key value: 'second' using: [ :opts | opts ifNotEqual: 'other' ]) equals: 'OK'.
+	self assert: (stick endpoint get: key) equals: 'second'
+]
+
+{ #category : 'tests' }
+RsRedisEndpointTest >> testSetUsingIfNotExists [
+	| key |
+	key := 'testSetUsingIfNotExists'.
+	self assert: (stick endpoint set: key value: 'first' using: [ :opts | opts ifNotExists ]) equals: 'OK'.
+	self assert: (stick endpoint set: key value: 'second' using: [ :opts | opts ifNotExists ]) isNil.
+	self assert: (stick endpoint get: key) equals: 'first'
+]
+
+{ #category : 'tests' }
+RsRedisEndpointTest >> testSetUsingIssueExample [
+	| key |
+	key := 'testSetUsingIssueExample'.
+	self
+		assert: (stick endpoint set: key value: 123 using: [ :opts | opts ifNotExists; get; expireIn: 1000 ])
+		equals: nil.
+	self assert: (stick endpoint get: key) equals: '123'.
+	self assert: ((stick endpoint ttl: key) between: 990 and: 1000)
+]
+
+{ #category : 'tests' }
+RsRedisEndpointTest >> testSetUsingKeepTtl [
+	| key ttl |
+	key := 'testSetUsingKeepTtl'.
+	stick endpoint set: key value: 'first' using: [ :opts | opts expireIn: 100 ].
+	stick endpoint set: key value: 'second' using: [ :opts | opts keepTtl ].
+	ttl := stick endpoint ttl: key.
+	self assert: (ttl between: 90 and: 100).
+	self assert: (stick endpoint get: key) equals: 'second'
+]
+
+{ #category : 'tests' }
+RsRedisEndpointTest >> testSetWithNilOptions [
+	self assert: (stick endpoint set: 'testSetWithNilOptions' value: 'v' options: nil) equals: 'OK'.
+	self assert: (stick endpoint get: 'testSetWithNilOptions') equals: 'v'
+]
+
+{ #category : 'tests' }
 RsRedisEndpointTest >> testShouldUseRawBytesDefaultsToFalse [
 	self deny: stick endpoint shouldUseRawBytes
 ]
