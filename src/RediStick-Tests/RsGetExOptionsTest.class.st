@@ -70,6 +70,17 @@ RsGetExOptionsTest >> testAsArrayWithPersist [
 ]
 
 { #category : 'tests' }
+RsGetExOptionsTest >> testUnknownExpirationModeSignalsInvalidArguments [
+	| options error |
+	options := RsGetExOptions new.
+	options expirationMode: #unknown value: nil.
+	error := [ options asArray. nil ] on: RsError do: [ :ex | ex ].
+	self assert: error notNil.
+	self assert: error kind equals: #InvalidArguments.
+	self assert: error messageText equals: 'Unknown GETEX expiration: #unknown'
+]
+
+{ #category : 'tests' }
 RsGetExOptionsTest >> testExpirationIsOverwritten [
 	| options |
 	options := RsGetExOptions new.

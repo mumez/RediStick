@@ -27,6 +27,11 @@ RsGetExOptions >> asArray [
 	^ self expirationArgs asArray
 ]
 
+{ #category : 'accessing' }
+RsGetExOptions >> commandName [
+	^ 'GETEX'
+]
+
 { #category : 'private' }
 RsGetExOptions >> customExpirationArgs [
 	self expirationMode = #persist ifTrue: [ ^ #( 'PERSIST' ) ].

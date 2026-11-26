@@ -67,6 +67,11 @@ RsSetOptions >> conditionValue [
 	^ conditionValue
 ]
 
+{ #category : 'accessing' }
+RsSetOptions >> commandName [
+	^ 'SET'
+]
+
 { #category : 'private' }
 RsSetOptions >> customExpirationArgs [
 	self expirationMode = #keepTtl ifTrue: [ ^ #( 'KEEPTTL' ) ].

@@ -7,6 +7,7 @@ Responsibility:
 - Hold the expiration as semantic state (mode + value); the last expiration message sent wins
 - Convert a DateAndTime to unix seconds/milliseconds for EXAT/PXAT (integers are passed through)
 - Build the expiration tokens in #expirationArgs; subclasses add their command-specific modes (e.g. KEEPTTL, PERSIST) by overriding #customExpirationArgs
+- Subclasses answer their Redis command name in #commandName so error messages keep the command context
 
 Option combinations are not validated; Redis reports invalid ones.
 
@@ -28,7 +29,15 @@ Class {
 RsExpirationOptions >> customExpirationArgs [
 	"Override in subclasses to handle command-specific expiration modes, calling super for unknown ones"
 
-	^ RsError invalidArguments signal: 'Unknown expiration: ' , self expirationMode printString
+	^ RsError invalidArguments signal:
+		  'Unknown ' , self commandName , ' expiration: ' , self expirationMode printString
+]
+
+{ #category : 'accessing' }
+RsExpirationOptions >> commandName [
+	"Answer the Redis command name these options belong to, used in error messages"
+
+	^ self subclassResponsibility
 ]
 
 { #category : 'private' }
