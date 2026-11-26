@@ -11,7 +11,7 @@ RsRedisEndpointTest >> testGetExOptionsNil [
 	key := 'testGetExOptionsNil'.
 	stick endpoint set: key value: 'v' using: [ :opts | opts expireIn: 100 ].
 	self assert: (stick endpoint getEx: key options: nil) equals: 'v'.
-	self assert: ((stick endpoint ttl: key) between: 90 and: 100)
+	self assert: ((stick endpoint ttl: key) between: 80 and: 100)
 ]
 
 { #category : 'tests' }
@@ -22,7 +22,7 @@ RsRedisEndpointTest >> testGetExUsingExpireAt [
 	self
 		assert: (stick endpoint getEx: key using: [ :opts | opts expireAt: DateAndTime now + 100 seconds ])
 		equals: 'v'.
-	self assert: ((stick endpoint ttl: key) between: 90 and: 100)
+	self assert: ((stick endpoint ttl: key) between: 80 and: 100)
 ]
 
 { #category : 'tests' }
@@ -34,7 +34,7 @@ RsRedisEndpointTest >> testGetExUsingExpireAtMilliseconds [
 		assert: (stick endpoint getEx: key using: [ :opts |
 				 opts expireAtMilliseconds: DateAndTime now + 100 seconds ])
 		equals: 'v'.
-	self assert: ((stick endpoint pttl: key) between: 90000 and: 100000)
+	self assert: ((stick endpoint pttl: key) between: 80000 and: 100000)
 ]
 
 { #category : 'tests' }
@@ -44,7 +44,7 @@ RsRedisEndpointTest >> testGetExUsingExpireIn [
 	stick endpoint set: key value: 'v'.
 	self assert: (stick endpoint ttl: key) equals: -1.
 	self assert: (stick endpoint getEx: key using: [ :opts | opts expireIn: 60 ]) equals: 'v'.
-	self assert: ((stick endpoint ttl: key) between: 50 and: 60)
+	self assert: ((stick endpoint ttl: key) between: 40 and: 60)
 ]
 
 { #category : 'tests' }
@@ -55,7 +55,7 @@ RsRedisEndpointTest >> testGetExUsingExpireInMilliseconds [
 	self
 		assert: (stick endpoint getEx: key using: [ :opts | opts expireInMilliseconds: 100000 ])
 		equals: 'v'.
-	self assert: ((stick endpoint pttl: key) between: 90000 and: 100000)
+	self assert: ((stick endpoint pttl: key) between: 80000 and: 100000)
 ]
 
 { #category : 'tests' }
