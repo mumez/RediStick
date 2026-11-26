@@ -7,3 +7,7 @@ CLAUDE.local.md
 # smalltalkCI test result output (e.g. Pharo64-13.xml)
 Pharo64-*.xml
 Pharo32-*.xml
+
+# PDS
+pds.json
+dev-spaces/
