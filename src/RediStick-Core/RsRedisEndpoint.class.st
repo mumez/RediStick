@@ -259,6 +259,30 @@ RsRedisEndpoint >> get: aKey [
 ]
 
 { #category : 'commands-strings' }
+RsRedisEndpoint >> getEx: aKey options: getExOptions [
+	"getExOptions is an RsGetExOptions or nil (sends a plain GETEX).
+	Returns the value of aKey, or nil when the key does not exist"
+
+	| args |
+	args := {
+		        'GETEX'.
+		        aKey }.
+	getExOptions ifNotNil: [ args := args , getExOptions asArray ].
+	^ self unifiedCommand: args
+]
+
+{ #category : 'commands-strings' }
+RsRedisEndpoint >> getEx: aKey using: optionsBlock [
+	"optionsBlock receives an RsGetExOptions to configure, e.g.
+	[ :opts | opts expireIn: 60 ]"
+
+	| options |
+	options := RsGetExOptions new.
+	optionsBlock value: options.
+	^ self getEx: aKey options: options
+]
+
+{ #category : 'commands-strings' }
 RsRedisEndpoint >> getSet: aKey value: aValue [
 	^ self
 		unifiedCommand:
