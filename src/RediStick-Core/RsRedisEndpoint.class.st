@@ -271,7 +271,8 @@ RsRedisEndpoint >> getDel: aKey [
 RsRedisEndpoint >> getRange: aKey start: startIndex end: endIndex [
 	"GETRANGE: Answer the substring of the value of aKey between startIndex and endIndex (both inclusive, 0-based; negative indexes count from the end).
 	Answer an empty string if the key does not exist or the range is out of bounds.
-	Note that offsets are in bytes, so multi-byte characters may be cut in the middle. Use #useRawBytesWhile: to get the raw bytes if needed"
+	Note that offsets are in bytes, so multi-byte characters may be cut in the middle. In that case the reply cannot be decoded as UTF-8 and nil is answered (not an empty string).
+	Use #useRawBytesWhile: to get the raw bytes if needed"
 
 	^ self unifiedCommand: {
 			  'GETRANGE'.

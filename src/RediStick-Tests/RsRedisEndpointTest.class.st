@@ -26,6 +26,21 @@ RsRedisEndpointTest >> testGetRange [
 ]
 
 { #category : 'tests' }
+RsRedisEndpointTest >> testGetRangeMultiByte [
+	"Offsets are in bytes; 'あいうえお' is 3 bytes per character"
+
+	stick endpoint set: 'testGetRangeMultiByte' value: 'あいうえお'.
+	self assert: (stick endpoint getRange: 'testGetRangeMultiByte' start: 3 end: 5) equals: 'い'.
+	self assert: (stick endpoint getRange: 'testGetRangeMultiByte' start: -3 end: -1) equals: 'お'.
+	self assert: (stick endpoint getRange: 'testGetRangeMultiByte' start: 0 end: 1) isNil.
+	self assert: (stick endpoint getRange: 'testGetRangeMultiByte' start: 0 end: 4) isNil.
+	self
+		assert: (stick endpoint useRawBytesWhile: [
+				 stick endpoint getRange: 'testGetRangeMultiByte' start: 0 end: 1 ])
+		equals: #[ 227 129 ]
+]
+
+{ #category : 'tests' }
 RsRedisEndpointTest >> testHSet [
 	| value |
 	value := self newDateAndTimeValue.
