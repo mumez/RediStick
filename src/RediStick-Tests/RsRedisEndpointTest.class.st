@@ -6,6 +6,41 @@ Class {
 }
 
 { #category : 'tests' }
+RsRedisEndpointTest >> testGetDel [
+	stick endpoint set: 'testGetDel' value: 'hello'.
+	self assert: (stick endpoint getDel: 'testGetDel') equals: 'hello'.
+	self assert: (stick endpoint get: 'testGetDel') isNil.
+	self assert: (stick endpoint getDel: 'testGetDel') isNil.
+	self assert: (stick endpoint getDel: 'testGetDelMissing') isNil
+]
+
+{ #category : 'tests' }
+RsRedisEndpointTest >> testGetRange [
+	stick endpoint set: 'testGetRange' value: 'This is a string'.
+	self assert: (stick endpoint getRange: 'testGetRange' start: 0 end: 3) equals: 'This'.
+	self assert: (stick endpoint getRange: 'testGetRange' start: -3 end: -1) equals: 'ing'.
+	self assert: (stick endpoint getRange: 'testGetRange' start: 0 end: -1) equals: 'This is a string'.
+	self assert: (stick endpoint getRange: 'testGetRange' start: 10 end: 100) equals: 'string'.
+	self assert: (stick endpoint getRange: 'testGetRange' start: 100 end: 200) equals: ''.
+	self assert: (stick endpoint getRange: 'testGetRangeMissing' start: 0 end: 3) equals: ''
+]
+
+{ #category : 'tests' }
+RsRedisEndpointTest >> testGetRangeMultiByte [
+	"Offsets are in bytes; 'あいうえお' is 3 bytes per character"
+
+	stick endpoint set: 'testGetRangeMultiByte' value: 'あいうえお'.
+	self assert: (stick endpoint getRange: 'testGetRangeMultiByte' start: 3 end: 5) equals: 'い'.
+	self assert: (stick endpoint getRange: 'testGetRangeMultiByte' start: -3 end: -1) equals: 'お'.
+	self assert: (stick endpoint getRange: 'testGetRangeMultiByte' start: 0 end: 1) isNil.
+	self assert: (stick endpoint getRange: 'testGetRangeMultiByte' start: 0 end: 4) isNil.
+	self
+		assert: (stick endpoint useRawBytesWhile: [
+				 stick endpoint getRange: 'testGetRangeMultiByte' start: 0 end: 1 ])
+		equals: #[ 227 129 ]
+]
+
+{ #category : 'tests' }
 RsRedisEndpointTest >> testHSet [
 	| value |
 	value := self newDateAndTimeValue.

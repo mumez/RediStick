@@ -259,6 +259,29 @@ RsRedisEndpoint >> get: aKey [
 ]
 
 { #category : 'commands-strings' }
+RsRedisEndpoint >> getDel: aKey [
+	"GETDEL: Return the value of aKey and delete the key. Answer nil if the key does not exist"
+
+	^ self unifiedCommand: {
+			  'GETDEL'.
+			  aKey }
+]
+
+{ #category : 'commands-strings' }
+RsRedisEndpoint >> getRange: aKey start: startIndex end: endIndex [
+	"GETRANGE: Answer the substring of the value of aKey between startIndex and endIndex (both inclusive, 0-based; negative indexes count from the end).
+	Answer an empty string if the key does not exist or the range is out of bounds.
+	Note that offsets are in bytes, so multi-byte characters may be cut in the middle. In that case the reply cannot be decoded as UTF-8 and nil is answered (not an empty string).
+	Use #useRawBytesWhile: to get the raw bytes if needed"
+
+	^ self unifiedCommand: {
+			  'GETRANGE'.
+			  aKey.
+			  startIndex.
+			  endIndex }
+]
+
+{ #category : 'commands-strings' }
 RsRedisEndpoint >> getSet: aKey value: aValue [
 	^ self
 		unifiedCommand:
